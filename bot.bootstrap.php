@@ -39,7 +39,9 @@ foreach (glob('./implementations/*.php') as $file)
 $discord->on('ready', function ($self) use ($discord) {
     echo "Bot is ready!", PHP_EOL;
 
-    // Listen for messages.
+    /*
+     * Listen to EVERY message. Even itself.
+     */
     $self->on('message', function ($in) use ($self, $discord) {
         /*
          * If the bot is talking, don't reference it.
