@@ -8,8 +8,6 @@ class Test extends \Commands\Command
     {
         $this->command = "test";
         $this->description = "test command lol";
-
-        echo 1;
     }
 
 }
