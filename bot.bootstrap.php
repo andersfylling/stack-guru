@@ -36,12 +36,12 @@ foreach (glob('./implementations/*.php') as $file)
     }
 }
 
-$discord->on('ready', function ($this) use ($discord) {
+$discord->on('ready', function ($self) use ($discord) {
     echo "Bot is ready!", PHP_EOL;
 
     // Listen for messages.
-    $this->on('message', function ($in) use ($this, $discord) {
-        if ($in->author->id == $this->id) {
+    $self->on('message', function ($in) use ($self, $discord) {
+        if ($in->author->id == $self->id) {
             return;
         }
 
@@ -50,6 +50,8 @@ $discord->on('ready', function ($this) use ($discord) {
             $discord->close();
             return;
         }
+
+
 
         echo "Something was written.\n";
     });
