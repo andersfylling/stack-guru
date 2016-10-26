@@ -11,6 +11,9 @@ $config = [
 
 $discord = new Discord($config);
 
+$commands = [
+    // "command" => ["class", "description"]
+];
 
 
 /**
@@ -28,20 +31,27 @@ foreach (glob('./implementations/*.php') as $file)
     if (class_exists($class))
     {
         $obj = new $class;
+
+        $commands[$obj->getCommand()] = [$class, $obj->getDescription()];
     }
 }
 
-
-$discord->on('ready', function ($discord) {
+$discord->on('ready', function ($this) use ($discord) {
     echo "Bot is ready!", PHP_EOL;
 
     // Listen for messages.
-    $discord->on('message', function ($in, $discord) {
+    $this->on('message', function ($in) use ($this, $discord) {
+        if ($in->author->id == $this->id) {
+            return;
+        }
 
-        //var_dump($in);
+        if ($in->content == "@_stack-guru shutdown") {
+            $in->reply("Shutting down..");
+            $discord->close();
+            return;
+        }
+
         echo "Something was written.\n";
-
-        //$in->reply("YAY!");
     });
 });
 
