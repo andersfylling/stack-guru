@@ -1,0 +1,26 @@
+{
+    "name": "react/datagram",
+    "description": "UDP datagram socket client and server for reactphp",
+    "keywords": ["udp", "datagram", "dgram", "socket", "client", "server", "react", "async"],
+    "homepage": "https://github.com/reactphp/datagram",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Christian Lück",
+            "email": "christian@lueck.tv"
+        }
+    ],
+    "autoload": {
+        "psr-4": {"React\\Datagram\\": "src"}
+    },
+    "require": {
+        "php": ">=5.3",
+        "evenement/evenement": "~1.0|~2.0",
+        "react/event-loop": ">=0.2, <0.5",
+        "react/dns": ">=0.2, <0.5",
+        "react/promise": "~2.1|~1.2"
+    },
+    "require-dev": {
+        "clue/block-react": "~1.0"
+    }
+}
