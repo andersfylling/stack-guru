@@ -2,8 +2,11 @@
 
 require __DIR__.'/vendor/autoload.php';
 require "./Command.php";
+require "./Bootstrapper.php";
 
 use Discord\Discord;
+
+echo "> Configuring bot..", PHP_EOL;
 
 $config = [
     'token' => 'MjQwNjIwNjA3MDM1ODAxNjA3.CvF-7A.ugfb5OgkbalSMXOwUm3lcA-EUu4',
@@ -11,38 +14,23 @@ $config = [
 
 $discord = new Discord($config);
 
-$commands = [
-    // "command" => ["class", "description"]
-];
-
-
-/**
- * Bootstrap Command class.
- */
-
-foreach (glob('./implementations/*.php') as $file)
-{
-    require_once $file;
-
-    // get the file name of the current file without the extension
-    // which is essentially the class name
-    $class = "\\Commands\\" . basename($file, '.php');
-
-    if (class_exists($class))
-    {
-        $obj = new $class;
-
-        $commands[$obj->getCommand()] = [$class, $obj->getDescription()];
-    }
-}
 
 $discord->on('ready', function ($self) use ($discord) {
-    echo "Bot is ready!", PHP_EOL;
+    echo "DONE!", PHP_EOL, PHP_EOL;
+
+    /*
+     * Retrieve commands available
+     */
+    $bootstrapper = new \CoreLogic\Bootstrapper("implementations");
+    $bootstrapper->linkCommands();
+    $commands = $bootstrapper->getCommands(); //add linked commands
+    echo "DONE!", PHP_EOL, PHP_EOL;
 
     /*
      * Listen to EVERY message. Even itself.
      */
-    $self->on('message', function ($in) use ($self, $discord) {
+    echo "> Bot is now listening.", PHP_EOL, PHP_EOL;
+    $self->on('message', function ($in) use ($self, $discord, $commands) {
         /*
          * If the bot is talking, don't reference it.
          */
@@ -70,40 +58,57 @@ $discord->on('ready', function ($self) use ($discord) {
          *
          * eg.
          *  <@dfksj...> command arg1 arg2 arg3 arg4
-         *
-         * I need to extract the command, and the arguments.
-         * We could create a rule that equals:
-         * @stack-guru COMMAND <arg> <arg2> ... <argX>
-         *
-         * then a simple extraction would do it.
-         *
-         * store the command in a variable for later use and the arguments in an array.
          */
+        $bot_command    = "";
+        $bot_args       = [];
         {
+            $in->content = str_replace("<@" . $self->id . "> ", "", $in->content); // removes the mention of bot
 
+            $words      = explode(" ", $in->content);
+            $command    = $words[0];
+
+            if (array_key_exists($command, $commands) || $command == "help") {
+                $bot_command    = $command;
+                $bot_args       = array_map('strtolower', array_slice($words, 1) );
+            }
+            else {
+                $in->reply("I'm sorry. It seem I cannot find your command. Please try the command: help");
+                return;
+            }
         }
 
-
         /*
-         * temporary
+         * For help
          */
-        if ($in->content == "shutdown") {
-            $in->reply("Shutting down..");
-            $discord->close();
+        if ($bot_command == "help") {
+            $msg = "Here's my list of commands you can use. Hope it helps!\n\n";
+
+            foreach ($commands as $key => $value) {
+                $msg .= "\t{$key}:\t{$value[1]}\n"; //$value[0] = classname, $value[1] = class description
+            }
+
+            $in->reply($msg);
             return;
         }
 
         /*
-         * Just feedback
+         * Initiate command
          */
-        $in->reply("copy that\n");
+        $classname = $commands[$bot_command][0];
+        $instance = new $classname;
 
+        //if the class wants it can now use the $discord instance. must be override parent class Command!
+        $instance->discordRelated(function () use ($discord) {
+            return $discord;
+        });
 
-        /*
-         * log it
-         */
-        echo $in->id,": ",$self->id,": ",$in->content,"\n";
+        $instance->command($bot_args, $in, $self); // don't pass command as this exist in the class as const.
     });
+});
+
+$discord->on('closed', function () {
+    echo "Shutting down!", PHP_EOL;
+    exit();
 });
 
 $discord->run();

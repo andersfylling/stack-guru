@@ -12,30 +12,30 @@ namespace Commands;
 class Command
 {
 
-    protected $command;
-    protected $description;
+    public static $description = "undefined description huh?";
+
+    protected $discord = NULL;
 
 
-
-    function __construct()
+    public function getDescription ()
     {
-        $this->command = "undefined";
-        $this->description = "undefined description huh?";
+        return Command::$description;
     }
 
-    function getCommand ()
+    function command ($args, $in, $self)
     {
-        return $this->command;
+        $in->reply("Command method for has not yet been implemented.");
     }
 
-    function getDescription ()
-    {
-        return $this->description;
-    }
-
-    function command ($msg, $discord, $discordCC)
-    {
-        echo "Command method for " , $this->command, " has not yet been implemented.\n";
+    /**
+     * The discord object is huge, so use this method that have a returning callback.
+     * The discord object will then be saved. this wont make us pass it as a parameter
+     * for all commands incoming which saves memory and time.
+     *
+     * @param $callback
+     */
+    function discordRelated ($callback) {
+        //$discord = $callback();
     }
 
 }

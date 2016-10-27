@@ -2,12 +2,17 @@
 
 namespace Commands;
 
-class Test extends \Commands\Command
+class Test extends Command
 {
+
     function __construct()
     {
-        $this->command = "test";
-        $this->description = "test command lol";
+        Test::$description = "test command lol";
+    }
+
+    function command ($args, $in, $self)
+    {
+        $in->reply("test logic here.");
     }
 
 }
