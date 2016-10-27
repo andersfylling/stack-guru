@@ -5,6 +5,7 @@ require "./Command.php";
 require "./Bootstrapper.php";
 
 use Discord\Discord;
+use Discord\Parts\Channel\Channel;
 
 echo "> Configuring bot..", PHP_EOL;
 
@@ -17,6 +18,11 @@ $discord = new Discord($config);
 
 $discord->on('ready', function ($self) use ($discord) {
     echo "DONE!", PHP_EOL, PHP_EOL;
+
+    /**
+     * Messing with channel class
+     */
+    //$channel = new Channel();
 
     /*
      * Retrieve commands available
@@ -47,7 +53,17 @@ $discord->on('ready', function ($self) use ($discord) {
 
             $mentioned          = isset($mentions[$self->id]);
             $usedBotReference   = strpos($in->content, "<@&240626683487453184>") !== false;
-            if (!($mentioned || $usedBotReference)) {
+
+            /*
+             * Check if this message is to the bot
+             */
+            if (false/* check if its a private chat somehow */) {
+
+            }
+            /*
+             * It's a public chat, check if the bot was mentioned.
+             */
+            else if (!($mentioned || $usedBotReference)) {
                 return; // Bot was not mentioned nor was @Bot used: <@&240626683487453184>
             }
         }
@@ -72,7 +88,7 @@ $discord->on('ready', function ($self) use ($discord) {
                 $bot_args       = array_map('strtolower', array_slice($words, 1) );
             }
             else {
-                $in->reply("I'm sorry. It seem I cannot find your command. Please try the command: help");
+                $in->reply("I'm sorry. It seems I cannot find your command. Please try the command: help");
                 return;
             }
         }
