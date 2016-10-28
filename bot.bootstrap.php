@@ -122,7 +122,7 @@ $discord->on('ready', function ($self) use ($discord, $commands) {
              */
             $in->reply($msg); // to be removed when the PM system works.
             if ($in->channel->is_private) {
-                $in->author->sendMessage($msg);
+                $in->author->sendMessage($msg); // MEmber object does not have sendMessage() method.....
             }
             else {
                 $in->author->user->sendMessage($msg);
