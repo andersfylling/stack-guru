@@ -8,7 +8,6 @@
 
 namespace Commands;
 
-
 class Service extends Command
 {
     function __construct()
@@ -51,9 +50,12 @@ class Service extends Command
          */
         if ($action == "shutdown") {
             $in->reply("Shutting down..");
-            $in->reply("Bye bye!");
+            $in->reply("Bye bye!")->then(function () {
+                $this->discord->close();
 
-            $this->discord->close();
+                echo "Shutting down!", PHP_EOL;
+                exit();
+            });
         }
 
         /*

@@ -34,8 +34,17 @@ class Command
      *
      * @param $callback
      */
-    function discordRelated ($callback) {
+    function discordRelated ($callback)
+    {
         //$discord = $callback();
+    }
+
+    /**
+     * This is called when "help CLASS" is issued by a user
+     */
+    function help ()
+    {
+        return "No help info yet.";
     }
 
 }

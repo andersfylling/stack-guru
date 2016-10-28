@@ -1,13 +1,34 @@
 <?php
 
 require __DIR__.'/vendor/autoload.php';
+require "./Database.php";
 require "./Command.php";
 require "./Bootstrapper.php";
 
 use Discord\Discord;
-use Discord\Parts\Channel\Channel;
 
-echo "> Configuring bot..", PHP_EOL;
+/*
+ * Retrieve commands available
+ */
+$bootstrapper = new \CoreLogic\Bootstrapper("implementations");
+$bootstrapper->linkCommands();
+$commands = $bootstrapper->getCommands(); //add linked commands
+echo "DONE!", PHP_EOL, PHP_EOL;
+
+/*
+ * Setup database connection
+ *
+ * To use the Database::$db instance. add:
+ *  use \CoreLogic\Database;
+ *
+ * then Database::$db; is use able.
+ */
+new \CoreLogic\Database();
+
+/*
+ * Configure bot
+ */
+echo "> Configuring bot connection..", PHP_EOL;
 
 $config = [
     'token' => 'MjQwNjIwNjA3MDM1ODAxNjA3.CvF-7A.ugfb5OgkbalSMXOwUm3lcA-EUu4',
@@ -16,21 +37,12 @@ $config = [
 $discord = new Discord($config);
 
 
-$discord->on('ready', function ($self) use ($discord) {
+
+
+$discord->on('ready', function ($self) use ($discord, $commands) {
     echo "DONE!", PHP_EOL, PHP_EOL;
 
-    /**
-     * Messing with channel class
-     */
-    //$channel = new Channel();
 
-    /*
-     * Retrieve commands available
-     */
-    $bootstrapper = new \CoreLogic\Bootstrapper("implementations");
-    $bootstrapper->linkCommands();
-    $commands = $bootstrapper->getCommands(); //add linked commands
-    echo "DONE!", PHP_EOL, PHP_EOL;
 
     /*
      * Listen to EVERY message. Even itself.
@@ -57,14 +69,13 @@ $discord->on('ready', function ($self) use ($discord) {
             /*
              * Check if this message is to the bot
              */
-            if (false/* check if its a private chat somehow */) {
-
-            }
-            /*
-             * It's a public chat, check if the bot was mentioned.
-             */
-            else if (!($mentioned || $usedBotReference)) {
-                return; // Bot was not mentioned nor was @Bot used: <@&240626683487453184>
+            if (!$in->channel->is_private) {
+                /*
+                 * It's a public chat, check if the bot was mentioned.
+                 */
+                if (!($mentioned || $usedBotReference)) {
+                    return; // Bot was not mentioned nor was @Bot used: <@&240626683487453184>
+                }
             }
         }
 
@@ -85,7 +96,10 @@ $discord->on('ready', function ($self) use ($discord) {
 
             if (array_key_exists($command, $commands) || $command == "help") {
                 $bot_command    = $command;
-                $bot_args       = array_map('strtolower', array_slice($words, 1) );
+
+                if (sizeof($words) > 1) {
+                    $bot_args   = array_map('strtolower', array_slice($words, 1) );
+                }
             }
             else {
                 $in->reply("I'm sorry. It seems I cannot find your command. Please try the command: help");
@@ -96,14 +110,34 @@ $discord->on('ready', function ($self) use ($discord) {
         /*
          * For help
          */
-        if ($bot_command == "help") {
+        if ($bot_command == "help" && empty($bot_args)) {
             $msg = "Here's my list of commands you can use. Hope it helps!\n\n";
 
             foreach ($commands as $key => $value) {
                 $msg .= "\t{$key}:\t{$value[1]}\n"; //$value[0] = classname, $value[1] = class description
             }
 
-            $in->reply($msg);
+            /*
+             * should respond with a private message..
+             */
+            $in->reply($msg); // to be removed when the PM system works.
+            if ($in->channel->is_private) {
+                $in->author->sendMessage($msg);
+            }
+            else {
+                $in->author->user->sendMessage($msg);
+            }
+            return;
+        }
+
+        /*
+         * Check if the user is getting help info about a command
+         */
+        else if (array_key_exists($bot_args[0], $commands)) {
+            $clazz = $commands[$bot_args[0]][0];
+            $help_info = (new $clazz)->help();
+
+            $in->reply("Showing help information for command: {$bot_args[0]}\n\n{$help_info}");
             return;
         }
 
@@ -120,11 +154,6 @@ $discord->on('ready', function ($self) use ($discord) {
 
         $instance->command($bot_args, $in, $self); // don't pass command as this exist in the class as const.
     });
-});
-
-$discord->on('closed', function () {
-    echo "Shutting down!", PHP_EOL;
-    exit();
 });
 
 $discord->run();
