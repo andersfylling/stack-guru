@@ -7,21 +7,37 @@
  */
 
 namespace Commands;
+use \ReflectionClass, \ReflectionMethod;
 
-class Service extends Command
+class Service
+    implements Command
 {
-    function __construct()
+    private $discord = null;
+
+    private $description;
+    private $help;
+
+    private $in;
+
+
+    public function __construct()
     {
-        Service::$description = "Service handler for stopping the instance.";
+        //Service::$description = "Service handler for stopping the instance.";
+        $this->description  = Command::defaults["description"];
+        $this->help         = Command::defaults["help"];
+
+        echo "ok\n";
     }
 
-    function command ($args, $in, $self)
+    public function command ($args, $in)
     {
+        $this->in = $in;
+
         /*
          * If there are not arguments behind the command, theres nothing to do here.
          */
         if (empty($args)) {
-            $in->reply("You must specify an argument!");
+            $this->in->reply("You must specify an argument!");
             return;
         }
 
@@ -30,7 +46,7 @@ class Service extends Command
          *
          */
         if ($this->discord == NULL) {
-            $in->reply("Discord instances was not set!");
+            $this->in->reply("Discord instances was not set!");
             return;
         }
 
@@ -42,28 +58,24 @@ class Service extends Command
         /**
          * Command interactions below
          */
+        $class = new ReflectionClass($this);
+        $methods = $class->getMethods(ReflectionMethod::IS_PRIVATE);
 
-        /*
-         * Shutdown
-         *
-         * ISSUE: won't reply back that service is shut down.. stupid design mistake by DiscordPHP
-         */
-        if ($action == "shutdown") {
-            $in->reply("Shutting down..");
-            $in->reply("Bye bye!")->then(function () {
-                $this->discord->close();
 
-                echo "Shutting down!", PHP_EOL;
-                exit();
-            });
+        $result = false;
+        for ($i = sizeof($methods) - 1; $i >= 0; $i -= 1) {
+            if ($methods[$i]->name == $action) {
+                $result = $methods[$i]->name;
+            }
         }
 
-        /*
-         * Restart
-         */
-        if ($action == "restart") {
-            // Restart logic...
+        if ($result === false) {
+            $in->reply("That's not an option!");
+            return;
         }
+
+        $this->{$result}();
+
     }
 
     /**
@@ -72,8 +84,34 @@ class Service extends Command
      * @param $callback
      * @return mixed
      */
-    function discordRelated ($callback)
+    public function linkDiscordObject ($callback)
     {
         $this->discord = $callback();
+    }
+
+    public function getDescription() : string
+    {
+        return $this->description;
+    }
+
+    public function getHelp() : string
+    {
+        return $this->help;
+    }
+
+
+    /**
+     * Sub commands
+     */
+
+    private function shutdown ()
+    {
+        $this->in->reply("Shutting down..");
+        $this->in->reply("Bye bye!")->then(function () {
+            $this->discord->close();
+
+            echo "Shutting down!", PHP_EOL;
+            exit();
+        });
     }
 }
