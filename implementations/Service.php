@@ -22,11 +22,8 @@ class Service
 
     public function __construct()
     {
-        //Service::$description = "Service handler for stopping the instance.";
         $this->description  = Command::defaults["description"];
         $this->help         = Command::defaults["help"];
-
-        echo "ok\n";
     }
 
     public function command ($args, $in)
