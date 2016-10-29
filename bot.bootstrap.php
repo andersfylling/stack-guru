@@ -76,12 +76,12 @@ $discord->on('ready', function ($self) use ($discord, $commands) {
                 /*
                  * It's a public chat, check if the bot was mentioned.
                  */
-                if ($mentioned || $usedBotReference) {
+                if (!$referenced && ($mentioned || $usedBotReference)) {
                     $in->content = str_replace("<@" . $self->id . ">", "", $in->content); // removes the mention of bot
                     $referenced = true; // Bot was not mentioned nor was @Bot used: <@&240626683487453184>
                 }
 
-                if ($in->content[0] === "!") {
+                if (!$referenced && (substr($in->content, 0, 1) === "!")) {
                     $in->content = ltrim($in->content, "!");
                     $referenced = true;
                 }
