@@ -5,7 +5,8 @@ require "./Database.php";
 require "./Command.php";
 require "./Bootstrapper.php";
 
-use Discord\Discord;
+use \Discord\Discord;
+use \Discord\WebSockets\Event;
 
 /*
  * Retrieve commands available
@@ -48,7 +49,8 @@ $discord->on('ready', function ($self) use ($discord, $commands) {
      * Listen to EVERY message. Even itself.
      */
     echo "> Bot is now listening.", PHP_EOL, PHP_EOL;
-    $self->on('message', function ($in) use ($self, $discord, $commands) {
+    $self->on("message", function ($in) use ($self, $discord, $commands) {
+
         /*
          * If the bot is talking, don't reference it.
          */
@@ -114,26 +116,26 @@ $discord->on('ready', function ($self) use ($discord, $commands) {
             $msg = "Here's my list of commands you can use. Hope it helps!\n\n";
 
             foreach ($commands as $key => $value) {
-                $msg .= "\t{$key}:\t{$value[1]}\n"; //$value[0] = classname, $value[1] = class description
+                $msg .= "\t- {$key}:\t{$value[1]}\n"; //$value[0] = classname, $value[1] = class description
             }
 
             /*
              * should respond with a private message..
              */
-            $in->reply($msg); // to be removed when the PM system works.
             if ($in->channel->is_private) {
                 $in->author->sendMessage($msg); // MEmber object does not have sendMessage() method.....
             }
             else {
                 $in->author->user->sendMessage($msg);
             }
+            $in->reply("I sent you the details in PM.");
             return;
         }
 
         /*
          * Check if the user is getting help info about a command
          */
-        else if (array_key_exists($bot_args[0], $commands)) {
+        else if (!empty($bot_args) && array_key_exists($bot_args[0], $commands)) {
             $clazz = $commands[$bot_args[0]][0];
             $help_info = (new $clazz)->help();
 
@@ -153,6 +155,15 @@ $discord->on('ready', function ($self) use ($discord, $commands) {
         });
 
         $instance->command($bot_args, $in, $self); // don't pass command as this exist in the class as const.
+    });
+
+    /**
+     * On GUILD JOIN
+     */
+    $self->on(Event::GUILD_MEMBER_ADD, function ($deferred, $data) {
+
+        //var_dump($deferred);
+        //var_dump($data);
     });
 });
 

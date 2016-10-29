@@ -1832,17 +1832,17 @@
     },
     {
         "name": "team-reflex/discord-php",
-        "version": "v4.0.2",
-        "version_normalized": "4.0.2.0",
+        "version": "dev-develop",
+        "version_normalized": "dev-develop",
         "source": {
             "type": "git",
             "url": "https://github.com/teamreflex/DiscordPHP.git",
-            "reference": "56de4685ea1ebb02a3472bbaf86cd20433df8d1e"
+            "reference": "ebd1ebfc9f4f7917b3bcc182f553f74e28c17515"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/teamreflex/DiscordPHP/zipball/56de4685ea1ebb02a3472bbaf86cd20433df8d1e",
-            "reference": "56de4685ea1ebb02a3472bbaf86cd20433df8d1e",
+            "url": "https://api.github.com/repos/teamreflex/DiscordPHP/zipball/ebd1ebfc9f4f7917b3bcc182f553f74e28c17515",
+            "reference": "ebd1ebfc9f4f7917b3bcc182f553f74e28c17515",
             "shasum": ""
         },
         "require": {
@@ -1872,9 +1872,9 @@
             "ext-libev": "For a faster, and more performant loop",
             "ext-libevent": "For a faster, and more performant loop. Preferred"
         },
-        "time": "2016-10-11 07:27:43",
+        "time": "2016-10-22 02:49:32",
         "type": "library",
-        "installation-source": "dist",
+        "installation-source": "source",
         "autoload": {
             "files": [
                 "src/Discord/functions.php"

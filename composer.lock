@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "953ac348a7c0ea3034a801f365bc4b38",
-    "content-hash": "aa833ee797e3f365f0854e63662020dc",
+    "hash": "5b1567f0c04618ef6868deb23c3d1dc7",
+    "content-hash": "9c3315602718eb97db72b67382ce63a8",
     "packages": [
         {
             "name": "TrafficCophp/ByteBuffer",
@@ -1677,16 +1677,16 @@
         },
         {
             "name": "team-reflex/discord-php",
-            "version": "v4.0.2",
+            "version": "dev-develop",
             "source": {
                 "type": "git",
                 "url": "https://github.com/teamreflex/DiscordPHP.git",
-                "reference": "56de4685ea1ebb02a3472bbaf86cd20433df8d1e"
+                "reference": "ebd1ebfc9f4f7917b3bcc182f553f74e28c17515"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/teamreflex/DiscordPHP/zipball/56de4685ea1ebb02a3472bbaf86cd20433df8d1e",
-                "reference": "56de4685ea1ebb02a3472bbaf86cd20433df8d1e",
+                "url": "https://api.github.com/repos/teamreflex/DiscordPHP/zipball/ebd1ebfc9f4f7917b3bcc182f553f74e28c17515",
+                "reference": "ebd1ebfc9f4f7917b3bcc182f553f74e28c17515",
                 "shasum": ""
             },
             "require": {
@@ -1740,7 +1740,7 @@
                 }
             ],
             "description": "An unofficial API to interact with the voice and text service Discord.",
-            "time": "2016-10-11 07:27:43"
+            "time": "2016-10-22 02:49:32"
         },
         {
             "name": "wyrihaximus/react-guzzle-http-client",
@@ -1839,7 +1839,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "team-reflex/discord-php": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
