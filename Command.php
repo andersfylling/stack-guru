@@ -18,7 +18,7 @@ interface Command
 
     public function __construct();
 
-    public function /*        */ command             (/* string[] */ $args, /* Object */ $in, /* Object */ $self);
+    public function /*        */ command             (/* string[] */ $args, /* Object */ $in);
     public function /*        */ linkDiscordObject   (/* function () : Object */ $callback);
 
     public function /* string */ getDescription      () : string;

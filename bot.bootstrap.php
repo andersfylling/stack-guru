@@ -123,12 +123,12 @@ $discord->on('ready', function ($self) use ($discord, $commands) {
              * should respond with a private message..
              */
             if ($in->channel->is_private) {
-                $in->author->sendMessage($msg); // MEmber object does not have sendMessage() method.....
+                $in->author->sendMessage($msg);
             }
             else {
                 $in->author->user->sendMessage($msg);
+                $in->reply("I sent you the details in PM.");
             }
-            $in->reply("I sent you the details in PM.");
             return;
         }
 
@@ -147,14 +147,14 @@ $discord->on('ready', function ($self) use ($discord, $commands) {
          * Initiate command
          */
         $classname = $commands[$bot_command][0];
-        $instance = new $classname;
+        $instance = new $classname();
 
         //if the class wants it can now use the $discord instance. must be override parent class Command!
-        $instance->discordRelated(function () use ($discord) {
+        $instance->linkDiscordObject(function () use ($discord) {
             return $discord;
         });
 
-        $instance->command($bot_args, $in, $self); // don't pass command as this exist in the class as const.
+        $instance->command($bot_args, $in);
     });
 
     /**
