@@ -26,7 +26,12 @@ class Google implements Command
 
     public function command ($args, $in)
     {
-        $url = $this->googleURL . implode($this->googleURLDelimiter, $args);
+        if (sizeof($args) > 0) {
+            $url = $this->googleURL . implode($this->googleURLDelimiter, $args);
+        }
+        else {
+            $url = "{$this->googleURL}Why+am+I+such+an+asshole?";
+        }
 
         $in->reply("Let me google that for you..\n" . $url);
     }
