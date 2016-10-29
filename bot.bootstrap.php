@@ -66,18 +66,35 @@ $discord->on('ready', function ($self) use ($discord, $commands) {
             $mentions           = json_decode(json_encode($in->mentions), true);
 
             $mentioned          = isset($mentions[$self->id]);
-            $usedBotReference   = strpos($in->content, "<@&240626683487453184>") !== false;
+            $usedBotReference   = strpos($in->content, "<@&240626683487453184>") !== false; //@Bot
 
             /*
              * Check if this message is to the bot
              */
             if (!$in->channel->is_private) {
+                $referenced = false;
                 /*
                  * It's a public chat, check if the bot was mentioned.
                  */
-                if (!($mentioned || $usedBotReference)) {
-                    return; // Bot was not mentioned nor was @Bot used: <@&240626683487453184>
+                if ($mentioned || $usedBotReference) {
+                    $in->content = str_replace("<@" . $self->id . ">", "", $in->content); // removes the mention of bot
+                    $referenced = true; // Bot was not mentioned nor was @Bot used: <@&240626683487453184>
                 }
+
+                if ($in->content[0] === "!") {
+                    $in->content = ltrim($in->content, "!");
+                    $referenced = true;
+                }
+
+
+                if (!$referenced) {
+                    return;
+                }
+
+                /*
+                 * trim whitespaces
+                 */
+                $in->content = ltrim($in->content, " ");
             }
         }
 
@@ -91,8 +108,6 @@ $discord->on('ready', function ($self) use ($discord, $commands) {
         $bot_command    = "";
         $bot_args       = [];
         {
-            $in->content = str_replace("<@" . $self->id . "> ", "", $in->content); // removes the mention of bot
-
             $words      = explode(" ", $in->content);
             $command    = $words[0];
 
