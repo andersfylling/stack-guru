@@ -8,43 +8,20 @@
 
 namespace Commands;
 
-
-class Command
+interface Command
 {
+    const defaults = [
+        "description"   => "[IN DEVELOPMENT] This command has no description yet.",
+        "help"          => "[IN DEVELOPMENT] This command has no help information.",
+        "command"       => "[IN DEVELOPMENT] This command has yet no functionality."
+    ];
 
-    public static $description = "undefined description huh?";
+    public function __construct();
 
-    protected $discord = NULL;
+    public function /*        */ command             (/* string[] */ $args, /* Object */ $in, /* Object */ $self);
+    public function /*        */ linkDiscordObject   (/* function () : Object */ $callback);
 
-
-    public function getDescription ()
-    {
-        return Command::$description;
-    }
-
-    function command ($args, $in, $self)
-    {
-        $in->reply("Command method for has not yet been implemented.");
-    }
-
-    /**
-     * The discord object is huge, so use this method that have a returning callback.
-     * The discord object will then be saved. this wont make us pass it as a parameter
-     * for all commands incoming which saves memory and time.
-     *
-     * @param $callback
-     */
-    function discordRelated ($callback)
-    {
-        //$discord = $callback();
-    }
-
-    /**
-     * This is called when "help CLASS" is issued by a user
-     */
-    function help ()
-    {
-        return "No help info yet.";
-    }
+    public function /* string */ getDescription      () : string;
+    public function /* string */ getHelp             () : string;
 
 }
