@@ -27,13 +27,14 @@ class Google implements Command
     public function command ($args, $in)
     {
         if (sizeof($args) > 0) {
-            $url = $this->googleURL . implode($this->googleURLDelimiter, $args);
+            $url = $this->googleURL . "'" . implode($this->googleURLDelimiter, $args) . "'";
         }
         else {
             $url = "{$this->googleURL}Why+am+I+such+an+asshole?";
         }
+        $msg = "Let me google that for you..\n" . $url;
 
-        $in->reply("Let me google that for you..\n" . $url);
+        $in->reply($msg);
     }
 
     public function linkDiscordObject ($callback)
