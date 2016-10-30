@@ -58,8 +58,6 @@ $discord->on('ready', function ($self) use ($discord, $commands) {
             return;
         }
 
-        //fgdfgfd
-
         /*
          * Check if bot is mentioned.
          * TODO: optimize it... scaling = death of everything
