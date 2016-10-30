@@ -24,5 +24,5 @@ git -C /home/devs/stack-guru reset --hard
 git -C /home/devs/stack-guru pull
 wall starting php
 php /home/devs/stack-guru/bot.bootstrap.php
-wall phpret is \'$?\'
+wall php ret is \'$?\'
 rm $lock_file
