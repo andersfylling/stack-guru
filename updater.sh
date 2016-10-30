@@ -20,7 +20,7 @@ if [ "$?" == "1" ]; then
     exit
 fi
 
-git -C /home/devs/stack-guru reset --hard
+git -C /home/devs/stack-guru remote update
 git -C /home/devs/stack-guru pull
 
 php /home/devs/stack-guru/bot.bootstrap.php &
