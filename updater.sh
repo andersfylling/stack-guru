@@ -1,10 +1,28 @@
 #!/bin/bash
+# by /u/theartmaker
 
-git reset --hard && git pull
+## CONSTANTS ##################################################################
+lock_file="/tmp/discord_updater.lock"
 
-if ps -p $(ps aux | grep '[p]hp bot.bootstrap.php' | awk '{print $2}') > /dev/null
-then
-    sudo kill $(ps aux | grep '[p]hp bot.bootstrap.php' | awk '{print $2}')
+## CODE #######################################################################
+
+if [ -f $lock_file ]; then
+    exit
 fi
 
-nohup php bot.bootstrap.php &
+echo "lock" > $lock_file
+
+php_pid=$(ps aux | grep '[p]hp bot.bootstrap.php' | awk '{print $2}')
+
+kill -9 $php_pid
+
+if [ "$?" == "1" ]; then
+    exit
+fi
+
+git -C /home/devs/stack-guru reset --hard
+git -C /home/devs/stack-guru pull
+
+php /home/devs/stack-guru/bot.bootstrap.php &
+
+rm $lock_file
