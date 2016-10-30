@@ -3,6 +3,7 @@
 
 ## CONSTANTS ##################################################################
 lock_file="/tmp/discord_updater.lock" # lock file path
+log_file="/home/devs/discord_autoupdate.log"
 
 ## CODE #######################################################################
 
@@ -24,6 +25,8 @@ git -C /home/devs/stack-guru reset --hard
 git -C /home/devs/stack-guru pull
 
 rm $lock_file
+
+echo "`date` | updated!" > $log_file
 
 sleep 1
 cd /home/devs/stack-guru
