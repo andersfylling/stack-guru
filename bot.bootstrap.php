@@ -177,8 +177,6 @@ $discord->on('ready', function ($self) use ($discord, $commands) {
      */
     $self->on(Event::GUILD_MEMBER_ADD, function ($deferred, $data) {
 
-        //var_dump($deferred);
-        //var_dump($data);
     });
 });
 
