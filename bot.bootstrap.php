@@ -58,7 +58,7 @@ $discord->on('ready', function ($self) use ($discord, $commands) {
             return;
         }
 
-        $in->reply("YES");
+        $in->reply("YES OR!?");
 
         /*
          * Check if bot is mentioned.
