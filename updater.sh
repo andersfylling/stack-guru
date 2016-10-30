@@ -2,7 +2,7 @@
 # by /u/theartmaker
 
 ## CONSTANTS ##################################################################
-lock_file="/tmp/discord_updater.lock"
+lock_file="/tmp/discord_updater.lock" # lock file path
 
 ## CODE #######################################################################
 
