@@ -1,3 +1,11 @@
 #!/bin/bash
 
-git reset --hard HEAD && git pull && kill $(ps aux | grep '[p]hp bot.bootstrap.php' | awk '{print $2}') && nohup php bot.bootstrap.php &
+git pull
+
+pidID = ps aux | grep '[p]hp bot.bootstrap.php' | awk '{print $2}'
+if ps -p $pidID > /dev/null
+then
+    kill $pidID
+fi
+
+nohup php bot.bootstrap.php &
