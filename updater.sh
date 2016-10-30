@@ -27,4 +27,5 @@ rm $lock_file
 wall rm ret is \'$?\'
 
 cd /home/devs/stack-guru
-exec php bot.bootstrap.php
+php bot.bootstrap.php
+wall php ret is \'$?\'
