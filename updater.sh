@@ -1,8 +1,9 @@
 #!/bin/bash
-# by /u/theartmaker
+# coded by /u/theartmaker <theartmaker@openmailbox.org>
+# part of stack-guru, a bot for /r/nootropics Discord server
 
 ## CONSTANTS ##################################################################
-lock_file="/tmp/discord_updater.lock" # lock file path
+lock_file="/tmp/discord_updater.lock"
 log_file="/home/devs/discord_autoupdate.log"
 
 ## CODE #######################################################################
