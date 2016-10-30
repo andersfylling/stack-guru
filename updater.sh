@@ -25,5 +25,6 @@ git -C /home/devs/stack-guru pull
 
 rm $lock_file
 
+sleep 1
 cd /home/devs/stack-guru
 php bot.bootstrap.php
