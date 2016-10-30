@@ -23,6 +23,6 @@ fi
 git -C /home/devs/stack-guru reset --hard
 git -C /home/devs/stack-guru pull
 
-php /home/devs/stack-guru/bot.bootstrap.php &
+php /home/devs/stack-guru/bot.bootstrap.php
 
 rm $lock_file
