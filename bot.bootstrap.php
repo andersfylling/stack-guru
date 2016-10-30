@@ -58,7 +58,7 @@ $discord->on('ready', function ($self) use ($discord, $commands) {
             return;
         }
 
-        $in->$reply("dfsdrfs");
+        $in->reply("dfsdrfs");
 
         /*
          * Check if bot is mentioned.
