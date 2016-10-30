@@ -26,7 +26,5 @@ git -C /home/devs/stack-guru pull
 rm $lock_file
 wall rm ret is \'$?\'
 
-wall starting php
-exec php /home/devs/stack-guru/bot.bootstrap.php
-wall php ret is \'$?\'
-
+cd /home/devs/stack-guru
+exec php bot.bootstrap.php
