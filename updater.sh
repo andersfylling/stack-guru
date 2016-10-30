@@ -22,7 +22,7 @@ fi
 
 git -C /home/devs/stack-guru reset --hard
 git -C /home/devs/stack-guru pull
-
+wall starting php
 php /home/devs/stack-guru/bot.bootstrap.php
-
+wall phpret is \'$?\'
 rm $lock_file
