@@ -26,7 +26,7 @@ git -C /home/devs/stack-guru pull
 
 rm $lock_file
 
-echo "`date` | updated!" > $log_file # log every update
+echo "`date` | updated!" >> $log_file # log every update
 
 sleep 1
 cd /home/devs/stack-guru
