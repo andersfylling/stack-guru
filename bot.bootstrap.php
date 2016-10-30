@@ -150,7 +150,7 @@ $discord->on('ready', function ($self) use ($discord, $commands) {
         /*
          * Check if the user is getting help info about a command
          */
-        else if (!empty($bot_args) && array_key_exists($bot_args[0], $commands)) {
+        else if ($bot_command == "help" && !empty($bot_args) && array_key_exists($bot_args[0], $commands)) {
             $clazz = $commands[$bot_args[0]][0];
             $help_info = (new $clazz)->help();
 
