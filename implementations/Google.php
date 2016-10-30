@@ -1,9 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Anders
- * Date: 29.10.2016
- * Time: 21.44
+ * Command for googling
+ *
+ * @author http://github.com/sciencefyll
  */
 
 namespace Commands;

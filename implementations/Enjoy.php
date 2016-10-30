@@ -1,9 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Anders
- * Date: 30.10.2016
- * Time: 01.25
+ * Just for giggles.
+ *
+ * @author http://github.com/sciencefyll
  */
 
 namespace Commands;

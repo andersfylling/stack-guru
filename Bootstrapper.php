@@ -1,9 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Anders
- * Date: 27.10.2016
- * Time: 15.56
+ * Loads all the possible commands.
+ *
+ * @author http://github.com/sciencefyll
  */
 
 namespace CoreLogic;

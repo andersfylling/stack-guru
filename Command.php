@@ -1,9 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Anders
- * Date: 26.10.2016
- * Time: 03.04
+ * interface for all commands to be written
+ *
+ * @author http://github.com/sciencefyll
  */
 
 namespace Commands;

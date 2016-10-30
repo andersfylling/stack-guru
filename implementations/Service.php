@@ -1,9 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Anders
- * Date: 27.10.2016
- * Time: 16.23
+ * For interacting with the interface
+ *
+ * @author http://github.com/sciencefyll
  */
 
 namespace Commands;
@@ -29,6 +28,7 @@ class Service
     public function command ($args, $in)
     {
         $this->in = $in;
+        $in->reply("lol");
 
         /*
          * If there are not arguments behind the command, theres nothing to do here.

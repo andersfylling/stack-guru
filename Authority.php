@@ -1,9 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Anders
- * Date: 26.10.2016
- * Time: 14.40
+ * Should check for roles.... but havent design how it should function at the moments being
+ *
+ * @author http://github.com/sciencefyll
  */
 
 namespace Commands;

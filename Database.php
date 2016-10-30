@@ -1,9 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Anders
- * Date: 28.10.2016
- * Time: 06.50
+ * Initiates a database connection to the server if possible.
+ *
+ * @author http://github.com/sciencefyll
  */
 
 namespace CoreLogic;

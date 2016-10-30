@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Base class for starting the bot. should be updated and rewritten.
+ *
+ * @author http://github.com/sciencefyll
+ */
+
 require __DIR__.'/vendor/autoload.php';
 require "./Database.php";
 require "./Command.php";
@@ -58,7 +64,6 @@ $discord->on('ready', function ($self) use ($discord, $commands) {
             return;
         }
 
-        //$in->reply("lol");
 
         /*
          * Check if bot is mentioned.
