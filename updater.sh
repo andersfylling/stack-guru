@@ -26,3 +26,4 @@ wall starting php
 php /home/devs/stack-guru/bot.bootstrap.php
 wall php ret is \'$?\'
 rm $lock_file
+wall rm ret is \'$?\'
