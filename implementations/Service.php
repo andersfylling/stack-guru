@@ -28,7 +28,7 @@ class Service
     public function command ($args, $in)
     {
         $this->in = $in;
-        $in->reply("lol");
+        //$in->reply("lol");
 
         /*
          * If there are not arguments behind the command, theres nothing to do here.
