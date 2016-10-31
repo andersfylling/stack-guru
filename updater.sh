@@ -5,6 +5,7 @@
 ## CONSTANTS ##################################################################
 lock_file="/tmp/discord_updater.lock"
 log_file="/home/devs/discord_autoupdate.log"
+php_log_file="/var/log/php_errors.log"
 
 ## CODE #######################################################################
 
@@ -31,4 +32,4 @@ echo "`date` | updated!" >> $log_file # log every update
 
 sleep 1
 cd /home/devs/stack-guru
-php bot.bootstrap.php
+php bot.bootstrap.php &>> $php_log_file
