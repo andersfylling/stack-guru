@@ -1,6 +1,15 @@
 <?php
 
 /**
+ * Logging
+ */
+ini_set("log_errors", "On");
+ini_set("error_reporting", "E_ALL");
+ini_set("error_log", "/var/logs/php_errors.php");
+ini_set("log_errors_max_len", "0");
+
+
+/**
  * Base class for starting the bot. should be updated and rewritten.
  *
  * @author http://github.com/sciencefyll
@@ -63,6 +72,8 @@ $discord->on('ready', function ($self) use ($discord, $commands) {
         if ($in->author->id == $self->id) {
             return;
         }
+
+
 
 
         /*
