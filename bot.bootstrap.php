@@ -3,10 +3,11 @@
 /**
  * Logging
  */
-ini_set("log_errors", "On");
+ini_set("log_errors", "1");
 ini_set("error_reporting", "E_ALL");
 ini_set("error_log", "/var/logs/php_errors.php");
 ini_set("log_errors_max_len", "0");
+ini_set('display_errors', "1");
 
 
 /**
