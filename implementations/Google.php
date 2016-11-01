@@ -27,7 +27,7 @@ class Google implements Command
     {
         if (sizeof($args) > 0) {
             $argsString = implode($this->googleURLDelimiter, $args);
-            $url = $this->googleURL . htmlentities($argsString);
+            $url = $this->googleURL . $argsString;
         }
         else {
             $url = "{$this->googleURL}Why+am+I+such+an+asshole?";
