@@ -10,8 +10,7 @@ namespace Commands;
 
 class Google implements Command
 {
-    private $googleURL = "http://www.google.com/search?q="; // Google+tutorial+create+link";
-    private $googleURLDelimiter = "+";
+    const SEARCH_URL = "http://www.google.com/search";
 
     private $description;
     private $help;
@@ -26,12 +25,12 @@ class Google implements Command
     public function command ($args, $in)
     {
         if (sizeof($args) > 0) {
-            $argsString = implode($this->googleURLDelimiter, $args);
-            $url = $this->googleURL . $argsString;
+            $query = $args[0];
         }
         else {
-            $url = "{$this->googleURL}Why+am+I+such+an+asshole?";
+            $query = "Why am I such an asshole?";
         }
+        $url = $this->searchURL($query);
         $msg = "Let me google that for you..\n" . $url;
 
         $in->reply($msg);
@@ -50,6 +49,11 @@ class Google implements Command
     public function getHelp() : string
     {
         return $this->help;
+    }
+
+    private function searchURL($query) : string
+    {
+        return self::SEARCH_URL . "?" . http_build_query(array('q' => $query));
     }
 
 }
