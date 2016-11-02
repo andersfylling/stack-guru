@@ -23,7 +23,7 @@ class Database
     /*
      * Database instance
      */
-    public static $db = NULL;
+    private static $db = NULL;
 
 
     function __construct ()
@@ -57,6 +57,20 @@ class Database
             //create content
             Database::$db->exec( file_get_contents($this->file) );
         }
+    }
+
+    /**
+     * Get database instance. create if not existing.
+     *
+     * @return null
+     */
+    public static function link ()
+    {
+        if (Database::$db === NULL) {
+            new Database();
+        }
+
+        return Database::$db;
     }
 
 }
