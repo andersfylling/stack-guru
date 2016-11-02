@@ -14,7 +14,7 @@ require "./Database.php";
 require "./Command.php";
 require "./Bot.php";
 
-require "discord_token.gitignore.php";
+require "./config/discord.php";
 
 /*
  * Warm up the bot
