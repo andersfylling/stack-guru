@@ -15,6 +15,8 @@ use \Discord\WebSockets\Event;
 
 class Bot
 {
+    private $instance   = null;
+
     private $db         = \PDO::class;
     private $discord    = \Discord\Discord::class;
     private $message    = \Discord\Parts\Channel\Message::class;
@@ -32,6 +34,13 @@ class Bot
      */
     function __construct ()
     {
+        /*
+         * Don't create a new bot if it's already running!
+         */
+        if ($this->instance != null) {
+            return;
+        }
+
         /*
          * Setup database connection
          *
