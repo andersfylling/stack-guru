@@ -269,9 +269,9 @@ class Bot
      *
      * @param string $message
      * @param \Closure $callback = null, To be called when message was sent
-     * @param boolean $private = true,
+     * @param boolean $private = false, use false when in development TODO-Production: set to true
      */
-    private function response (string $message, \Closure $callback = null, boolean $private = null)
+    private function response (string $message, \Closure $callback = null, boolean $private = false)
     {
         if ($this->message == null) {
             return;
