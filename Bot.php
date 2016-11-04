@@ -60,11 +60,11 @@ class Bot
         /*
          * Don't create a new bot if it's already running!
          */
-        if (Bot::$instance != null) {
-            return Bot::$instance;
+        if (Bot::$instance == null) {
+            Bot::$instance = new Bot();
         }
 
-        return new Bot();
+        return Bot::$instance;
     }
 
     /**
