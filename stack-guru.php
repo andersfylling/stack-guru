@@ -19,7 +19,7 @@ require "./config/discord.php";
 /*
  * Warm up the bot
  */
-$bot = new \CoreLogic\Bot();
+$bot = \CoreLogic\Bot::instance();
 
 
 /*
