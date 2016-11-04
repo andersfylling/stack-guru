@@ -6,7 +6,8 @@
  */
 
 namespace CoreLogic;
-use \PDO, \PDOException;
+use \PDO;
+use \Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 
 class Database
@@ -16,61 +17,79 @@ class Database
     private $user   = "devs";
     private $pass   = "e98de41bc5fa94d464bb831da129ab49ab5a0dffd54811fd";
     private $schema = "mydb";
-    private $file   = "database_backup.sql";
+    private $file   = null;
 
 
 
     /*
      * Database instance
      */
-    private static $db = NULL;
+    protected $db = null;
 
 
-    function __construct ()
+    function __construct (array $options = [])
     {
+        /*
+         * Verify parameter to have required keys
+         */
+        $options = $this->resolveOptions($options);
+
+
+        $this->file = $options["databaseFile"];
 
         /*
          * establish a new PDO connection
          */
-        echo "> Establishing database connection..";
-        Database::$db = new PDO(
+        $this->db = new PDO(
             "mysql:host={$this->host};port={$this->port}", $this->user, $this->pass,
             array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'")
         );
-        Database::$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         /*
          * If the database does not exist, it is created.
          */
         $name = "`".str_replace("`","``", $this->schema)."`";
-        Database::$db->query('CREATE DATABASE IF NOT EXISTS ' . $name);
-        Database::$db->query('use ' . $name);
+        $this->db->query('CREATE DATABASE IF NOT EXISTS ' . $name);
+        $this->db->query('use ' . $name);
         unset($name);
 
-        echo "OK!", PHP_EOL, PHP_EOL;
 
         /*
-         *  Now check if the tables exists, if not they are created.
+         * TODO: must be improved and based on the given file.
+         * Don't do a check if the file isn't set.
          */
-        $exists = Database::$db->query('SHOW TABLES');
+        if ($this->file === null) {
+            return;
+        }
+
+        $exists = $this->db->query('SHOW TABLES');
         if ($exists->rowCount() == 0) {
             //create content
-            Database::$db->exec( file_get_contents($this->file) );
+            $this->db->exec( file_get_contents($this->file) );
         }
     }
 
     /**
-     * Get database instance. create if not existing.
+     * Resolves the options.
      *
-     * @return null
+     * @param array $options Array of options.
+     *
+     * @return array Options.
      */
-    public static function link ()
+    protected function resolveOptions(array $options = [])
     {
-        if (Database::$db === NULL) {
-            new Database();
+        $required = [
+            "databaseFile"
+        ];
+
+        foreach ($required as $key) {
+            if (!key_exists($key, $options)) {
+                throw new \ErrorException("Key file must be specified (and contain a value): {$key}");
+            }
         }
 
-        return Database::$db;
+        return $options;
     }
 
 }
