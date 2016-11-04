@@ -12,6 +12,8 @@
 require __DIR__.'/vendor/autoload.php';
 require "./Database.php";
 require "./Command.php";
+require "./Bootstrapper.php";
+require "./BotEvent.php";
 require "./Bot.php";
 
 require "./config/discord.php";
@@ -19,7 +21,11 @@ require "./config/discord.php";
 /*
  * Warm up the bot
  */
-$bot = \CoreLogic\Bot::instance();
+$bot = new \CoreLogic\Bot([
+    "discordToken" => DISCORD_TOKEN,
+    "commandsFolder" => "implementations",
+    "databaseFile" => "",
+]);
 
 
 /*

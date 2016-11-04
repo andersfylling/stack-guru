@@ -14,12 +14,11 @@ use \Discord\WebSockets\Event;
 
 
 class Bot
+    extends Database
 {
-    static  $instance   = null;
-
-    private $db         = \PDO::class;
-    private $discord    = \Discord\Discord::class;
-    private $message    = \Discord\Parts\Channel\Message::class;
+    private $discord            = \Discord\Discord::class;
+    private $message            = \Discord\Parts\Channel\Message::class;
+    private $commandsFolder     = null;
 
     private $callbacks = [
         // string "callback_name" => [\Closure, \Closure, ... ],
@@ -32,8 +31,13 @@ class Bot
     /**
      * Bot constructor.
      */
-    function __construct ()
+    function __construct (array $options = [])
     {
+        /*
+         * Verify parameter to have required keys
+         */
+        $options = $this->resolveOptions($options);
+
         /*
          * Setup database connection
          *
@@ -42,29 +46,18 @@ class Bot
          *
          * then Database::$db; is use able.
          */
-        $this->db = Database::link();
+        Database::__construct($options);
 
         /*
          * Retrieve the latest commands
          */
+        $this->commandsFolder = $options["commandsFolder"];
         $this->updateCommands();
 
         /*
          * Set up a discord instance
          */
-        $this->discord = new Discord(['token' => DISCORD_TOKEN]);
-    }
-
-    static function instance ()
-    {
-        /*
-         * Don't create a new bot if it's already running!
-         */
-        if (Bot::$instance == null) {
-            Bot::$instance = new Bot();
-        }
-
-        return Bot::$instance;
+        $this->discord = new Discord(["token" => $options["discordToken"]]);
     }
 
     /**
@@ -264,9 +257,9 @@ class Bot
         /*
          * Retrieve commands available
          */
-        $bootstrapper = new Bootstrapper("implementations");
-        $bootstrapper->linkCommands();
-        $this->commands = $bootstrapper->getCommands(); //add linked commands
+        $bs = new Bootstrapper($this->commandsFolder);
+        $bs->linkCommands();
+        $this->commands = $bs->getCommands(); //add linked commands
     }
 
     /**
@@ -278,14 +271,14 @@ class Bot
      */
     private function response (string $message, \Closure $callback = null, boolean $private = null)
     {
-        if ($this->message == null) {
+        if ($this->message === null) {
             return;
         }
 
         /*
          * Check if the channel is private or not
          */
-        if ($private != null) {
+        if ($private !== null) {
             /*
              * For some reason, the author object differs when its a private chat compared to public.
              */
@@ -347,5 +340,27 @@ class Bot
         }
     }
 
+    /**
+     * Resolves the options.
+     *
+     * @param array $options Array of options.
+     *
+     * @return array Options.
+     */
+    protected function resolveOptions(array $options = [])
+    {
+        $required = [
+            "discordToken",
+            "commandsFolder"
+        ];
+
+        foreach ($required as $key) {
+            if (!key_exists($key, $options)) {
+                throw new \ErrorException("Key file must be specified and contain a value: {$key}");
+            }
+        }
+
+        return $options;
+    }
 
 }
