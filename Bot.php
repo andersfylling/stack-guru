@@ -269,9 +269,9 @@ class Bot
      *
      * @param string $message
      * @param \Closure $callback = null, To be called when message was sent
-     * @param boolean $private = false, use false when in development TODO-Production: set to true
+     * @param boolean $private = null
      */
-    private function response (string $message, \Closure $callback = null, boolean $private = false)
+    private function response (string $message, \Closure $callback = null, boolean $private = null)
     {
         if ($this->message == null) {
             return;
@@ -280,7 +280,7 @@ class Bot
         /*
          * Check if the channel is private or not
          */
-        if ($private) {
+        if ($private != null) {
             /*
              * For some reason, the author object differs when its a private chat compared to public.
              */
