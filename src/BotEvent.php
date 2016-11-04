@@ -1,4 +1,5 @@
 <?php
+namespace StackGuru;
 
 /**
  * Class BOTEVENT contains different const for keeping a record over what STATE to run commands in

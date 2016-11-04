@@ -5,7 +5,7 @@
  * @author http://github.com/sciencefyll
  */
 
-namespace CoreLogic;
+namespace StackGuru\CoreLogic;
 
 
 class Bootstrapper

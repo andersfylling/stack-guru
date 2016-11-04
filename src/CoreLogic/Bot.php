@@ -8,7 +8,7 @@
 
 
 
-namespace CoreLogic;
+namespace StackGuru\CoreLogic;
 use \Discord\Discord;
 use \Discord\WebSockets\Event;
 
@@ -65,7 +65,7 @@ class Bot
     /**
      *
      */
-    public function initiate ()
+    public function run ()
     {
         /*
          * When the app is ready, listen for messages.

@@ -1,15 +1,16 @@
 <?php
 /**
- * Just for giggles.
+ * Command for googling
  *
  * @author http://github.com/sciencefyll
  */
 
-namespace Commands;
+namespace StackGuru\Commands;
 
 
-class Enjoy implements Command
+class Google implements Command
 {
+    const SEARCH_URL = "http://www.google.com/search";
 
     private $description;
     private $help;
@@ -23,7 +24,16 @@ class Enjoy implements Command
 
     public function command ($args, $in)
     {
-        $in->reply("HAHHA *CLAP CLAP CLAP*, yes that's very funny. Ah, much good, very delicious.");
+        if (sizeof($args) > 0) {
+            $query = $args[0];
+        }
+        else {
+            $query = "Why am I such an asshole?";
+        }
+        $url = $this->searchURL($query);
+        $msg = "Let me google that for you..\n" . $url;
+
+        $in->reply($msg);
     }
 
     public function linkDiscordObject ($callback)
@@ -39,6 +49,11 @@ class Enjoy implements Command
     public function getHelp() : string
     {
         return $this->help;
+    }
+
+    private function searchURL($query) : string
+    {
+        return self::SEARCH_URL . "?" . http_build_query(array('q' => $query));
     }
 
 }

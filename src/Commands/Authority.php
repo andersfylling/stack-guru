@@ -5,7 +5,7 @@
  * @author http://github.com/sciencefyll
  */
 
-namespace Commands;
+namespace StackGuru\Commands;
 
 
 class Authority

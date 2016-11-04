@@ -6,7 +6,7 @@
  * Time: 21.16
  */
 
-namespace Commands;
+namespace StackGuru\Commands;
 
 
 class Sudo

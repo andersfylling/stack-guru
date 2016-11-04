@@ -10,16 +10,27 @@
  * Includes
  */
 require __DIR__.'/vendor/autoload.php';
-require "./Database.php";
-require "./Command.php";
-require "./Bot.php";
+
+// require "./src/CoreLogic/Database.php";
+// require "./src/CoreLogic/Bot.php";
+// require "./src/Commands/Command.php";
+
+require "./src/AutoLoader.php";
 
 require "./config/discord.php";
 
 /*
- * Warm up the bot
+ * Setup Auto loader
  */
-$bot = new \CoreLogic\Bot();
+$loader = new \StackGuru\AutoLoader;
+$loader->register();
+$loader->addNamespace('StackGuru', __DIR__.'/src');
+
+/*
+ * Set up the bot
+ */
+use \StackGuru\BotEvent;
+$bot = new \StackGuru\CoreLogic\Bot();
 
 
 /*
@@ -68,6 +79,6 @@ $bot->state(BotEvent::MESSAGE_SELF_TO_SELF,     $messages_bot_to_bot);
 $bot->state(BotEvent::MESSAGE_OTHERS_TO_SELF,   $messages_other_to_bot);
 
 /*
- * Initiate the bot
+ * Run the bot
  */
-$bot->initiate();
+$bot->run();
