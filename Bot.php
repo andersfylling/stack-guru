@@ -271,7 +271,7 @@ class Bot
      * @param \Closure $callback = null, To be called when message was sent
      * @param boolean $private = true,
      */
-    private function response (string $message, \Closure $callback = null, boolean $private = true)
+    private function response (string $message, \Closure $callback = null, boolean $private = null)
     {
         if ($this->message == null) {
             return;
