@@ -14,7 +14,7 @@ namespace Psr\Http\Message;
  * - Headers
  * - Message body
  *
- * During construction, implementations MUST attempt to set the Host header from
+ * During construction, Command MUST attempt to set the Host header from
  * a provided URI if no Host header is provided.
  *
  * Requests are considered immutable; all methods that might change state MUST
@@ -71,7 +71,7 @@ interface RequestInterface extends MessageInterface
      * Return an instance with the provided HTTP method.
      *
      * While HTTP method names are typically all uppercase characters, HTTP
-     * method names are case-sensitive and thus implementations SHOULD NOT
+     * method names are case-sensitive and thus Command SHOULD NOT
      * modify the given string.
      *
      * This method MUST be implemented in such a way as to retain the

@@ -27,7 +27,7 @@ class Stream extends EventEmitter implements DuplexStreamInterface
 
         // Use unbuffered read operations on the underlying stream resource.
         // Reading chunks from the stream may otherwise leave unread bytes in
-        // PHP's stream buffers which some event loop implementations do not
+        // PHP's stream buffers which some event loop Command do not
         // trigger events on (edge triggered).
         // This does not affect the default event loop implementation (level
         // triggered), so we can ignore platforms not supporting this (HHVM).

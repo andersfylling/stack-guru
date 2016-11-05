@@ -4,7 +4,7 @@ namespace GuzzleHttp\Psr7;
 use Psr\Http\Message\StreamInterface;
 
 /**
- * Compose stream implementations based on a hash of functions.
+ * Compose stream Command based on a hash of functions.
  *
  * Allows for easy testing and extension of a provided stream without needing
  * to create a concrete class for a simple extension point.
