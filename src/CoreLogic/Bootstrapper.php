@@ -13,7 +13,7 @@ class Bootstrapper
     private $commands;
     private $folder;
 
-    function __construct($folder)
+    function __construct(string $folder = "")
     {
         $this->folder = $folder;
     }
@@ -21,8 +21,6 @@ class Bootstrapper
     function linkCommands ()
     {
         $this->commands = []; //reset
-
-        echo "> Linking commands:",PHP_EOL;
 
         foreach (glob("./{$this->folder}/*.php") as $file)
         {
@@ -35,11 +33,7 @@ class Bootstrapper
             $class = "\\Commands\\" . $basename;
 
             if (class_exists($class)) {
-                echo "\t{$command}.. ";
-
                 $this->commands[$command] = [$class, (new $class)->getDescription()];
-
-                echo "OK!", PHP_EOL;
             }
         }
     }

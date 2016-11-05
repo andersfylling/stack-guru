@@ -6,27 +6,22 @@
  * Time: 22.57
  */
 
-/*
- * Includes
- */
-require __DIR__.'/vendor/autoload.php';
+// Autoload classes
+require __DIR__.'/autoload.php';
 
-require "./src/AutoLoader.php";
+use \StackGuru\BotEvent;
 
-require "./config/discord.php";
-
-/*
- * Setup Auto loader
- */
-$loader = new \StackGuru\AutoLoader;
-$loader->register();
-$loader->addNamespace('StackGuru', __DIR__.'/src');
+// Load configuration
+require __DIR__.'/config/discord.php';
 
 /*
  * Set up the bot
  */
-use \StackGuru\BotEvent;
-$bot = new \StackGuru\CoreLogic\Bot();
+$bot = new \StackGuru\CoreLogic\Bot([
+    "discordToken" => DISCORD_TOKEN,
+    "commandsFolder" => "implementations",
+    "databaseFile" => "",
+]);
 
 
 /*

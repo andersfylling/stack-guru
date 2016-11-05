@@ -15,8 +15,6 @@ use \Discord\WebSockets\Event;
 
 class Bot
 {
-    static  $instance   = null;
-
     private $db         = \PDO::class;
     private $discord    = \Discord\Discord::class;
     private $message    = \Discord\Parts\Channel\Message::class;
@@ -53,18 +51,6 @@ class Bot
          * Set up a discord instance
          */
         $this->discord = new Discord(['token' => DISCORD_TOKEN]);
-    }
-
-    static function instance ()
-    {
-        /*
-         * Don't create a new bot if it's already running!
-         */
-        if (Bot::$instance == null) {
-            Bot::$instance = new Bot();
-        }
-
-        return Bot::$instance;
     }
 
     /**
@@ -274,7 +260,7 @@ class Bot
      *
      * @param string $message
      * @param \Closure $callback = null, To be called when message was sent
-     * @param boolean $private = null
+     * @param boolean $private = true,
      */
     private function response (string $message, \Closure $callback = null, boolean $private = null)
     {
@@ -285,7 +271,7 @@ class Bot
         /*
          * Check if the channel is private or not
          */
-        if ($private != null) {
+        if ($private) {
             /*
              * For some reason, the author object differs when its a private chat compared to public.
              */

@@ -10,6 +10,5 @@ Written and maintained by:
   
 ## Setup and common issues on new clones
 
-#### Undefined class constant 'MYSQL_ATTR_INIT_COMMAND' with pdo
-
-https://stackoverflow.com/questions/2424343/undefined-class-constant-mysql-attr-init-command-with-pdo
+ * #### Undefined class constant 'MYSQL_ATTR_INIT_COMMAND' with pdo
+   https://stackoverflow.com/questions/2424343/undefined-class-constant-mysql-attr-init-command-with-pdo
