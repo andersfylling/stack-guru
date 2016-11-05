@@ -1,8 +1,7 @@
 <?php
 
 // configs
-require_once __DIR__."/config/constants.php";
-require_once __DIR__."/config/discord.php";
+require_once __DIR__."/config/autoloader.php";
 
 // composer autoload
 require __DIR__."/vendor/autoload.php";
