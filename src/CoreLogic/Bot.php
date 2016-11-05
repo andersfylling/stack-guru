@@ -16,7 +16,6 @@ use \Discord\WebSockets\Event;
 class Bot extends Database
 {
     private $discord            = \Discord\Discord::class;
-    private $commandsFolder     = null;
 
     private $callbacks = [
         // string "callback_name" => [callable, callable, ... ],
@@ -30,9 +29,13 @@ class Bot extends Database
      * Bot constructor.
      *
      * @param array $options = []
+     * @param bool $shutup
      */
-    function __construct (array $options = [])
+    function __construct (array $options = [], bool $shutup = null)
     {
+        if ($shutup !== null && $shutup === true) {
+            return;
+        }
         /*
          * Verify parameter to have required keys
          */
@@ -46,8 +49,7 @@ class Bot extends Database
         /*
          * Retrieve the latest commands
          */
-        $this->commandsFolder = $options["commands"]["folder"];
-        $this->updateCommands();
+        $this->loadCommands($options["commands"]);
 
         /*
          * Set up a discord instance
@@ -255,14 +257,38 @@ class Bot extends Database
     /**
      * Gets all the commands in given folder.
      */
-    public function updateCommands ()
+    public function loadCommands (array $options = []) : array
     {
-        /*
-         * Retrieve commands available
-         */
-        $bs = new Bootstrapper($this->commandsFolder);
-        $bs->linkCommands();
-        $this->commands = $bs->getCommands(); //add linked commands
+        $options = Utils\ResolveOptions::verify($options, ["folder"]);
+
+        function dig (string $folder, bool $ignoreFiles = null) : array
+        {
+            $commands = [];
+            foreach (glob($folder . "/*") as $path)
+            {
+                $file = substr(strrchr($path, "/"), 1);
+
+                if (strpos($path, ".php") !== false) {
+                    if ($ignoreFiles !== true) {
+                        $commands[] = $file;
+                    }
+                } else {
+                    $commands[] = dig($path);
+                }
+            }
+
+            if ($ignoreFiles !== true) {
+                return [$folder => $commands];
+            } else {
+                return $commands;
+            }
+        }
+
+        $commands = dig($options["folder"], true);
+
+        echo \GuzzleHttp\json_encode($commands);
+
+        return []; //$commands;
     }
 
 
