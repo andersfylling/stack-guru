@@ -32,7 +32,7 @@ class Database
         /*
          * Verify parameter to have required keys
          */
-        $options = $this->resolveOptions($options);
+        $options = \CoreLogicUtils\ResolveOptions::verify($options, ["databaseFile"]);
 
 
         $this->file = $options["databaseFile"];
@@ -68,28 +68,6 @@ class Database
             //create content
             $this->db->exec( file_get_contents($this->file) );
         }
-    }
-
-    /**
-     * Resolves the options.
-     *
-     * @param array $options Array of options.
-     *
-     * @return array Options.
-     */
-    protected function resolveOptions(array $options = [])
-    {
-        $required = [
-            "databaseFile"
-        ];
-
-        foreach ($required as $key) {
-            if (!key_exists($key, $options)) {
-                throw new \ErrorException("Key file must be specified (and contain a value): {$key}");
-            }
-        }
-
-        return $options;
     }
 
 }

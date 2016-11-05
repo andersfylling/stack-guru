@@ -15,6 +15,7 @@ require "./Command.php";
 require "./Bootstrapper.php";
 require "./BotEvent.php";
 require "./Bot.php";
+require "./ResolveOptions.php";
 
 require "./config/discord.php";
 
