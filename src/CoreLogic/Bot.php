@@ -20,7 +20,7 @@ class Bot
     private $commandsFolder     = null;
 
     private $callbacks = [
-        // string "callback_name" => [\Closure, \Closure, ... ],
+        // string "callback_name" => [callable, callable, ... ],
     ];
 
     private $commands = [
@@ -67,8 +67,8 @@ class Bot
         /*
          * When the app is ready, listen for messages.
          */
-        $this->discord->on('ready', function (\Discord\Discord $self) {
-            $self->on('message', function (\Discord\Parts\Channel\Message $in) {
+        $this->discord->on("ready", function (\Discord\Discord $self) {
+            $self->on(Event::MESSAGE_CREATE, function (\Discord\Parts\Channel\Message $in) {
                 $this->incoming($in);
             });
         });
@@ -314,7 +314,7 @@ class Bot
      * @param string $state
      * @param \Closure $callback
      */
-    public function state (string $state, \Closure& $callback)
+    public function state (string $state, Callable $callback)
     {
         $this->callbacks[$state][] = $callback;
     }
@@ -328,9 +328,9 @@ class Bot
      */
     private function runScripts (string $state)
     {
-        if (array_key_exists($state, $this->callbacks)) {
+        if (isset($this->callbacks[$state])) {
             $arr = $this->callbacks[$state];
-            for ($i = sizeof($arr); $i >= 0; $i -= 1, call_user_func($arr[$i]));
+            for ($i = sizeof($arr) - 1; $i >= 0; call_user_func($this->callbacks[$state][$i--]));
         }
     }
 
