@@ -17,7 +17,6 @@ class Bot
     extends Database
 {
     private $discord            = \Discord\Discord::class;
-    private $message            = \Discord\Parts\Channel\Message::class;
     private $commandsFolder     = null;
 
     private $callbacks = [
@@ -69,8 +68,8 @@ class Bot
          * When the app is ready, listen for messages.
          */
         $this->discord->on(Event::READY, function (\Discord\Discord $self) {
-            $self->on(Event::MESSAGE_CREATE, function (\Discord\Parts\Channel\Message $in) use ($self) {
-                $this->incoming($in, $self);
+            $self->on(Event::MESSAGE_CREATE, function (\Discord\Parts\Channel\Message $in) {
+                $this->incoming($in);
             });
         });
 
@@ -96,14 +95,11 @@ class Bot
      */
     private function incoming (\Discord\Parts\Channel\Message $message)
     {
-        $this->message = \Discord\Parts\Channel\Message::class; // reset it
-        $this->message = $message;
-
         /*
          * First BOTEVENT::ALL_MESSAGES
          */
         {
-            $this->runScripts(\BotEvent::MESSAGE_ALL_I_SELF);
+            $this->runScripts(\StackGuru\BotEvent::MESSAGE_ALL_I_SELF);
         }
 
 
@@ -116,11 +112,11 @@ class Bot
          */
         {
             if ($message->author->id == $this->discord->id) {
-                $this->runScripts(\BotEvent::MESSAGE_FROM_SELF);
+                $this->runScripts(\StackGuru\BotEvent::MESSAGE_FROM_SELF);
                 return;
             }
 
-            $this->runScripts(\BotEvent::MESSAGE_ALL_E_SELF);
+            $this->runScripts(\StackGuru\BotEvent::MESSAGE_ALL_E_SELF);
         }
 
 
@@ -191,7 +187,7 @@ class Bot
             /*
              * The incoming message is for the bot.
              */
-            $this->runScripts(\BotEvent::MESSAGE_OTHERS_TO_SELF);
+            $this->runScripts(\StackGuru\BotEvent::MESSAGE_OTHERS_TO_SELF);
 
         }
 
@@ -226,7 +222,7 @@ class Bot
                 }
             }
             else {
-                $this->response("I'm sorry. It seems I cannot find your command. Please try the command: help");
+                $this->response("I'm sorry. It seems I cannot find your command. Please try the command: help", $message);
                 return;
             }
         }
@@ -242,7 +238,7 @@ class Bot
             return $this->discord;
         });
 
-        $instance->command($bot["arguments"], $this->message);
+        $instance->command($bot["arguments"], $message);
 
 
     } // METHOD END: public incomming (\Discord\Parts\Channel\Message $in, \Discord\Discord $self)
@@ -267,9 +263,9 @@ class Bot
      * @param \Closure $callback = null, To be called when message was sent
      * @param boolean $private = null
      */
-    private function response (string $message, \Closure $callback = null, boolean $private = null)
+    private function response (string $str, \Discord\Parts\Channel\Message $message = null, \Closure $callback = null, boolean $private = null)
     {
-        if ($this->message === null) {
+        if ($message === null) {
             return;
         }
 
@@ -284,15 +280,15 @@ class Bot
             /*
              * Private
              */
-            if ($this->message->channel->is_private) {
-                $this->message->author->sendMessage($message)->then($callback);
+            if ($message->channel->is_private) {
+                $message->author->sendMessage($str)->then($callback);
             }
 
             /*
              * Public
              */
             else {
-                $this->message->author->user->sendMessage($message)->then($callback);
+                $message->author->user->sendMessage($str)->then($callback);
             }
         }
 
@@ -301,7 +297,7 @@ class Bot
          * $in->author->((user->)*)sendMessage("{$in->author}, {$message}");
          */
         else {
-            $this->message->reply($message)->then($callback);
+            $message->reply($str)->then($callback);
         }
     }
 
