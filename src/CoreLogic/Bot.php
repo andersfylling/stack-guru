@@ -13,8 +13,7 @@ use \Discord\Discord;
 use \Discord\WebSockets\Event;
 
 
-class Bot
-    extends Database
+class Bot extends Database
 {
     private $discord            = \Discord\Discord::class;
     private $commandsFolder     = null;
@@ -29,34 +28,31 @@ class Bot
 
     /**
      * Bot constructor.
+     *
+     * @param array $options = []
      */
     function __construct (array $options = [])
     {
         /*
          * Verify parameter to have required keys
          */
-        $options = Utils\ResolveOptions::verify($options, ["discordToken", "commandsFolder"]);
+        $options = Utils\ResolveOptions::verify($options, ["discord", "commands", "database"]);
 
         /*
          * Setup database connection
-         *
-         * To use the Database::$db instance. add:
-         *  use \CoreLogic\Database;
-         *
-         * then Database::$db; is use able.
          */
-        Database::__construct($options);
+        Database::__construct($options["database"]);
 
         /*
          * Retrieve the latest commands
          */
-        $this->commandsFolder = $options["commandsFolder"];
+        $this->commandsFolder = $options["commands"]["folder"];
         $this->updateCommands();
 
         /*
          * Set up a discord instance
          */
-        $this->discord = new Discord(["token" => $options["discordToken"]]);
+        $this->discord = new Discord($options["discord"]);
     }
 
     /**
@@ -68,8 +64,8 @@ class Bot
          * When the app is ready, listen for messages.
          */
         $this->discord->on("ready", function (\Discord\Discord $self) {
-            $self->on(Event::MESSAGE_CREATE, function (\Discord\Parts\Channel\Message $in) {
-                $this->incoming($in);
+            $self->on(Event::MESSAGE_CREATE, function (\Discord\Parts\Channel\Message $message) {
+                $this->incoming($message);
             });
         });
 
@@ -85,13 +81,27 @@ class Bot
     }
 
     /**
+     *
+     */
+    public function stop ()
+    {
+        /*
+         * Stop discord connection
+         */
+        try {
+            $this->discord->close();
+        } catch (\Throwable $e) {
+            echo $e;
+        }
+    }
+
+    /**
      * Probably the worst function i've written in my life.
      *  If you can even call this a function.
      *
      * TODO: a method that takes any message and return a object for dealing with the content if it's a command.
      *
      * @param \Discord\Parts\Channel\Message $message
-     * @param Discord $self
      */
     private function incoming (\Discord\Parts\Channel\Message $message)
     {
@@ -124,16 +134,6 @@ class Bot
          * Check if anyone is contacting the bot / SELF
          */
         {
-
-            /*
-             * Convert the object to an array.
-             *
-             * Needs a better to handle this. But I wasn't able to use $in->mentions->{$self->id}
-             *  to get the content I needed..
-             */
-            $mentions = json_decode(json_encode($message->mentions), true);
-
-
             /*
              * Check if this message was written in a public.
              *  Otherwise its private => PM
@@ -143,6 +143,15 @@ class Bot
                  * Keeps track of whether or not the bot has been referenced.
                  */
                 $referenced = false;
+
+
+                /*
+                 * Convert the object to an array.
+                 *
+                 * Needs a better to handle this. But I wasn't able to use $in->mentions->{$self->id}
+                 *  to get the content I needed..
+                 */
+                $mentions = json_decode(json_encode($message->mentions), true);
 
                 /*
                  * Check if the bot was referenced by either "@stack-guru" or "@Bot"
@@ -221,7 +230,7 @@ class Bot
                 }
             }
             else {
-                $this->response("I'm sorry. It seems I cannot find your command. Please try the command: help", $message);
+                Utils\Response::message("I'm sorry. It seems I cannot find your command. Please try the command: help", $message);
                 return;
             }
         }
@@ -256,50 +265,6 @@ class Bot
         $this->commands = $bs->getCommands(); //add linked commands
     }
 
-    /**
-     * Reply to a user.
-     *
-     * @param string $message
-     * @param \Closure $callback = null, To be called when message was sent
-     * @param boolean $private = null
-     */
-    private function response (string $str, \Discord\Parts\Channel\Message $message = null, \Closure $callback = null, boolean $private = null)
-    {
-        if ($message === null) {
-            return;
-        }
-
-        /*
-         * Check if the channel is private or not
-         */
-        if ($private !== null) {
-            /*
-             * For some reason, the author object differs when its a private chat compared to public.
-             */
-
-            /*
-             * Private
-             */
-            if ($message->channel->is_private) {
-                $message->author->sendMessage($str)->then($callback);
-            }
-
-            /*
-             * Public
-             */
-            else {
-                $message->author->user->sendMessage($str)->then($callback);
-            }
-        }
-
-        /*
-         * If this is to be sent in public, utilize the already existing reply method.
-         * $in->author->((user->)*)sendMessage("{$in->author}, {$message}");
-         */
-        else {
-            $message->reply($str)->then($callback);
-        }
-    }
 
 
     /* ********************************************
@@ -332,6 +297,11 @@ class Bot
             $arr = $this->callbacks[$state];
             for ($i = sizeof($arr) - 1; $i >= 0; call_user_func($this->callbacks[$state][$i--]));
         }
+    }
+
+    public function getCommands () : string
+    {
+        return $this->commands;
     }
 
 }
