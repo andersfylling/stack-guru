@@ -15,7 +15,7 @@ use \Discord\WebSockets\Event;
 
 class Bot
 {
-    private $instance   = null;
+    static  $instance   = null;
 
     private $db         = \PDO::class;
     private $discord    = \Discord\Discord::class;
@@ -35,13 +35,6 @@ class Bot
     function __construct ()
     {
         /*
-         * Don't create a new bot if it's already running!
-         */
-        if ($this->instance != null) {
-            return;
-        }
-
-        /*
          * Setup database connection
          *
          * To use the Database::$db instance. add:
@@ -60,6 +53,18 @@ class Bot
          * Set up a discord instance
          */
         $this->discord = new Discord(['token' => DISCORD_TOKEN]);
+    }
+
+    static function instance ()
+    {
+        /*
+         * Don't create a new bot if it's already running!
+         */
+        if (Bot::$instance == null) {
+            Bot::$instance = new Bot();
+        }
+
+        return Bot::$instance;
     }
 
     /**

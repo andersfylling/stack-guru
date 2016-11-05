@@ -11,10 +11,6 @@
  */
 require __DIR__.'/vendor/autoload.php';
 
-// require "./src/CoreLogic/Database.php";
-// require "./src/CoreLogic/Bot.php";
-// require "./src/Commands/Command.php";
-
 require "./src/AutoLoader.php";
 
 require "./config/discord.php";

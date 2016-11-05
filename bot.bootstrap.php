@@ -1,33 +1,22 @@
 <?php
 
-/**
- * Logging
- */
+// Logging
 ini_set("log_errors", "1");
 ini_set("error_reporting", "E_ALL");
 ini_set("error_log", "/var/logs/php_errors.php");
 ini_set("log_errors_max_len", "0");
 ini_set('display_errors', "1");
 
+// Autoloader
+require __DIR__."/autoload.php";
 
-/**
- * Base class for starting the bot. should be updated and rewritten.
- *
- * @author http://github.com/sciencefyll
- */
-
-require __DIR__.'/vendor/autoload.php';
-require "./Database.php";
-require "./Command.php";
-require "./Bootstrapper.php";
+require __DIR__."/config/discord.php";
 
 use \Discord\Discord;
 use \Discord\WebSockets\Event;
 
-/*
- * Retrieve commands available
- */
-$bootstrapper = new \CoreLogic\Bootstrapper("implementations");
+// Load commands
+$bootstrapper = new \StackGuru\CoreLogic\Bootstrapper("implementations");
 $bootstrapper->linkCommands();
 $commands = $bootstrapper->getCommands(); //add linked commands
 echo "DONE!", PHP_EOL, PHP_EOL;
@@ -36,11 +25,11 @@ echo "DONE!", PHP_EOL, PHP_EOL;
  * Setup database connection
  *
  * To use the Database::$db instance. add:
- *  use \CoreLogic\Database;
+ *  use \StackGuru\CoreLogic\Database;
  *
  * then Database::$db; is use able.
  */
-new \CoreLogic\Database();
+new \StackGuru\CoreLogic\Database();
 
 /*
  * Configure bot
@@ -48,34 +37,25 @@ new \CoreLogic\Database();
 echo "> Configuring bot connection..", PHP_EOL;
 
 $config = [
-    'token' => 'MjQwNjIwNjA3MDM1ODAxNjA3.CvF-7A.ugfb5OgkbalSMXOwUm3lcA-EUu4',
+    'token' => DISCORD_TOKEN,
 ];
 
 $discord = new Discord($config);
 
-
-
-
 $discord->on('ready', function ($self) use ($discord, $commands) {
     echo "DONE!", PHP_EOL, PHP_EOL;
-
-
 
     /*
      * Listen to EVERY message. Even itself.
      */
     echo "> Bot is now listening.", PHP_EOL, PHP_EOL;
     $self->on("message", function ($in) use ($self, $discord, $commands) {
-
         /*
          * If the bot is talking, don't reference it.
          */
         if ($in->author->id == $self->id) {
             return;
         }
-
-
-
 
         /*
          * Check if bot is mentioned.
