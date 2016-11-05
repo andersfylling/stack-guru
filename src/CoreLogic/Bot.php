@@ -14,10 +14,11 @@ use \Discord\WebSockets\Event;
 
 
 class Bot
+    extends Database
 {
-    private $db         = \PDO::class;
-    private $discord    = \Discord\Discord::class;
-    private $message    = \Discord\Parts\Channel\Message::class;
+    private $discord            = \Discord\Discord::class;
+    private $message            = \Discord\Parts\Channel\Message::class;
+    private $commandsFolder     = null;
 
     private $callbacks = [
         // string "callback_name" => [\Closure, \Closure, ... ],
@@ -30,8 +31,13 @@ class Bot
     /**
      * Bot constructor.
      */
-    function __construct ()
+    function __construct (array $options = [])
     {
+        /*
+         * Verify parameter to have required keys
+         */
+        $options = Utils\ResolveOptions::verify($options, ["discordToken", "commandsFolder"]);
+
         /*
          * Setup database connection
          *
@@ -40,17 +46,18 @@ class Bot
          *
          * then Database::$db; is use able.
          */
-        $this->db = Database::link();
+        Database::__construct($options);
 
         /*
          * Retrieve the latest commands
          */
+        $this->commandsFolder = $options["commandsFolder"];
         $this->updateCommands();
 
         /*
          * Set up a discord instance
          */
-        $this->discord = new Discord(['token' => DISCORD_TOKEN]);
+        $this->discord = new Discord(["token" => $options["discordToken"]]);
     }
 
     /**
@@ -95,9 +102,9 @@ class Bot
         /*
          * First BOTEVENT::ALL_MESSAGES
          */
-        /* BLOCK START */ { /* BLOCK START */
-        $this->runScripts(\BotEvent::MESSAGE_ALL_I_SELF);
-        /* BLOCK END */ } /* BLOCK END */
+        {
+            $this->runScripts(\BotEvent::MESSAGE_ALL_I_SELF);
+        }
 
 
         /*
@@ -107,86 +114,86 @@ class Bot
          * Don't continue if the message is by the bot.
          * Initiate the BOTEVENT::ALL_MESSAGES_E_SELF
          */
-        /* BLOCK START */ { /* BLOCK START */
-        if ($message->author->id == $this->discord->id) {
-            $this->runScripts(\BotEvent::MESSAGE_FROM_SELF);
-            return;
-        }
+        {
+            if ($message->author->id == $this->discord->id) {
+                $this->runScripts(\BotEvent::MESSAGE_FROM_SELF);
+                return;
+            }
 
-        $this->runScripts(\BotEvent::MESSAGE_ALL_E_SELF);
-        /* BLOCK END */ } /* BLOCK END */
+            $this->runScripts(\BotEvent::MESSAGE_ALL_E_SELF);
+        }
 
 
         /*
          * Check if anyone is contacting the bot / SELF
          */
-        /* BLOCK START */ { /* BLOCK START */
-
-        /*
-         * Convert the object to an array.
-         *
-         * Needs a better to handle this. But I wasn't able to use $in->mentions->{$self->id}
-         *  to get the content I needed..
-         */
-        $mentions = json_decode(json_encode($message->mentions), true);
-
-
-        /*
-         * Check if this message was written in a public.
-         *  Otherwise its private => PM
-         */
-        if (!$message->channel->is_private) {
-            /*
-             * Keeps track of whether or not the bot has been referenced.
-             */
-            $referenced = false;
+        {
 
             /*
-             * Check if the bot was referenced by either "@stack-guru" or "@Bot"
-             * Sadly I've hardcoded the mention ID for @Bot. This should be fixed somehow.
+             * Convert the object to an array.
              *
-             * TODO: this is ugly, fix it.
-             *
-             * Saves some of the if checks, otherwise these gets so long.
+             * Needs a better to handle this. But I wasn't able to use $in->mentions->{$self->id}
+             *  to get the content I needed..
              */
-            $mentioned = isset($mentions[$this->discord->id]);
-            $usedBotReference = strpos($message->content, "<@&240626683487453184>") !== false; //@Bot
-            if (!$referenced && ($mentioned || $usedBotReference)) {
-                $message->content = str_replace("<@" . $this->discord->id . ">", "", $message->content); // removes the mention of bot
-                $referenced = true; // Bot was not mentioned nor was @Bot used: <@&240626683487453184>
+            $mentions = json_decode(json_encode($message->mentions), true);
+
+
+            /*
+             * Check if this message was written in a public.
+             *  Otherwise its private => PM
+             */
+            if (!$message->channel->is_private) {
+                /*
+                 * Keeps track of whether or not the bot has been referenced.
+                 */
+                $referenced = false;
+
+                /*
+                 * Check if the bot was referenced by either "@stack-guru" or "@Bot"
+                 * Sadly I've hardcoded the mention ID for @Bot. This should be fixed somehow.
+                 *
+                 * TODO: this is ugly, fix it.
+                 *
+                 * Saves some of the if checks, otherwise these gets so long.
+                 */
+                $mentioned = isset($mentions[$this->discord->id]);
+                $usedBotReference = strpos($message->content, "<@&240626683487453184>") !== false; //@Bot
+                if (!$referenced && ($mentioned || $usedBotReference)) {
+                    $message->content = str_replace("<@" . $this->discord->id . ">", "", $message->content); // removes the mention of bot
+                    $referenced = true; // Bot was not mentioned nor was @Bot used: <@&240626683487453184>
+                }
+
+                /*
+                 * Check if the bot was referenced by "!"
+                 */
+                if (!$referenced && (substr($message->content, 0, 1) === "!")) {
+                    $message->content = ltrim($message->content, "!");
+                    $referenced = true;
+                }
+
+
+                /*
+                 * Check if the bot wasn't referenced.
+                 *
+                 * If so, exit this function.
+                 */
+                if (!$referenced) {
+                    return;
+                }
+
+                /*
+                 * Since the bot has been referenced at this point, and the reference ID been stripped.
+                 * Remove any useless whitespaces, left of the message or command input.
+                 */
+                $message->content = ltrim($message->content, " ");
             }
 
             /*
-             * Check if the bot was referenced by "!"
+             * The incoming message is for the bot.
              */
-            if (!$referenced && (substr($message->content, 0, 1) === "!")) {
-                $message->content = ltrim($message->content, "!");
-                $referenced = true;
-            }
+            $this->runScripts(\BotEvent::MESSAGE_OTHERS_TO_SELF);
 
-
-            /*
-             * Check if the bot wasn't referenced.
-             *
-             * If so, exit this function.
-             */
-            if (!$referenced) {
-                return;
-            }
-
-            /*
-             * Since the bot has been referenced at this point, and the reference ID been stripped.
-             * Remove any useless whitespaces, left of the message or command input.
-             */
-            $message->content = ltrim($message->content, " ");
         }
-
-        /*
-         * The incoming message is for the bot.
-         */
-        $this->runScripts(\BotEvent::MESSAGE_OTHERS_TO_SELF);
-
-        /* BLOCK END */ } /* BLOCK END */
 
 
 
@@ -201,7 +208,6 @@ class Bot
             "arguments" => []
         ];
 
-        /* BLOCK START */ { /* BLOCK START */
         {
             $words      = explode(" ", strtolower($message->content));
             $command    = $words[0];
@@ -224,7 +230,6 @@ class Bot
                 return;
             }
         }
-        /* BLOCK END */ } /* BLOCK END */
 
         /*
          * Initiate command
@@ -250,9 +255,9 @@ class Bot
         /*
          * Retrieve commands available
          */
-        $bootstrapper = new Bootstrapper("implementations");
-        $bootstrapper->linkCommands();
-        $this->commands = $bootstrapper->getCommands(); //add linked commands
+        $bs = new Bootstrapper($this->commandsFolder);
+        $bs->linkCommands();
+        $this->commands = $bs->getCommands(); //add linked commands
     }
 
     /**
@@ -260,18 +265,18 @@ class Bot
      *
      * @param string $message
      * @param \Closure $callback = null, To be called when message was sent
-     * @param boolean $private = true,
+     * @param boolean $private = null
      */
     private function response (string $message, \Closure $callback = null, boolean $private = null)
     {
-        if ($this->message == null) {
+        if ($this->message === null) {
             return;
         }
 
         /*
          * Check if the channel is private or not
          */
-        if ($private) {
+        if ($private !== null) {
             /*
              * For some reason, the author object differs when its a private chat compared to public.
              */
@@ -332,6 +337,5 @@ class Bot
             for ($i = sizeof($arr); $i >= 0; $i -= 1, call_user_func($arr[$i]));
         }
     }
-
 
 }
