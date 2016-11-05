@@ -11,15 +11,12 @@ require __DIR__.'/autoload.php';
 
 use \StackGuru\BotEvent;
 
-// Load configuration
-require __DIR__.'/config/discord.php';
-
 /*
  * Set up the bot
  */
 $bot = new \StackGuru\CoreLogic\Bot([
     "discordToken" => DISCORD_TOKEN,
-    "commandsFolder" => __DIR__."/src/Commands/implementations",
+    "commandsFolder" => __DIR__ . "/src/Commands/Command",
     "databaseFile" => "",
 ]);
 

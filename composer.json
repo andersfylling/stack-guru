@@ -1,5 +1,8 @@
 {
     "require": {
         "team-reflex/discord-php": "dev-develop"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "5.5.*"
     }
 }
