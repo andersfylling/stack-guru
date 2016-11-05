@@ -8,7 +8,6 @@
 namespace StackGuru\CoreLogic;
 
 use \PDO;
-use \Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 
 class Database

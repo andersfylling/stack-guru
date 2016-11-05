@@ -17,7 +17,6 @@ class Bot
     extends Database
 {
     private $discord            = \Discord\Discord::class;
-    private $message            = \Discord\Parts\Channel\Message::class;
     private $commandsFolder     = null;
 
     private $callbacks = [
@@ -69,8 +68,8 @@ class Bot
          * When the app is ready, listen for messages.
          */
         $this->discord->on('ready', function (\Discord\Discord $self) {
-            $self->on('message', function (\Discord\Parts\Channel\Message $in) use ($self) {
-                $this->incoming($in, $self);
+            $self->on('message', function (\Discord\Parts\Channel\Message $in) {
+                $this->incoming($in);
             });
         });
 
@@ -96,9 +95,6 @@ class Bot
      */
     private function incoming (\Discord\Parts\Channel\Message $message)
     {
-        $this->message = \Discord\Parts\Channel\Message::class; // reset it
-        $this->message = $message;
-
         /*
          * First BOTEVENT::ALL_MESSAGES
          */
@@ -225,7 +221,7 @@ class Bot
                 }
             }
             else {
-                $this->response("I'm sorry. It seems I cannot find your command. Please try the command: help");
+                $this->response("I'm sorry. It seems I cannot find your command. Please try the command: help", $message);
                 return;
             }
         }
@@ -242,7 +238,7 @@ class Bot
             return $this->discord;
         });
 
-        $instance->command($bot["arguments"], $this->message);
+        $instance->command($bot["arguments"], $message);
 
 
     } // METHOD END: public incomming (\Discord\Parts\Channel\Message $in, \Discord\Discord $self)
@@ -267,9 +263,9 @@ class Bot
      * @param \Closure $callback = null, To be called when message was sent
      * @param boolean $private = null
      */
-    private function response (string $message, \Closure $callback = null, boolean $private = null)
+    private function response (string $str, \Discord\Parts\Channel\Message $message = null, \Closure $callback = null, boolean $private = null)
     {
-        if ($this->message === null) {
+        if ($message === null) {
             return;
         }
 
@@ -284,15 +280,15 @@ class Bot
             /*
              * Private
              */
-            if ($this->message->channel->is_private) {
-                $this->message->author->sendMessage($message)->then($callback);
+            if ($message->channel->is_private) {
+                $message->author->sendMessage($str)->then($callback);
             }
 
             /*
              * Public
              */
             else {
-                $this->message->author->user->sendMessage($message)->then($callback);
+                $message->author->user->sendMessage($str)->then($callback);
             }
         }
 
@@ -301,7 +297,7 @@ class Bot
          * $in->author->((user->)*)sendMessage("{$in->author}, {$message}");
          */
         else {
-            $this->message->reply($message)->then($callback);
+            $message->reply($str)->then($callback);
         }
     }
 
