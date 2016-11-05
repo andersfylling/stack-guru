@@ -14,7 +14,7 @@ interface CommandInterface
     /*
      * Parses the give string array to do further actions.. improvements?
      */
-    public function /*        */ process (/* string[] */ array $args);
+    public function /*        */ response (/* string[] */ array $args) : string;
     //public function /*        */ linkDiscordObject  (/* function () : Object */ $callback);
 
 }
