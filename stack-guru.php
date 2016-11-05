@@ -15,9 +15,15 @@ use \StackGuru\BotEvent;
  * Set up the bot
  */
 $bot = new \StackGuru\CoreLogic\Bot([
-    "discordToken" => DISCORD_TOKEN,
-    "commandsFolder" => __DIR__ . "/src/Commands/Command",
-    "databaseFile" => "",
+
+    "discord"   => ST_DISCORD_SETTINGS,
+
+    "database"  => ST_DATABASE_SETTINGS,
+
+    "commands"  => [
+        "folder" => __DIR__ . "/src/Commands"
+    ]
+
 ]);
 
 
