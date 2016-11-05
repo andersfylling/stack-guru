@@ -12,15 +12,6 @@ use \PDO;
 
 class Database
 {
-    private $host   = "138.68.66.212";
-    private $port   = "11237";
-    private $user   = "devs";
-    private $pass   = "e98de41bc5fa94d464bb831da129ab49ab5a0dffd54811fd";
-    private $schema = "mydb";
-    private $file   = null;
-
-
-
     /*
      * Database instance
      */
@@ -32,16 +23,16 @@ class Database
         /*
          * Verify parameter to have required keys
          */
-        $options = Utils\ResolveOptions::verify($options, ["databaseFile"]);
+        $options = Utils\ResolveOptions::verify($options, ["file", "host", "port", "user", "pass", "schema"]);
 
 
-        $this->file = $options["databaseFile"];
+        $this->file = $options["file"];
 
         /*
          * establish a new PDO connection
          */
         $this->db = new PDO(
-            "mysql:host={$this->host};port={$this->port}", $this->user, $this->pass,
+            "mysql:host={$options["host"]};port={$options["port"]}", $options["user"], $options["pass"],
             array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'")
         );
         $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -49,7 +40,7 @@ class Database
         /*
          * If the database does not exist, it is created.
          */
-        $name = "`".str_replace("`","``", $this->schema)."`";
+        $name = "`".str_replace("`","``", $options["schema"])."`";
         $this->db->query('CREATE DATABASE IF NOT EXISTS ' . $name);
         $this->db->query('use ' . $name);
         unset($name);
