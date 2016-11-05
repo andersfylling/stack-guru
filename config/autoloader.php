@@ -9,8 +9,6 @@
             continue;
         }
 
-        echo $file . PHP_EOL;
-
         require_once $file;
     }
 }
