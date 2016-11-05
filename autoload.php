@@ -1,7 +1,7 @@
 <?php
 
 // configs
-require_once __DIR__."/config/autoloader.php";
+require __DIR__."/config/autoloader.php";
 
 // composer autoload
 require __DIR__."/vendor/autoload.php";
