@@ -1,7 +1,4 @@
-get.classes.php
 .idea/
-
 config/database.php
 config/discord.php
-
 vendor/
