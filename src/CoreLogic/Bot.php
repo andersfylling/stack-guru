@@ -68,8 +68,8 @@ class Bot
         /*
          * When the app is ready, listen for messages.
          */
-        $this->discord->on(Event::READY, function (\Discord\Discord $self) {
-            $self->on(Event::MESSAGE_CREATE, function (\Discord\Parts\Channel\Message $in) use ($self) {
+        $this->discord->on('ready', function (\Discord\Discord $self) {
+            $self->on('message', function (\Discord\Parts\Channel\Message $in) use ($self) {
                 $this->incoming($in, $self);
             });
         });
@@ -103,7 +103,7 @@ class Bot
          * First BOTEVENT::ALL_MESSAGES
          */
         {
-            $this->runScripts(\BotEvent::MESSAGE_ALL_I_SELF);
+            $this->runScripts(\StackGuru\BotEvent::MESSAGE_ALL_I_SELF);
         }
 
 
@@ -116,11 +116,11 @@ class Bot
          */
         {
             if ($message->author->id == $this->discord->id) {
-                $this->runScripts(\BotEvent::MESSAGE_FROM_SELF);
+                $this->runScripts(\StackGuru\BotEvent::MESSAGE_FROM_SELF);
                 return;
             }
 
-            $this->runScripts(\BotEvent::MESSAGE_ALL_E_SELF);
+            $this->runScripts(\StackGuru\BotEvent::MESSAGE_ALL_E_SELF);
         }
 
 
@@ -191,10 +191,9 @@ class Bot
             /*
              * The incoming message is for the bot.
              */
-            $this->runScripts(\BotEvent::MESSAGE_OTHERS_TO_SELF);
+            $this->runScripts(\StackGuru\BotEvent::MESSAGE_OTHERS_TO_SELF);
 
         }
-
 
 
         /*
@@ -230,6 +229,7 @@ class Bot
                 return;
             }
         }
+
 
         /*
          * Initiate command

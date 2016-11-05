@@ -19,7 +19,7 @@ require __DIR__.'/config/discord.php';
  */
 $bot = new \StackGuru\CoreLogic\Bot([
     "discordToken" => DISCORD_TOKEN,
-    "commandsFolder" => "implementations",
+    "commandsFolder" => __DIR__."/src/Commands/implementations",
     "databaseFile" => "",
 ]);
 

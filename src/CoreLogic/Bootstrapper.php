@@ -22,7 +22,7 @@ class Bootstrapper
     {
         $this->commands = []; //reset
 
-        foreach (glob("./{$this->folder}/*.php") as $file)
+        foreach (glob("{$this->folder}/*.php") as $file)
         {
             require_once $file;
 
@@ -30,10 +30,11 @@ class Bootstrapper
             // which is essentially the class name
             $basename = basename($file, '.php');
             $command = strtolower($basename);
-            $class = "\\Commands\\" . $basename;
+            $class = "\\StackGuru\\Commands\\" . $basename;
 
             if (class_exists($class)) {
                 $this->commands[$command] = [$class, (new $class)->getDescription()];
+                echo "> Loaded command '{$command}'", PHP_EOL;
             }
         }
     }
