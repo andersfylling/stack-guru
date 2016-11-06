@@ -5,7 +5,7 @@ namespace StackGuru\Commands\Google;
 class Google extends \StackGuru\Commands\CommandBase
 {
     const DESCRIPTION = "";
-    const URL = "http://www.google.com/";
+    const URL = "https://www.google.com/";
 
     public function __construct()
     {
