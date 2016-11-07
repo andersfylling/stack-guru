@@ -25,7 +25,7 @@ class Google implements Command
     public function command ($args, $in)
     {
         if (sizeof($args) > 0) {
-            $query = $args[0];
+            $query = implode(" ", $args);
         }
         else {
             $query = "Why am I such an asshole?";
