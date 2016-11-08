@@ -2,7 +2,7 @@
 
 namespace StackGuru\Commands;
 
-class CommandBase
+class BaseCommand
 {
     protected $method;
 

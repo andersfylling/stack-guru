@@ -240,8 +240,11 @@ class Bot extends Database
          */
         $command = $this->commands[$cmd["command"]];
 
-        $command->process($cmd["arguments"], $message);
+        $context = new \StackGuru\CommandContext();
+        $context->bot = $this;
+        $context->message = $message;
 
+        $command->process($cmd["arguments"], $context);
 
     } // METHOD END: public incomming (\Discord\Parts\Channel\Message $in, \Discord\Discord $self)
 
@@ -294,10 +297,9 @@ class Bot extends Database
                     $classNamespace = ucfirst(basename($folder));
                     $className = ucfirst(basename($filename, '.php'));
                     $class = "\\StackGuru\\Commands\\${classNamespace}\\${className}";
-                    echo "Class ${class}", PHP_EOL;
                     if (class_exists($class)) {
                         $interfaces = class_implements($class);
-                        if (isset($interfaces["StackGuru\\Commands\\CommandInterface"])) {
+                        if (isset($interfaces["StackGuru\\CommandInterface"])) {
                             $commandName = $class::COMMAND_NAME;
                             $command = new $class();
                             echo "\t{$commandName}.. ";
@@ -309,7 +311,7 @@ class Bot extends Database
             }
         }
 
-        return []; //$commands;
+        return $this->commands;
     }
 
 
