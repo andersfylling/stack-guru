@@ -23,7 +23,7 @@ class SearchTest extends TestCase
         $expected2 = $base . "q=Why+am+I+such+an+asshole%3F";
 
 
-        $this->assertEquals($expected1, $google->response($query));
-        $this->assertEquals($expected2, $google->response());
+        $this->assertEquals($expected1, $google->process($query));
+        $this->assertEquals($expected2, $google->process());
     }
 }

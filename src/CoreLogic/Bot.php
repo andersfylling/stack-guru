@@ -178,7 +178,6 @@ class Bot extends Database
                     $referenced = true;
                 }
 
-
                 /*
                  * Check if the bot wasn't referenced.
                  *
@@ -202,14 +201,13 @@ class Bot extends Database
 
         }
 
-
         /*
          * Retrieve the command and view later values, separated by whitespace, as arguments.
          *
          * eg.
          *  <@dfksj...> command arg1 arg2 arg3 arg4
          */
-        $bot = [
+        $cmd = [
             "command"   => "",
             "arguments" => []
         ];
@@ -222,34 +220,27 @@ class Bot extends Database
              * If the first word/command is a registered command, save it.
              */
             if (array_key_exists($command, $this->commands)) {
-                $bot["command"] = $command;
+                $cmd["command"] = $command;
 
                 /*
                  * Add the arguments if there are any, and convert all to lowercase
                  */
                 if (sizeof($words) > 1) {
-                    $bot["arguments"] = array_slice($words, 1);
+                    $cmd["arguments"] = array_slice($words, 1);
                 }
             }
             else {
-                Utils\Response::message("I'm sorry. It seems I cannot find your command. Please try the command: help", $message);
+                Utils\Response::sendResponse("I'm sorry. It seems I cannot find your command. Please try the command: help", $message);
                 return;
             }
         }
 
-
         /*
          * Initiate command
          */
-        $className = $this->commands[$bot["command"]];
-        $instance = new $className();
+        $command = $this->commands[$cmd["command"]];
 
-        //if the class wants it can now use the $discord instance. must be override parent class Command!
-        $instance->linkDiscordObject(function () {
-            return $this->discord;
-        });
-
-        $instance->command($bot["arguments"], $message);
+        $command->process($cmd["arguments"], $message);
 
 
     } // METHOD END: public incomming (\Discord\Parts\Channel\Message $in, \Discord\Discord $self)
@@ -261,6 +252,7 @@ class Bot extends Database
     {
         $options = Utils\ResolveOptions::verify($options, ["folder"]);
 
+        // Find command files
         function dig (string $folder, bool $ignoreFiles = null) : array
         {
             $commands = [];
@@ -272,8 +264,14 @@ class Bot extends Database
                     if ($ignoreFiles !== true) {
                         $commands[] = $file;
                     }
-                } else {
-                    $commands[] = dig($path);
+                }
+                else {
+                    if (is_dir($path))
+                    {
+                        $files = dig($path);
+                        if (sizeof($files) > 0)
+                            $commands[] = $files;
+                    }
                 }
             }
 
@@ -284,9 +282,32 @@ class Bot extends Database
             }
         }
 
-        $commands = dig($options["folder"], true);
+        $commandFiles = dig($options["folder"], true);
 
-        echo \GuzzleHttp\json_encode($commands);
+        // Load files
+        foreach ($commandFiles as $fileSet) {
+            foreach ($fileSet as $folder => $files) {
+                foreach ($files as $filename) {
+                    $path = $folder."/".$filename;
+                    include $path;
+
+                    $classNamespace = ucfirst(basename($folder));
+                    $className = ucfirst(basename($filename, '.php'));
+                    $class = "\\StackGuru\\Commands\\${classNamespace}\\${className}";
+                    echo "Class ${class}", PHP_EOL;
+                    if (class_exists($class)) {
+                        $interfaces = class_implements($class);
+                        if (isset($interfaces["StackGuru\\Commands\\CommandInterface"])) {
+                            $commandName = $class::COMMAND_NAME;
+                            $command = new $class();
+                            echo "\t{$commandName}.. ";
+                            $this->commands[$commandName] = $command;
+                            echo "OK!", PHP_EOL;
+                        }
+                    }
+                }
+            }
+        }
 
         return []; //$commands;
     }

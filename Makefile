@@ -1,3 +1,3 @@
 .PHONY: test
 test:
-	phpunit --bootstrap autoload.php tests/
+	phpunit --bootstrap test-environment.php tests/

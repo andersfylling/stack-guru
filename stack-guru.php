@@ -7,7 +7,7 @@
  */
 
 // Autoload classes
-require __DIR__.'/autoload.php';
+require __DIR__."/autoload.php";
 
 use \StackGuru\BotEvent;
 
@@ -75,4 +75,4 @@ $bot->state(BotEvent::MESSAGE_OTHERS_TO_SELF,   $messages_other_to_bot);
 /*
  * Run the bot
  */
-//$bot->run();
+$bot->run();

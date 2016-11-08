@@ -19,7 +19,7 @@ class Response
      * @param \Closure|null $callback
      * @param bool|null $private
      */
-    public static function message (
+    public static function sendResponse (
         string                          $str,
         \Discord\Parts\Channel\Message  $message    = null,
         boolean                         $private    = null,
@@ -43,7 +43,9 @@ class Response
              */
             if ($message->channel->is_private) {
                 if (DEVELOPMENT) {
-                } else {
+                    echo "Response: {$str}", PHP_EOL;
+                }
+                elseif (!TESTING) {
                     $message->author->sendMessage($str)->then($callback);
                 }
             }
@@ -53,7 +55,9 @@ class Response
              */
             else {
                 if (DEVELOPMENT) {
-                } else {
+                    echo "Response: {$str}", PHP_EOL;
+                }
+                elseif (!TESTING) {
                     $message->author->user->sendMessage($str)->then($callback);
                 }
             }
@@ -65,7 +69,9 @@ class Response
          */
         else {
             if (DEVELOPMENT) {
-            } else {
+                echo "Response: {$str}", PHP_EOL;
+            }
+            elseif (!TESTING) {
                 $message->reply($str)->then($callback);
             }
         }
