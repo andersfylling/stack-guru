@@ -18,6 +18,49 @@ class BotTest extends TestCase
         //$this->assertEquals($commands->getCommands(), $bot->getCommands());
     }
 
+    public function testLoadCommands ()
+    {
+        $s = true;
+        $bot = new \StackGuru\CoreLogic\Bot([], $s);
+
+        $config = [
+            "folder" => "./src/Commands"
+        ];
+
+        $commands = $bot->loadCommands($config);
+
+        //var_dump($commands);
+
+        /*
+         * Check that commands are loaded
+         */
+        $this->assertArrayHasKey("google",      $commands);
+        $this->assertArrayHasKey("service",     $commands);
+
+
+        /*
+         * Check that the commands have loaded all their sub-commands
+         */
+
+        $google = $commands["google"];// doesn't load Google.php, Image.php. only Search.php
+        $this->assertArrayHasKey("google",      $google);
+        $this->assertArrayHasKey("search",      $google);
+        $this->assertArrayHasKey("image",       $google);
+
+        $service = $commands["service"];// doesn't load Service.php, nor Crash.php
+        $this->assertArrayHasKey("service",     $service);
+        $this->assertArrayHasKey("shutdown",    $service);
+        $this->assertArrayHasKey("crash",       $service);
+
+    }
+
+
+
+    /*************************************************
+     * ********************************************* *
+     *************************************************/
+
+
     /**
      * @param array $options
      * @param callable|null $callback

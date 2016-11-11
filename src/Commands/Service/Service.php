@@ -9,7 +9,13 @@
 namespace StackGuru\Commands\Service;
 
 
-class Service
+class Service extends \StackGuru\Commands\BaseCommand
 {
+    const DESCRIPTION = "Service command description";
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
 
 }

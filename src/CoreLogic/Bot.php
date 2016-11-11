@@ -33,9 +33,13 @@ class Bot extends Database
      */
     function __construct (array $options = [], bool $shutup = null)
     {
+        /*
+         * Used for testing the bot methods
+         */
         if ($shutup !== null && $shutup === true) {
             return;
         }
+
         /*
          * Verify parameter to have required keys
          */
@@ -268,12 +272,10 @@ class Bot extends Database
                         $commands[] = $file;
                     }
                 }
-                else {
-                    if (is_dir($path))
-                    {
-                        $files = dig($path);
-                        if (sizeof($files) > 0)
-                            $commands[] = $files;
+                else if (is_dir($path)) {
+                    $files = dig($path);
+                    if (sizeof($files) > 0) {
+                        $commands[] = $files;
                     }
                 }
             }
@@ -283,7 +285,7 @@ class Bot extends Database
             } else {
                 return $commands;
             }
-        }
+        } // dig() END
 
         $commandFiles = dig($options["folder"], true);
 
@@ -291,25 +293,22 @@ class Bot extends Database
         foreach ($commandFiles as $fileSet) {
             foreach ($fileSet as $folder => $files) {
                 foreach ($files as $filename) {
-                    $path = $folder."/".$filename;
-                    include $path;
+                    //$path = $folder."/".$filename;
 
                     $classNamespace = ucfirst(basename($folder));
                     $className = ucfirst(basename($filename, '.php'));
                     $class = "\\StackGuru\\Commands\\${classNamespace}\\${className}";
                     if (class_exists($class)) {
                         $interfaces = class_implements($class);
-                        if (isset($interfaces["StackGuru\\CommandInterface"])) {
-                            $commandName = $class::COMMAND_NAME;
+                        if (isset($interfaces["StackGuru\\CommandInterface"]) || $className === $classNamespace) {
+                            $commandName = strtolower($className); // eg. Google, Service, etc.
                             $command = new $class();
-                            echo "\t{$commandName}.. ";
-                            $this->commands[$commandName] = $command;
-                            echo "OK!", PHP_EOL;
+                            $this->commands[strtolower($classNamespace)][$commandName] = $command;
                         }
                     }
                 }
             }
-        }
+        } // foreach() END
 
         return $this->commands;
     }

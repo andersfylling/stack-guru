@@ -2,13 +2,13 @@
 
 namespace StackGuru\Commands\Service;
 
-class Shutdown extends Service implements \StackGuru\CommandInterface
+class Crash extends Service implements \StackGuru\CommandInterface
 {
     const COMMAND_NAME = "shutdown";
     const DESCRIPTION = "something about the shutdown command";
 
     public function process (array $args = [], \StackGuru\CommandContext $ctx = null) : string
     {
-        return "gkdfjhlg";
+        return "gkdfjhlg_crash";
     }
 }

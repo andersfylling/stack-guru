@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
-phpunit --debug --stop-on-failure --bootstrap autoload.php tests
+phpunit --colors=auto --verbose --debug --bootstrap test-environment.php tests
+#phpunit --debug --stop-on-failure --bootstrap test-environment.php tests # Stop tests when an error or failure occurred
