@@ -52,6 +52,17 @@ class BotTest extends TestCase
         $this->assertArrayHasKey("shutdown",    $service);
         $this->assertArrayHasKey("crash",       $service);
 
+        /*
+         * Test some of the object types for sub commands
+         */
+        $this->assertInstanceOf(\StackGuru\Commands\Google\Google::class,       $commands["google"]["google"]);
+        $this->assertInstanceOf(\StackGuru\Commands\Google\Search::class,       $commands["google"]["search"]);
+        $this->assertInstanceOf(\StackGuru\Commands\Google\Image::class,        $commands["google"]["image"]);
+
+        $this->assertInstanceOf(\StackGuru\Commands\Service\Service::class,     $commands["service"]["service"]);
+        $this->assertInstanceOf(\StackGuru\Commands\Service\Shutdown::class,    $commands["service"]["shutdown"]);
+        $this->assertInstanceOf(\StackGuru\Commands\Service\Crash::class,       $commands["service"]["crash"]);
+
     }
 
 
