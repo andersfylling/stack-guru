@@ -15,14 +15,17 @@ use \Discord\WebSockets\Event;
 
 class Bot extends Database
 {
-    private $discord            = \Discord\Discord::class;
+    private $discord    = \Discord\Discord::class;
 
-    private $callbacks = [
-        // string "callback_name" => [callable, callable, ... ],
+    private $callbacks  = [
+        // string "callback_name"   => [callable, callable, ... ],
     ];
 
-    private $commands = [
-        // string "command_name" => [boolean sudo, string class, string description],
+    private $commands   = [
+        // string "command_name"    => [
+        //      string "command_name"       => [boolean sudo, string class, string description],
+        //      string "sub_command_name"   => [boolean sudo, string class, string description],
+        // ],
     ];
 
     /**
