@@ -41,15 +41,18 @@ $bot = new \StackGuru\CoreLogic\Bot([
  */
 $messages_all_including_bot     = function (
         \Discord\Parts\Channel\Message $message,
+        string $event,
         array $command = null
 ) {
     /*
      * Stuff to be called in this state.
      */
+    echo "$event: ", $message->content, PHP_EOL;
 };
 
 $messages_all_excluding_bot     = function (
         \Discord\Parts\Channel\Message $message,
+        string $event,
         array $command = null
 ) {
     /*
@@ -59,6 +62,7 @@ $messages_all_excluding_bot     = function (
 
 $messages_from_bot              = function (
         \Discord\Parts\Channel\Message $message,
+        string $event,
         array $command = null
 ) {
     /*
@@ -68,6 +72,7 @@ $messages_from_bot              = function (
 
 $messages_bot_to_bot            = function (
         \Discord\Parts\Channel\Message $message,
+        string $event,
         array $command = null
 ) {
     /*
@@ -77,6 +82,7 @@ $messages_bot_to_bot            = function (
 
 $messages_other_to_bot          = function (
         \Discord\Parts\Channel\Message $message,
+        string $event,
         array $command = null
 ) {
     /*
@@ -87,6 +93,7 @@ $messages_other_to_bot          = function (
 
 $messages_other_to_bot_ready    = function (
         \Discord\Parts\Channel\Message $message,
+        string $event,
         array $command = null
 ) {
     /*
@@ -119,6 +126,7 @@ $bot->state(BotEvent::MESSAGE_FROM_SELF,            $messages_from_bot);
 $bot->state(BotEvent::MESSAGE_SELF_TO_SELF,         $messages_bot_to_bot);
 $bot->state(BotEvent::MESSAGE_OTHERS_TO_SELF,       $messages_other_to_bot);
 $bot->state(BotEvent::MESSAGE_OTHERS_TO_SELF_READY, $messages_other_to_bot_ready);
+
 
 /*
  * Run the bot

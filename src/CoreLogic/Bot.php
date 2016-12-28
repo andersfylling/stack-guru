@@ -70,12 +70,26 @@ class Bot extends Database
     public function run ()
     {
         /*
+         * Events to trigger a message update.
+         */
+        $messageEvents = [
+            Event::MESSAGE_CREATE,
+            Event::MESSAGE_UPDATE
+        ];
+
+        /*
          * When the app is ready, listen for messages.
          */
-        $this->discord->on("ready", function (\Discord\Discord $self) {
-            $self->on(Event::MESSAGE_CREATE, function (\Discord\Parts\Channel\Message $message) {
-                $this->incoming($message);
-            });
+        $this->discord->on("ready", function (\Discord\Discord $self) use ($messageEvents) {
+
+            /*
+             * Message events
+             */
+            foreach ($messageEvents as $event) {
+                $self->on($event, function (\Discord\Parts\Channel\Message $message) use ($event) {
+                    $this->incoming($message, $event);
+                });
+            }
         });
 
 
@@ -112,13 +126,13 @@ class Bot extends Database
      *
      * @param \Discord\Parts\Channel\Message $message
      */
-    private function incoming (\Discord\Parts\Channel\Message $message)
+    private function incoming (\Discord\Parts\Channel\Message $message, string $event)
     {
         /*
          * First BOTEVENT::ALL_MESSAGES
          */
         {
-            $this->runScripts(\StackGuru\BotEvent::MESSAGE_ALL_I_SELF, $message);
+            $this->runScripts(\StackGuru\BotEvent::MESSAGE_ALL_I_SELF, $message, $event);
         }
 
 
@@ -131,11 +145,11 @@ class Bot extends Database
          */
         {
             if ($message->author->id == $this->discord->id) {
-                $this->runScripts(\StackGuru\BotEvent::MESSAGE_FROM_SELF, $message);
+                $this->runScripts(\StackGuru\BotEvent::MESSAGE_FROM_SELF, $message, $event);
                 return;
             }
 
-            $this->runScripts(\StackGuru\BotEvent::MESSAGE_ALL_E_SELF, $message);
+            $this->runScripts(\StackGuru\BotEvent::MESSAGE_ALL_E_SELF, $message, $event);
         }
 
 
@@ -204,7 +218,7 @@ class Bot extends Database
             /*
              * The incoming message is for the bot.
              */
-            $this->runScripts(\StackGuru\BotEvent::MESSAGE_OTHERS_TO_SELF, $message);
+            $this->runScripts(\StackGuru\BotEvent::MESSAGE_OTHERS_TO_SELF, $message, $event);
 
         }
 
@@ -246,7 +260,7 @@ class Bot extends Database
         /*
          * The incoming message is for the bot.
          */
-        $this->runScripts(\StackGuru\BotEvent::MESSAGE_OTHERS_TO_SELF_READY, $message, $cmd);
+        $this->runScripts(\StackGuru\BotEvent::MESSAGE_OTHERS_TO_SELF_READY, $message, $event, $cmd);
     } // METHOD END: public incomming (\Discord\Parts\Channel\Message $in, \Discord\Discord $self)
 
     /**
@@ -354,12 +368,13 @@ class Bot extends Database
      */
     private function runScripts (
         string $state, 
-        \Discord\Parts\Channel\Message $message = null,
-        array $command                          = null
+        \Discord\Parts\Channel\Message $message,
+        string $event,
+        array $command = null
     ) {
         if (isset($this->callbacks[$state])) {
             $arr = $this->callbacks[$state];
-            for ($i = sizeof($arr) - 1; $i >= 0; call_user_func_array($this->callbacks[$state][$i--], [$message, $command]) );
+            for ($i = sizeof($arr) - 1; $i >= 0; call_user_func_array($this->callbacks[$state][$i--], [$message, $event, $command]) );
         }
     }
 
