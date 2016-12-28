@@ -6,6 +6,5 @@
  *
  * @see \StackGuru\CoreLogic\Utils\Response Response class uses this to echo replies rather than sending them.
  */
-const DEVELOPMENT = true;
-
-define('TESTING', defined('PHPUNIT_STACKGURU_TESTSUITE'));
+define("DEVELOPMENT", $terminal_args["DEVELOPMENT"]);
+define("TESTING", $terminal_args["TESTING"]);

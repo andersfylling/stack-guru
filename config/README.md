@@ -1,0 +1,2 @@
+You must specify a file that contains the private constants ST_DATABASE_SETTINGS and ST_DISCORD_SETTINGS.
+You can either have one file for each "database.php" and "discord.php" or you can store both in a file called "00_privateConstants.php".

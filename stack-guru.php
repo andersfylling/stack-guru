@@ -6,8 +6,17 @@
  * Time: 22.57
  */
 
+/*
+ * Handle incomming terminal arguments.
+ */
+$terminal_args = [];
+require __DIR__."/terminalArgumentsHandler.php";
+
+
 // Autoload classes
 require __DIR__."/autoload.php";
+
+
 
 use \StackGuru\BotEvent;
 

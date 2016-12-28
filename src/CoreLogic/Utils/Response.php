@@ -25,7 +25,7 @@ class Response
         boolean                         $private    = null,
         \Closure                        $callback   = null
     ) {
-        if ($message === null) {
+        if (null === $message) {
             echo "Message was not sent: {$str}" . PHP_EOL;
             return;
         }
@@ -33,7 +33,7 @@ class Response
         /*
          * Check if the channel is private or not
          */
-        if ($private !== null) {
+        if (null !== $private) {
             /*
              * For some reason, the author object differs when its a private chat compared to public.
              */
@@ -41,11 +41,12 @@ class Response
             /*
              * Private
              */
-            if ($message->channel->is_private) {
+            if (true === $message->channel->is_private) {
                 if (DEVELOPMENT) {
                     echo "Response: {$str}", PHP_EOL;
                 }
-                elseif (!TESTING) {
+                
+                if (!TESTING) {
                     $message->author->sendMessage($str)->then($callback);
                 }
             }
@@ -54,10 +55,11 @@ class Response
              * Public
              */
             else {
-                if (DEVELOPMENT) {
+                if (true === DEVELOPMENT) {
                     echo "Response: {$str}", PHP_EOL;
                 }
-                elseif (!TESTING) {
+                
+                if (false === TESTING) {
                     $message->author->user->sendMessage($str)->then($callback);
                 }
             }
@@ -68,10 +70,11 @@ class Response
          * $in->author->((user->)*)sendMessage("{$in->author}, {$message}");
          */
         else {
-            if (DEVELOPMENT) {
+            if (true === DEVELOPMENT) {
                 echo "Response: {$str}", PHP_EOL;
             }
-            elseif (!TESTING) {
+            
+            if (false === TESTING) {
                 $message->reply($str)->then($callback);
             }
         }

@@ -1,4 +1,5 @@
 .idea/
 config/database.php
 config/discord.php
+config/00_privateConstants.php
 vendor/
