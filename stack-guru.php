@@ -92,6 +92,20 @@ $messages_other_to_bot_ready    = function (
     /*
      * Stuff to be called in this state.
      */
+    
+
+    /*
+     * Initiate command
+     */
+    if (null !== $command) {
+        $command = $this->commands[$command["command"]];
+
+        $context = new \StackGuru\CommandContext();
+        $context->bot = $this;
+        $context->message = $message;
+
+        $command->process($command["arguments"], $context);
+    }
 };
 
 

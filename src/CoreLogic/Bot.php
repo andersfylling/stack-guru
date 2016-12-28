@@ -247,18 +247,6 @@ class Bot extends Database
          * The incoming message is for the bot.
          */
         $this->runScripts(\StackGuru\BotEvent::MESSAGE_OTHERS_TO_SELF_READY, $message, $cmd);
-
-        /*
-         * Initiate command
-         */
-        $command = $this->commands[$cmd["command"]];
-
-        $context = new \StackGuru\CommandContext();
-        $context->bot = $this;
-        $context->message = $message;
-
-        $command->process($cmd["arguments"], $context);
-
     } // METHOD END: public incomming (\Discord\Parts\Channel\Message $in, \Discord\Discord $self)
 
     /**
