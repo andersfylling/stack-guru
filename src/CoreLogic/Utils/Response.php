@@ -25,7 +25,7 @@ class Response
         boolean                         $private    = null,
         \Closure                        $callback   = null
     ) {
-        if (null === $message) {
+        if (null === $message && true === DEVELOPMENT) {
             echo "Message was not sent: {$str}" . PHP_EOL;
             return;
         }
@@ -42,11 +42,11 @@ class Response
              * Private
              */
             if (true === $message->channel->is_private) {
-                if (DEVELOPMENT) {
+                if (true === DEVELOPMENT) {
                     echo "Response: {$str}", PHP_EOL;
                 }
                 
-                if (!TESTING) {
+                if (false === TESTING) {
                     $message->author->sendMessage($str)->then($callback);
                 }
             }

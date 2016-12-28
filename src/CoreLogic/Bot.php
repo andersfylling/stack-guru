@@ -118,7 +118,7 @@ class Bot extends Database
          * First BOTEVENT::ALL_MESSAGES
          */
         {
-            $this->runScripts(\StackGuru\BotEvent::MESSAGE_ALL_I_SELF);
+            $this->runScripts(\StackGuru\BotEvent::MESSAGE_ALL_I_SELF, $message);
         }
 
 
@@ -131,11 +131,11 @@ class Bot extends Database
          */
         {
             if ($message->author->id == $this->discord->id) {
-                $this->runScripts(\StackGuru\BotEvent::MESSAGE_FROM_SELF);
+                $this->runScripts(\StackGuru\BotEvent::MESSAGE_FROM_SELF, $message);
                 return;
             }
 
-            $this->runScripts(\StackGuru\BotEvent::MESSAGE_ALL_E_SELF);
+            $this->runScripts(\StackGuru\BotEvent::MESSAGE_ALL_E_SELF, $message);
         }
 
 
@@ -204,7 +204,7 @@ class Bot extends Database
             /*
              * The incoming message is for the bot.
              */
-            $this->runScripts(\StackGuru\BotEvent::MESSAGE_OTHERS_TO_SELF);
+            $this->runScripts(\StackGuru\BotEvent::MESSAGE_OTHERS_TO_SELF, $message);
 
         }
 
@@ -242,6 +242,12 @@ class Bot extends Database
             }
         }
 
+
+        /*
+         * The incoming message is for the bot.
+         */
+        $this->runScripts(\StackGuru\BotEvent::MESSAGE_OTHERS_TO_SELF_READY, $message, $cmd);
+
         /*
          * Initiate command
          */
@@ -254,6 +260,22 @@ class Bot extends Database
         $command->process($cmd["arguments"], $context);
 
     } // METHOD END: public incomming (\Discord\Parts\Channel\Message $in, \Discord\Discord $self)
+
+    /**
+     * retrieves a specific command or all the commands.
+     * 
+     * @param  string|null $key [description]
+     * @return [type]           [description]
+     */
+    public function getCommands (string $key = null) : array
+    {
+        if (null === $key) {
+            return $this->commands;
+        }
+        elseif (isset($this->commands[$key])) {
+            return $this->commands[$key];
+        }
+    }
 
     /**
      * Gets all the commands in given folder.
@@ -342,17 +364,15 @@ class Bot extends Database
      *
      * @param string $state
      */
-    private function runScripts (string $state)
-    {
+    private function runScripts (
+        string $state, 
+        \Discord\Parts\Channel\Message $message = null,
+        array $command                          = null
+    ) {
         if (isset($this->callbacks[$state])) {
             $arr = $this->callbacks[$state];
-            for ($i = sizeof($arr) - 1; $i >= 0; call_user_func($this->callbacks[$state][$i--]));
+            for ($i = sizeof($arr) - 1; $i >= 0; call_user_func_array($this->callbacks[$state][$i--], [$message, $command]) );
         }
-    }
-
-    public function getCommands () : string
-    {
-        return $this->commands;
     }
 
 }
