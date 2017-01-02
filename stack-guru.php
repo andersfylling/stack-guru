@@ -17,102 +17,98 @@ require __DIR__."/terminalArgumentsHandler.php";
 require __DIR__."/autoload.php";
 
 
-
 use \StackGuru\BotEvent;
 
 /*
  * Set up the bot
  */
 $bot = new \StackGuru\CoreLogic\Bot([
-
     "discord"   => ST_DISCORD_SETTINGS,
+    "database"  => ST_DATABASE_SETTINGS
+]);
 
-    "database"  => ST_DATABASE_SETTINGS,
-
-    "commands"  => [
+var_dump(\StackGuru\CoreLogic\Utils\Commands::constructOverviewArray(
+    [
         "folder" => __DIR__ . "/src/Commands"
     ]
-
-]);
+));
 
 
 /*
  * Event handlers for different states
  */
-$messages_all_including_bot     = function (
-        \Discord\Parts\Channel\Message $message,
-        string $event,
-        array $command = null
-) {
+$messages_all_including_bot     = function (\Discord\Parts\Channel\Message $message, string $event) 
+{
     /*
      * Stuff to be called in this state.
      */
-    echo "$event: ", $message->content, PHP_EOL;
+    echo PHP_EOL,"---",PHP_EOL,"$event: $message->content", PHP_EOL;
 };
 
-$messages_all_excluding_bot     = function (
-        \Discord\Parts\Channel\Message $message,
-        string $event,
-        array $command = null
-) {
+$messages_all_excluding_bot     = function (\Discord\Parts\Channel\Message $message, string $event) 
+{
     /*
      * Stuff to be called in this state.
      */
+    echo "messages_all_excluding_bot",PHP_EOL;
 };
 
-$messages_from_bot              = function (
-        \Discord\Parts\Channel\Message $message,
-        string $event,
-        array $command = null
-) {
+$messages_from_bot              = function (\Discord\Parts\Channel\Message $message, string $event) 
+{
     /*
      * Stuff to be called in this state.
      */
+    echo "messages_from_bot",PHP_EOL;
 };
 
-$messages_bot_to_bot            = function (
-        \Discord\Parts\Channel\Message $message,
-        string $event,
-        array $command = null
-) {
+$messages_bot_to_bot            = function (\Discord\Parts\Channel\Message $message, string $event) 
+{
     /*
      * Stuff to be called in this state.
      */
+    echo "messages_bot_to_bot",PHP_EOL;
 };
 
-$messages_other_to_bot          = function (
-        \Discord\Parts\Channel\Message $message,
-        string $event,
-        array $command = null
-) {
+$messages_other_to_bot          = function (\Discord\Parts\Channel\Message $message, string $event) 
+{
     /*
      * Stuff to be called in this state.
      */
-};
+    echo "messages_other_to_bot",PHP_EOL;
 
 
-$messages_other_to_bot_ready    = function (
-        \Discord\Parts\Channel\Message $message,
-        string $event,
-        array $command = null
-) {
-    /*
-     * Stuff to be called in this state.
-     */
+    echo (\StackGuru\CoreLogic\Utils\Commands::firstWordIsACommand($message->content) !== '' ? "true" : "false");
     
+};
+
+
+$messages_other_to_bot_ready    = function (\Discord\Parts\Channel\Message $message, string $event) 
+{
+    /*
+     * Stuff to be called in this state.
+     */
+    echo "messages_other_to_bot_ready",PHP_EOL;
+
+    //echo $bot->firstWordIsACommand($message);
+
+    //($bot->firstWordIsACommand($message) !== '' ? echo"true" : echo"false");
+    
+    //echo 213;
 
     /*
      * Initiate command
      */
-    if (null !== $command) {
-        $command = $this->commands[$command["command"]];
+    // if (null !== $command) {
+    //     var_dump($command);
+    //     $command = $this->commands[$command["command"]];
 
-        $context = new \StackGuru\CommandContext();
-        $context->bot = $this;
-        $context->message = $message;
+    //     $context = new \StackGuru\CommandContext();
+    //     $context->bot = $this;
+    //     $context->message = $message;
 
-        $command->process($command["arguments"], $context);
-    }
+    //     //if () 
+    //     $command->process($command["arguments"], $context);
+    // }
 };
 
 
@@ -120,12 +116,11 @@ $messages_other_to_bot_ready    = function (
 /*
  * Add listeners
  */
-$bot->state(BotEvent::MESSAGE_ALL_I_SELF,           $messages_all_including_bot);
-$bot->state(BotEvent::MESSAGE_ALL_E_SELF,           $messages_all_excluding_bot);
-$bot->state(BotEvent::MESSAGE_FROM_SELF,            $messages_from_bot);
-$bot->state(BotEvent::MESSAGE_SELF_TO_SELF,         $messages_bot_to_bot);
-$bot->state(BotEvent::MESSAGE_OTHERS_TO_SELF,       $messages_other_to_bot);
-$bot->state(BotEvent::MESSAGE_OTHERS_TO_SELF_READY, $messages_other_to_bot_ready);
+$bot->state(\StackGuru\BotEvent::MESSAGE_ALL_I_SELF,           $messages_all_including_bot);
+$bot->state(\StackGuru\BotEvent::MESSAGE_ALL_E_SELF,           $messages_all_excluding_bot);
+$bot->state(\StackGuru\BotEvent::MESSAGE_FROM_SELF,            $messages_from_bot);
+$bot->state(\StackGuru\BotEvent::MESSAGE_SELF_TO_SELF,         $messages_bot_to_bot);
+$bot->state(\StackGuru\BotEvent::MESSAGE_OTHERS_TO_SELF,       $messages_other_to_bot);
 
 
 /*

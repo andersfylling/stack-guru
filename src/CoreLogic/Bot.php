@@ -21,13 +21,6 @@ class Bot extends Database
         // string "callback_name"   => [callable, callable, ... ],
     ];
 
-    private $commands   = [
-        // string "command_name"    => [
-        //      string "command_name"       => [boolean sudo, string class, string description],
-        //      string "sub_command_name"   => [boolean sudo, string class, string description],
-        // ],
-    ];
-
     /**
      * Bot constructor.
      *
@@ -46,17 +39,12 @@ class Bot extends Database
         /*
          * Verify parameter to have required keys
          */
-        $options = Utils\ResolveOptions::verify($options, ["discord", "commands", "database"]);
+        $options = Utils\ResolveOptions::verify($options, ["discord", "database"]);
 
         /*
          * Setup database connection
          */
         Database::__construct($options["database"]);
-
-        /*
-         * Retrieve the latest commands
-         */
-        $this->loadCommands($options["commands"]);
 
         /*
          * Set up a discord instance
@@ -74,7 +62,9 @@ class Bot extends Database
          */
         $messageEvents = [
             Event::MESSAGE_CREATE,
-            Event::MESSAGE_UPDATE
+            Event::MESSAGE_UPDATE,
+            Event::MESSAGE_DELETE,
+            Event::MESSAGE_DELETE_BULK
         ];
 
         /*
@@ -126,7 +116,7 @@ class Bot extends Database
      *
      * @param \Discord\Parts\Channel\Message $message
      */
-    private function incoming (\Discord\Parts\Channel\Message $message, string $event)
+    public function incoming (\Discord\Parts\Channel\Message $message, string $event)
     {
         /*
          * First BOTEVENT::ALL_MESSAGES
@@ -237,10 +227,11 @@ class Bot extends Database
             $words      = explode(" ", strtolower($message->content));
             $command    = $words[0];
 
+
             /*
              * If the first word/command is a registered command, save it.
              */
-            if (array_key_exists($command, $this->commands)) {
+            if ($this->wordIsACommand($command)) {
                 $cmd["command"] = $command;
 
                 /*
@@ -249,6 +240,7 @@ class Bot extends Database
                 if (sizeof($words) > 1) {
                     $cmd["arguments"] = array_slice($words, 1);
                 }
+
             }
             else {
                 Utils\Response::sendResponse("I'm sorry. It seems I cannot find your command. Please try the command: help", $message);
@@ -260,86 +252,8 @@ class Bot extends Database
         /*
          * The incoming message is for the bot.
          */
-        $this->runScripts(\StackGuru\BotEvent::MESSAGE_OTHERS_TO_SELF_READY, $message, $event, $cmd);
+        //$this->runScripts(\StackGuru\BotEvent::MESSAGE_OTHERS_TO_SELF_READY, $message, $event, $cmd);
     } // METHOD END: public incomming (\Discord\Parts\Channel\Message $in, \Discord\Discord $self)
-
-    /**
-     * retrieves a specific command or all the commands.
-     * 
-     * @param  string|null $key [description]
-     * @return [type]           [description]
-     */
-    public function getCommands (string $key = null) : array
-    {
-        if (null === $key) {
-            return $this->commands;
-        }
-        elseif (isset($this->commands[$key])) {
-            return $this->commands[$key];
-        }
-    }
-
-    /**
-     * Gets all the commands in given folder.
-     */
-    public function loadCommands (array $options = []) : array
-    {
-        $options = Utils\ResolveOptions::verify($options, ["folder"]);
-
-        // Find command files
-        function dig (string $folder, bool $ignoreFiles = null) : array
-        {
-            $commands = [];
-            foreach (glob($folder . "/*") as $path)
-            {
-                $file = substr(strrchr($path, "/"), 1);
-
-                if (strpos($path, ".php") !== false) {
-                    if ($ignoreFiles !== true) {
-                        $commands[] = $file;
-                    }
-                }
-                else if (is_dir($path)) {
-                    $files = dig($path);
-                    if (sizeof($files) > 0) {
-                        $commands[] = $files;
-                    }
-                }
-            }
-
-            if ($ignoreFiles !== true) {
-                return [$folder => $commands];
-            } else {
-                return $commands;
-            }
-        } // dig() END
-
-        $commandFiles = dig($options["folder"], true);
-
-        // Load files
-        foreach ($commandFiles as $fileSet) {
-            foreach ($fileSet as $folder => $files) {
-                foreach ($files as $filename) {
-                    //$path = $folder."/".$filename;
-
-                    $classNamespace = ucfirst(basename($folder));
-                    $className = ucfirst(basename($filename, '.php'));
-                    $class = "\\StackGuru\\Commands\\${classNamespace}\\${className}";
-                    if (class_exists($class)) {
-                        $interfaces = class_implements($class);
-                        if (isset($interfaces["StackGuru\\CommandInterface"]) || $className === $classNamespace) {
-                            $commandName = strtolower($className); // eg. Google, Service, etc.
-                            $command = new $class();
-                            $this->commands[strtolower($classNamespace)][$commandName] = $command;
-                        }
-                    }
-                }
-            }
-        } // foreach() END
-
-        return $this->commands;
-    }
-
 
 
     /* ********************************************
@@ -366,15 +280,15 @@ class Bot extends Database
      *
      * @param string $state
      */
-    private function runScripts (
-        string $state, 
-        \Discord\Parts\Channel\Message $message,
-        string $event,
-        array $command = null
-    ) {
-        if (isset($this->callbacks[$state])) {
-            $arr = $this->callbacks[$state];
-            for ($i = sizeof($arr) - 1; $i >= 0; call_user_func_array($this->callbacks[$state][$i--], [$message, $event, $command]) );
+    private function runScripts (string $state, \Discord\Parts\Channel\Message $message, string $event)
+    {
+        if (!isset($this->callbacks[$state])) { 
+            return;
+        }
+
+        $arr = $this->callbacks[$state];
+        for ($i = sizeof($arr) - 1; $i >= 0; $i -= 1) {
+            call_user_func_array($this->callbacks[$state][$i], [$message, $event]);
         }
     }
 

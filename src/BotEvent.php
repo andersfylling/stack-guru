@@ -14,5 +14,4 @@ class BotEvent
     const MESSAGE_FROM_SELF         	= "message_self";               	// SELF         -> *
     const MESSAGE_SELF_TO_SELF      	= "message_self_to_self";       	// SELF         -> SELF
     const MESSAGE_OTHERS_TO_SELF    	= "message_others_to_self";     	// *            -> SELF
-    const MESSAGE_OTHERS_TO_SELF_READY	= "message_others_to_self_ready";	// *            -> SELF, after the $command has been calculated..
 }

@@ -6,6 +6,7 @@ class Google extends \StackGuru\Commands\BaseCommand
 {
     const DESCRIPTION = "";
     const URL = "https://www.google.com/";
+    const DEFAULT = "Search"; // default command
 
     public function __construct()
     {
