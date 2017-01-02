@@ -10,8 +10,10 @@ class Image extends Google implements \StackGuru\CommandInterface
     const DESCRIPTION = "something about the search command";
     const SEARCH_URL = Google::URL . "search?";
 
-    public function process (array $args = [], \StackGuru\CommandContext $ctx = null) : string
+    public function process (string $query, \StackGuru\CommandContext $ctx = null) : string
     {
+        $args = explode(' ', trim($query) . ' ');
+        
         if (sizeof($args) !== 0) {
             $query = implode(" ", $args);
         } else {

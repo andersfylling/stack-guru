@@ -75,10 +75,17 @@ $messages_other_to_bot          = function (\Discord\Parts\Channel\Message $mess
      * Stuff to be called in this state.
      */
     echo "messages_other_to_bot",PHP_EOL;
-
-
-    echo (\StackGuru\CoreLogic\Utils\Commands::firstWordIsACommand($message->content) !== '' ? "true" : "false");
     
+    $data = \StackGuru\CoreLogic\Utils\Commands::getCommandInstance($message->content);
+
+    $command = $data["instance"];
+    $command = new $command();
+    $query = $data["query"];
+    var_dump($query);
+    var_dump($command->process($query));
+
+    //TODO should be updated..
+    \StackGuru\CoreLogic\Utils\Response::sendResponse($command->process($query), $message);
 };
 
 

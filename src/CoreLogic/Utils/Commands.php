@@ -21,63 +21,70 @@ class Commands
      */
 	public static function getCommandInstance (string $query) : array
 	{
-        $command = null;
+        $prevCommand = null;
+        $nextCommand = self::getFirstWordFromString($query);
         $options = self::$commands;
-        $response = [$query, null];
+        $response = [
+            "query" => $query, 
+            "instance" => null
+        ];
 
-        while (true) {
+        $maxChain = 10;
+        $depth = 0;
+
+        while ($depth++ < $maxChain) {
             /*
-             * No command given, send a potential command
+             * Update command to the new first word..
              */
-            if ($command === null) {
-                $command = self::firstWordIsACommand($query);
-                continue;
-            }
+            
+
+            $nextCommand = self::getFirstWordFromString($query);
 
             /*
              * The first word, aka command, wasn't valid.
              * The first word is not a command.
+             *
+             * assumption1: $options is always an array
+             * 
+             * assumption2: if there are no matches, it might be a default command..
+             *                  Google.google = default..
              */
-            else if ($command === '') {
-                return [$query, null];
+            if (!isset($options[$nextCommand])) {
+
+                if (null === $prevCommand || !isset($options[$prevCommand])) {
+                    return $response;
+                }
+
+                $className = $options[$prevCommand];
+                $nextCommand = strtolower($className::DEFAULT); // get default command from main command class
+
+                // check for programming mistakes
+                if (null === $nextCommand) {
+                    //error!!!!!
+                    echo "ERROR! Commands default was null: $query", PHP_EOL;
+                    return $response;
+                }
             }
 
 
             /*
              * Handle the command logic
              */
-            $options = $options[$command];
+            $options                = $options[$nextCommand]; // go into the new sub array or extract the object
+            $query                  = $nextCommand === ltrim(substr($query, 0, strlen($nextCommand))) ? ltrim(substr($query, strlen($nextCommand))) : $query; // remove the command word from the query string if exists
+            $prevCommand            = $nextCommand;
+            $response["query"]      = trim($query);
+
+            // if options isnt an array anymore, but an object. its a match!
+            if (is_object($options)) {
+                $response["instance"] = $options;
+
+                return $response;
+            }
 
         }
 
-
-
-        
-
-        /*
-         * Run command if set......
-         * 1w: main
-         * 2w: sub
-         *
-         * or
-         *
-         * 1w: main
-         * 2w - nw: args
-         */
-        $word = self::firstWordIsACommand($message);
-        if ($word !== '') {
-
-            // store command
-            $command = self::$commands[$word];
-
-            // remove valid command word from the string
-            $query = ltrim(substr($word, $query));
-
-
-            // if no sub command
-            // go into the command.command.DEFAULT and use that class
-            // 
-        }
+        return $response; // assumed to never be called..
 	}
 
     public static function getCommands (string $key = null) : array 
@@ -90,11 +97,17 @@ class Commands
         }
     }
 
+    public static function getFirstWordFromString (string $str) : string
+    {
+        $result = strstr(ltrim($str), ' ', true);
+        $result = (false === $result ? $str : $result);
+
+        return trim($result);
+    }
+
     public static function firstWordIsACommand (string $query) : string
     {
-        $words = explode(" ", strtolower(trim($query)));
-
-        return self::wordIsACommand($words[0]);
+        return self::wordIsACommand(self::getFirstWordFromString($query));
     }
 
     public static function wordIsASubCommand (string $word, array $arr) : bool

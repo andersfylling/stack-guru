@@ -12,6 +12,7 @@ namespace StackGuru\Commands\Service;
 class Service extends \StackGuru\Commands\BaseCommand
 {
     const DESCRIPTION = "Service command description";
+    const DEFAULT = "Shutdown";
 
     public function __construct()
     {
