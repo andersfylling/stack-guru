@@ -22,7 +22,7 @@ class Commands
 	public static function getCommandInstance (string $query) : array
 	{
         $command = null;
-        $options = $this->commands;
+        $options = self::$commands;
         $response = [$query, null];
 
         while (true) {
@@ -30,7 +30,7 @@ class Commands
              * No command given, send a potential command
              */
             if ($command === null) {
-                $command = $this->firstWordIsACommand($query);
+                $command = self::firstWordIsACommand($query);
                 continue;
             }
 
@@ -64,11 +64,11 @@ class Commands
          * 1w: main
          * 2w - nw: args
          */
-        $word = $this->firstWordIsACommand($message);
+        $word = self::firstWordIsACommand($message);
         if ($word !== '') {
 
             // store command
-            $command = $this->commands[$word];
+            $command = self::$commands[$word];
 
             // remove valid command word from the string
             $query = ltrim(substr($word, $query));
@@ -90,21 +90,38 @@ class Commands
         }
     }
 
-    public static function firstwordIsACommand (string $query) : string
+    public static function firstWordIsACommand (string $query) : string
     {
         $words = explode(" ", strtolower(trim($query)));
 
         return self::wordIsACommand($words[0]);
     }
 
-    public static function wordIsACommand (string $word) : string
+    public static function wordIsASubCommand (string $word, array $arr) : bool
     {
-        if (array_key_exists($word, self::$commands)) {
+        return isset($arr[$word]);
+    }
+
+    public static function wordIsACommand (string $word, array $arr = null) : string
+    {
+        if (null === $arr) {
+            return self::wordIsACommand($word, self::$commands);
+        }
+
+        if (self::wordIsASubCommand($word, $arr)) {
             return $word;
         }
-        else {
-            return '';
+
+        foreach ($arr as $val) {
+            if (is_array($val)) {
+                $vv = self::wordIsACommand($word, $val);
+                if ('' !== $vv) {
+                    return $vv;
+                }
+            }
         }
+
+        return '';
     }
 
 	public static function constructOverviewArray (array $options = []) : array
