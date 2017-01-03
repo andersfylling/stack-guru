@@ -21,6 +21,7 @@ class Bot extends Database
         // string "callback_name"   => [callable, callable, ... ],
     ];
 
+
     /**
      * Bot constructor.
      *
@@ -29,37 +30,27 @@ class Bot extends Database
      */
     function __construct (array $options = [], bool $shutup = null)
     {
-        /*
-         * Used for testing the bot methods
-         */
+        // Used for testing the bot methods
         if ($shutup !== null && $shutup === true) {
             return;
         }
 
-        /*
-         * Verify parameter to have required keys
-         */
+        // Verify parameter to have required keys
         $options = Utils\ResolveOptions::verify($options, ["discord", "database"]);
 
-        /*
-         * Setup database connection
-         */
+        // Setup database connection
         Database::__construct($options["database"]);
 
-        /*
-         * Set up a discord instance
-         */
+        // Set up a discord instance
         $this->discord = new Discord($options["discord"]);
     }
 
     /**
-     *
+     * Setup event handlers and run the bot.
      */
     public function run ()
     {
-        /*
-         * Events to trigger a message update.
-         */
+        // Events to trigger a message update.
         $messageEvents = [
             Event::MESSAGE_CREATE,
             Event::MESSAGE_UPDATE,
@@ -67,14 +58,9 @@ class Bot extends Database
             Event::MESSAGE_DELETE_BULK
         ];
 
-        /*
-         * When the app is ready, listen for messages.
-         */
+        // When the app is ready, listen for messages.
         $this->discord->on("ready", function (\Discord\Discord $self) use ($messageEvents) {
-
-            /*
-             * Message events
-             */
+            // Message events
             foreach ($messageEvents as $event) {
                 $self->on($event, function (\Discord\Parts\Channel\Message $message) use ($event) {
                     $this->incoming($message, $event);
@@ -83,9 +69,7 @@ class Bot extends Database
         });
 
 
-        /*
-         * Run!
-         */
+        // Run!
         try {
             $this->discord->run();
         } catch (\Throwable $e) {
@@ -94,7 +78,7 @@ class Bot extends Database
     }
 
     /**
-     *
+     * Stop the bot.
      */
     public function stop ()
     {
@@ -116,23 +100,18 @@ class Bot extends Database
      *
      * @param \Discord\Parts\Channel\Message $message
      */
-    public function incoming (\Discord\Parts\Channel\Message $message, string $event)
+    private function incoming (\Discord\Parts\Channel\Message $message, string $event)
     {
-        /*
-         * First BOTEVENT::ALL_MESSAGES
-         */
+        // First BOTEVENT::ALL_MESSAGES
         {
             $this->runScripts(\StackGuru\BotEvent::MESSAGE_ALL_I_SELF, $message, $event);
         }
 
-
-        /*
-         * This checks if the message written is by this bot itself: AKA self.
-         * If its a message from self: run
-         *
-         * Don't continue if the message is by the bot.
-         * Initiate the BOTEVENT::ALL_MESSAGES_E_SELF
-         */
+        // This checks if the message written is by this bot itself: AKA self.
+        // If its a message from self: run
+        //
+        // Don't continue if the message is by the bot.
+        // Initiate the BOTEVENT::ALL_MESSAGES_E_SELF
         {
             if ($message->author->id == $this->discord->id) {
                 $this->runScripts(\StackGuru\BotEvent::MESSAGE_FROM_SELF, $message, $event);
@@ -143,37 +122,27 @@ class Bot extends Database
         }
 
 
-        /*
-         * Check if anyone is contacting the bot / SELF
-         */
+        // Check if anyone is contacting the bot / SELF
         {
-            /*
-             * Check if this message was written in a public.
-             *  Otherwise its private => PM
-             */
+            // Check if this message was written in a public.
+            // Otherwise its private => PM
             if (!$message->channel->is_private) {
-                /*
-                 * Keeps track of whether or not the bot has been referenced.
-                 */
+                // Keeps track of whether or not the bot has been referenced.
                 $referenced = false;
 
 
-                /*
-                 * Convert the object to an array.
-                 *
-                 * Needs a better to handle this. But I wasn't able to use $in->mentions->{$self->id}
-                 *  to get the content I needed..
-                 */
+                // Convert the object to an array.
+                //
+                // Needs a better to handle this. But I wasn't able to use $in->mentions->{$self->id}
+                // to get the content I needed..
                 $mentions = json_decode(json_encode($message->mentions), true);
 
-                /*
-                 * Check if the bot was referenced by either "@stack-guru" or "@Bot"
-                 * Sadly I've hardcoded the mention ID for @Bot. This should be fixed somehow.
-                 *
-                 * TODO: this is ugly, fix it.
-                 *
-                 * Saves some of the if checks, otherwise these gets so long.
-                 */
+                // Check if the bot was referenced by either "@stack-guru" or "@Bot"
+                // Sadly I've hardcoded the mention ID for @Bot. This should be fixed somehow.
+                //
+                // TODO: this is ugly, fix it.
+                //
+                // Saves some of the if checks, otherwise these gets so long.
                 $mentioned = isset($mentions[$this->discord->id]);
                 $usedBotReference = strpos($message->content, "<@&240626683487453184>") !== false; //@Bot
                 if (!$referenced && ($mentioned || $usedBotReference)) {
@@ -181,79 +150,29 @@ class Bot extends Database
                     $referenced = true; // Bot was not mentioned nor was @Bot used: <@&240626683487453184>
                 }
 
-                /*
-                 * Check if the bot was referenced by "!"
-                 */
+                // Check if the bot was referenced by "!"
                 if (!$referenced && (substr($message->content, 0, 1) === "!")) {
                     $message->content = ltrim($message->content, "!");
                     $referenced = true;
                 }
 
-                /*
-                 * Check if the bot wasn't referenced.
-                 *
-                 * If so, exit this function.
-                 */
+                // Check if the bot wasn't referenced.
+                //
+                // If so, exit this function.
                 if (!$referenced) {
                     return;
                 }
 
-                /*
-                 * Since the bot has been referenced at this point, and the reference ID been stripped.
-                 * Remove any useless whitespaces, left of the message or command input.
-                 */
+                // Since the bot has been referenced at this point, and the reference ID been stripped.
+                // Remove any useless whitespaces, left of the message or command input.
                 $message->content = ltrim($message->content, " ");
             }
 
-            /*
-             * The incoming message is for the bot.
-             */
+            // The incoming message is for the bot.
             $this->runScripts(\StackGuru\BotEvent::MESSAGE_OTHERS_TO_SELF, $message, $event);
-
         }
+    } // METHOD END: public incoming (\Discord\Parts\Channel\Message $in, \Discord\Discord $self)
 
-        /*
-         * Retrieve the command and view later values, separated by whitespace, as arguments.
-         *
-         * eg.
-         *  <@dfksj...> command arg1 arg2 arg3 arg4
-         */
-        $cmd = [
-            "command"   => "",
-            "arguments" => []
-        ];
-
-        {
-            $words      = explode(" ", strtolower($message->content));
-            $command    = $words[0];
-
-
-            /*
-             * If the first word/command is a registered command, save it.
-             */
-            if ($this->wordIsACommand($command)) {
-                $cmd["command"] = $command;
-
-                /*
-                 * Add the arguments if there are any, and convert all to lowercase
-                 */
-                if (sizeof($words) > 1) {
-                    $cmd["arguments"] = array_slice($words, 1);
-                }
-
-            }
-            else {
-                Utils\Response::sendResponse("I'm sorry. It seems I cannot find your command. Please try the command: help", $message);
-                return;
-            }
-        }
-
-
-        /*
-         * The incoming message is for the bot.
-         */
-        //$this->runScripts(\StackGuru\BotEvent::MESSAGE_OTHERS_TO_SELF_READY, $message, $event, $cmd);
-    } // METHOD END: public incomming (\Discord\Parts\Channel\Message $in, \Discord\Discord $self)
 
 
     /* ********************************************
@@ -282,10 +201,9 @@ class Bot extends Database
      */
     private function runScripts (string $state, \Discord\Parts\Channel\Message $message, string $event)
     {
-        if (!isset($this->callbacks[$state])) { 
+        if (!isset($this->callbacks[$state])) {
             return;
         }
-
         $arr = $this->callbacks[$state];
         for ($i = sizeof($arr) - 1; $i >= 0; $i -= 1) {
             call_user_func_array($this->callbacks[$state][$i], [$message, $event]);

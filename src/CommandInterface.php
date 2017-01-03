@@ -15,6 +15,5 @@ interface CommandInterface
      * Parses the give string array to do further actions.. improvements?
      */
     public function /*        */ process (string $query, CommandContext $ctx) : string;
-    //public function /*        */ linkDiscordObject  (/* function () : Object */ $callback);
 
 }
