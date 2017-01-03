@@ -4,7 +4,7 @@ namespace StackGuru\Commands\Google;
 
 class Google extends \StackGuru\Commands\BaseCommand
 {
-    const DESCRIPTION = "";
+    const DESCRIPTION = "link to google";
     const URL = "https://www.google.com/";
     const DEFAULT = "Search"; // default command
 

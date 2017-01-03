@@ -9,21 +9,17 @@ class SearchTest extends TestCase
     {
         $google = new \StackGuru\Commands\Google\Search();
 
-        $query = [
-            "test",
-            "something",
-            "some",
-            "lol",
-            "idkwhy",
-            "WORD"
-        ];
+        $query = "some keywords";
 
         $base = "https://www.google.com/search?";
-        $expected1 = $base . "q=test+something+some+lol+idkwhy+WORD";
-        $expected2 = $base . "q=Why+am+I+such+an+asshole%3F";
 
+        $expectations = array(
+            "" => $base . "q=Why+am+I+such+an+asshole%3F",
+            "some keywords" => $base . "q=some+keywords",
+        );
 
-        $this->assertEquals($expected1, $google->process($query));
-        $this->assertEquals($expected2, $google->process());
+        foreach ($expectations as $keywords => $url) {
+             $this->assertEquals($url, $google->process($keywords));
+        }
     }
 }

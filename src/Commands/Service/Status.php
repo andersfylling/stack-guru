@@ -21,23 +21,23 @@ class Status extends Service implements \StackGuru\CommandInterface
 	        " minute"   => $secs / 60 % 60,
 	        " second"	=> $secs % 60
 	    ];
-	        
+
 	    foreach ($bit as $k => $v) {
 	        if($v > 1) {
 	        	$ret[] = $v . $k . 's';
 	        }
-	        
+
 	        if($v == 1) {
 	        	$ret[] = $v . $k;
 	        }
-        }	
+        }
 
 	    array_splice($ret, count($ret)-1, 0, 'and');
 
 	    if ("and" === $ret[0]) {
 	    	unset($ret[0]);
 	    }
-	    
+
 	    return join(' ', $ret);
     }
 
@@ -51,16 +51,15 @@ class Status extends Service implements \StackGuru\CommandInterface
         $elapsedTime 	= trim($this->time_elapsed());
 
 
-        $response = "" . PHP_EOL .
-        			"MEMORY" . PHP_EOL . 
-        			" - Used:\t\t\t {$memoryKiB}KiB ({$memoryMiB}MiB)." . PHP_EOL . 
-        			" - Allocated:\t {$memoryLimitKiB}KiB ({$memoryLimitMiB}MiB)." . PHP_EOL . 
-        			"" . PHP_EOL .
-        			"HISTORY" . PHP_EOL .
-        			" - Runtime:\t\t{$elapsedTime}." . PHP_EOL .
-        			"" . PHP_EOL .
-        			"" . PHP_EOL . 
-        			"";
+        $response = "```markdown\n" .
+        			"# Memory\n" .
+        			sprintf("* Used:      %20s", "{$memoryKiB}KiB ({$memoryMiB}MiB)") . "\n" .
+        			sprintf("* Allocated: %20s", "{$memoryLimitKiB}KiB ({$memoryLimitMiB}MiB)") . "\n" .
+        			"\n" .
+        			"# History\n" .
+        			sprintf("* Runtime:   %20s", $elapsedTime) . "\n" .
+        			"\n" .
+        			"```";
 
         return $response;
     }
