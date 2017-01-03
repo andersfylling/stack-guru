@@ -86,7 +86,6 @@ $messages_other_to_bot          = function (\Discord\Parts\Channel\Message $mess
 
     // Parse query to find the command instance and get the remaining arguments.
     $data = $cmdRegistry->parseQuery($message->content);
-    var_dump($data);
 
     $command = $data["instance"];
     if ($command === null) {
