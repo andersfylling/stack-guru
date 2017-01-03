@@ -14,8 +14,6 @@ require __DIR__."/terminalArgumentsHandler.php";
 // Autoload classes
 require __DIR__."/autoload.php";
 
-error_reporting( E_ALL );
-ini_set('display_errors', 1);
 
 use \StackGuru\BotEvent;
 use \StackGuru\CoreLogic\Utils;
@@ -52,6 +50,21 @@ $messages_all_excluding_bot     = function (\Discord\Parts\Channel\Message $mess
 {
     // Stuff to be called in this state.
     echo "messages_all_excluding_bot", PHP_EOL;
+
+    // Be rude to people who say NZT
+    if (strpos(strtolower($message->content), "nzt") !== false) {
+        $rudeNZTResponses = [
+            "Really.. NZT!?",
+            "NZT? Who do you think you are!?",
+            "NZT? Shut up human!",
+            "NZT!? You silly little creature.",
+            "NZT? Blæ?",
+            "How about no more NZT you humans"
+        ];
+
+        $response = $rudeNZTResponses[array_rand($rudeNZTResponses, 1)];
+        \StackGuru\CoreLogic\Utils\Response::sendResponse($response, $message);
+    }
 };
 
 $messages_from_bot              = function (\Discord\Parts\Channel\Message $message, string $event)
@@ -71,8 +84,6 @@ $messages_other_to_bot          = function (\Discord\Parts\Channel\Message $mess
     // Stuff to be called in this state.
     echo "messages_other_to_bot", PHP_EOL;
 
-    echo "Processing message: ", $message->content, PHP_EOL;
-
     // Parse query to find the command instance and get the remaining arguments.
     $data = $cmdRegistry->parseQuery($message->content);
     var_dump($data);
@@ -90,13 +101,9 @@ $messages_other_to_bot          = function (\Discord\Parts\Channel\Message $mess
     $context->bot = $bot;
     $context->message = $message;
 
-    // Run command and don't send a response if the return is null.
-    echo "a", PHP_EOL;
+    // Run command and send a response if the return is not null.
     $response = $command->process($query);
-    var_dump(array('response' => $response));
     if ($response !== null) {
-        echo "Trying to send response:", PHP_EOL;
-        var_dump(array('response' => $response, 'message' => $message));
         \StackGuru\CoreLogic\Utils\Response::sendResponse($response, $message);
     }
 };

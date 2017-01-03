@@ -30,8 +30,6 @@ class CommandRegistry
      */
     function __construct (array $commandFolders)
     {
-        var_dump($commandFolders);
-
         // Load all given folders into the registry.
         foreach ($commandFolders as $folder)
             $this->commands = array_merge($this->commands, $this->loadCommands($folder));
