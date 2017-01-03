@@ -89,36 +89,6 @@ $messages_other_to_bot          = function (\Discord\Parts\Channel\Message $mess
 };
 
 
-$messages_other_to_bot_ready    = function (\Discord\Parts\Channel\Message $message, string $event) 
-{
-    /*
-     * Stuff to be called in this state.
-     */
-    echo "messages_other_to_bot_ready",PHP_EOL;
-
-    //echo $bot->firstWordIsACommand($message);
-
-    //($bot->firstWordIsACommand($message) !== '' ? echo"true" : echo"false");
-    
-    //echo 213;
-
-    /*
-     * Initiate command
-     */
-    // if (null !== $command) {
-    //     var_dump($command);
-    //     $command = $this->commands[$command["command"]];
-
-    //     $context = new \StackGuru\CommandContext();
-    //     $context->bot = $this;
-    //     $context->message = $message;
-
-    //     //if () 
-    //     $command->process($command["arguments"], $context);
-    // }
-};
-
-
 
 /*
  * Add listeners
