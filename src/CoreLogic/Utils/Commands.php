@@ -21,11 +21,6 @@ class Commands
         return self::wordIsACommand(self::getFirstWordFromString($query));
     }
 
-    public static function wordIsASubCommand (string $word, array $arr) : bool
-    {
-        return isset($arr[$word]);
-    }
-
     public static function wordIsACommand (string $word, array $arr = null) : string
     {
         if (null === $arr) {
@@ -46,5 +41,10 @@ class Commands
         }
 
         return '';
+    }
+
+    public static function wordIsASubCommand (string $word, array $arr) : bool
+    {
+        return isset($arr[$word]);
     }
 }

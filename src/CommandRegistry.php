@@ -61,26 +61,19 @@ class CommandRegistry
             // Update command to the new first word..
             $nextCommand = Utils\Commands::getFirstWordFromString($query);
 
-            /*
-             * The first word, aka command, wasn't valid.
-             * The first word is not a command.
-             *
-             * assumption1: $options is always an array
-             *
-             * assumption2: if there are no matches, it might be a default command..
-             *                  Google.google = default..
-             */
-            if (!isset($this->commands[$nextCommand])) {
+            // The first word, aka command, wasn't valid.
+            // The first word is not a command.
+            //
+            // assumption1: $commands is always an array
+            //
+            // assumption2: if there are no matches, it might be a default command..
+            //                   Google.google = default..
+            if (!isset($commands[$nextCommand])) {
                 if (null === $prevCommand || !isset($commands[$prevCommand])) {
                     return $response;
                 }
 
                 $command = $commands[$prevCommand];
-                // var_dump(array(
-                //     "prevCommand" => $prevCommand,
-                //     "nextCommand" => $nextCommand,
-                //     "command" => $command,
-                // ));
                 $nextCommand = strtolower($command::DEFAULT); // get default command from main command class
 
                 // check for programming mistakes
