@@ -17,8 +17,8 @@ class CommandRegistry
 {
     private $commands   = [
         // string "command_name"    => [
-        //      string "command_name"       => [boolean sudo, string class, string description],
-        //      string "sub_command_name"   => [boolean sudo, string class, string description],
+        //      string "command_name"       => \StackGuru\CommandInterface,
+        //      string "sub_command_name"   => \StackGuru\CommandInterface,
         // ],
     ];
 
