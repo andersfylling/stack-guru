@@ -123,7 +123,7 @@ class Info extends Drug implements \StackGuru\CommandInterface
             $results = $this->getDatasheet($args[0]);
 
             foreach ($results as $key => $value) {
-                $result .= $key . ": " . $this->parseValue($value) . PHP_EOL;
+                $result .= $key . ": " . $this->parseValue($value) . ("dose" === $key ? "mg" : ""). PHP_EOL;
             }
         }
 
