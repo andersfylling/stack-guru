@@ -70,7 +70,7 @@ class CommandRegistry
              * assumption2: if there are no matches, it might be a default command..
              *                  Google.google = default..
              */
-            if (!isset($this->commands[$nextCommand])) {
+            if (!isset($commands[$nextCommand])) {
                 if (null === $prevCommand || !isset($commands[$prevCommand])) {
                     return $response;
                 }
