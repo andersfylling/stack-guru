@@ -5,7 +5,7 @@ namespace StackGuru\Commands\Help;
 class Help extends \StackGuru\Commands\BaseCommand
 {
     const COMMAND_NAME = "help";
-    const DESCRIPTION = "Returns a list of available bot commands";
+    const DESCRIPTION = "returns a list of available bot commands";
     const DEFAULT = "help";
 
     public function __construct()
@@ -24,12 +24,24 @@ class Help extends \StackGuru\Commands\BaseCommand
         $commands = $ctx->cmdRegistry->getAll();
         foreach ($commands as $command => $subcommands) {
             // Remove main command from subcommands
+            $mainCommand = $subcommands[$command];
             unset($subcommands[$command]);
 
+            // Print command and subcommands
             $cmdline = "* !{$command}";
             if (sizeof($subcommands) > 0) {
                 $cmdline .= " [" . implode(", ", array_keys($subcommands)) ."]";
             }
+
+            // Pad command names to align command descriptions
+            $cmdline = sprintf("%-40s", $cmdline);
+
+            // Add command description
+            $description = $mainCommand::DESCRIPTION;
+            if (!empty($description)) {
+                $cmdline .= " - {$description}";
+            }
+
             $helptext .= $cmdline . "\n";
         }
         $helptext .= "```";
