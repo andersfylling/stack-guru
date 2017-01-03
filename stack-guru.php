@@ -81,11 +81,13 @@ $messages_other_to_bot          = function (\Discord\Parts\Channel\Message $mess
     $command = $data["instance"];
     $command = new $command();
     $query = $data["query"];
-    var_dump($query);
-    var_dump($command->process($query));
 
     //TODO should be updated..
-    \StackGuru\CoreLogic\Utils\Response::sendResponse($command->process($query), $message);
+    // dont send a response if the return is null.
+    $response = $command->process($query);
+    if ($response !== null) {
+        \StackGuru\CoreLogic\Utils\Response::sendResponse($response, $message);
+    }
 };
 
 
