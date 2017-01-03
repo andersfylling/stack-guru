@@ -15,11 +15,24 @@ class Help extends \StackGuru\Commands\BaseCommand
 
     public function process (string $query, \StackGuru\CommandContext $ctx = null) : string
     {
-        $helptext = "Here is a list of available commands:\n";
+        // Encapsulate command list in code block
+        $helptext = "```markdown\n";
+
+        $helptext .= "# Available commands\n";
+
+        // Print all commands
         $commands = $ctx->cmdRegistry->getAll();
         foreach ($commands as $command => $subcommands) {
-            $helptext .= sprintf("* !%s [%s]\n", $command, implode(", ", array_keys($subcommands)));
+            // Remove main command from subcommands
+            unset($subcommands[$command]);
+
+            $cmdline = "* !{$command}";
+            if (sizeof($subcommands) > 0) {
+                $cmdline .= " [" . implode(", ", array_keys($subcommands)) ."]";
+            }
+            $helptext .= $cmdline . "\n";
         }
+        $helptext .= "```";
 
         return $helptext;
     }
