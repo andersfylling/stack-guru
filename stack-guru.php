@@ -99,10 +99,11 @@ $messages_other_to_bot          = function (\Discord\Parts\Channel\Message $mess
     // and other commands.
     $context = new \StackGuru\CommandContext();
     $context->bot = $bot;
+    $context->cmdRegistry = $cmdRegistry;
     $context->message = $message;
 
     // Run command and send a response if the return is not null.
-    $response = $command->process($query);
+    $response = $command->process($query, $context);
     if ($response !== null) {
         \StackGuru\CoreLogic\Utils\Response::sendResponse($response, $message);
     }

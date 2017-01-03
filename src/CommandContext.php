@@ -5,8 +5,9 @@ namespace StackGuru;
 class CommandContext
 {
     public $bot; // \StackGuru\CoreLogic\Bot
-    public $message; // \Discord\Parts\Channel\Message
+    public $cmdRegistry; // \StackGuru\CommandRegistry
     public $parent; // \StackGuru\CommandInterface
+    public $message; // \Discord\Parts\Channel\Message
 
     public function __construct()
     {
