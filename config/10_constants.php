@@ -8,3 +8,4 @@
  */
 define("DEVELOPMENT", 		$terminal_args["DEVELOPMENT"]);
 define("TESTING", 			$terminal_args["TESTING"]);
+define("STARTUP_TIME",		time());
