@@ -61,7 +61,7 @@ class Info extends Drug implements \StackGuru\CommandInterface
 
 
         // Drug and category exists
-        return $category .": " . $this->parseValue($drug[$category]);
+        return $category .": " . $this->parseValue($category, $drug[$category]);
     }
 
     private function getDatasheet (string $drugname) : array
@@ -81,10 +81,14 @@ class Info extends Drug implements \StackGuru\CommandInterface
         return $drug;
     }
 
-    private function parseValue ($value) 
+    private function parseValue (string $key, $value) 
     {
         if (is_array($value)) {
             $value = implode(", ", $value);
+        }
+
+        if ("dose" === $key) {
+            $value .= "mg";
         }
 
         return $value;
@@ -123,7 +127,7 @@ class Info extends Drug implements \StackGuru\CommandInterface
             $results = $this->getDatasheet($args[0]);
 
             foreach ($results as $key => $value) {
-                $result .= $key . ": " . $this->parseValue($value) . ("dose" === $key ? "mg" : ""). PHP_EOL;
+                $result .= $key . ": " . $this->parseValue($key, $value) . PHP_EOL;
             }
         }
 
