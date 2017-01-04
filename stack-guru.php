@@ -7,9 +7,10 @@
  */
 
 // Make sure that the php version is correct
-if (70014 > PHP_VERSION_ID) { // 7.0.14
+// echo PHP_VERSION_ID;
+if (701000 > PHP_VERSION_ID) { // 7.1
     echo "Your php version is too old: ", phpversion(), PHP_EOL;
-    echo "Please upgrade to version or higher: 7.0.14", PHP_EOL;
+    echo "Please upgrade to version or higher: 7.1", PHP_EOL;
     exit;
 }
 
