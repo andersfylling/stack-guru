@@ -15,35 +15,52 @@ use \StackGuru\CoreLogic\Utils;
  */
 class CommandRegistry
 {
-    private $commands   = [
-        // string "command_name"    => [
-        //      string "command_name"       => \StackGuru\CommandInterface,
-        //      string "sub_command_name"   => \StackGuru\CommandInterface,
+    const COMMAND_NAMESPACE = "\\StackGuru\\Commands";
+    const COMMAND_INTERFACE = "StackGuru\\CommandInterface";
+
+    const MAX_DEPTH = 10; // Maximum recursion depth for loading commands/subcommands
+
+
+    // Nested hashmap for commands by name.
+    private $commands = [
+        // "command_name"    => [
+        //      "command"       => \StackGuru\CommandInterface,
+        //      "subcommands"   => [
+        //          "command" => \StackGuru\CommandInterface,
+        //          "subcommands" => []
+        //      ],
         // ],
     ];
-    
+
+    // Hashmap for commands by fully qualified class name. For internal use only.
+    private $commandsByClass = [
+        // string "\StackGuru\Commands\Google\Google" => \StackGuru\Commands\Google\Google,
+        // string "\StackGuru\Commands\Google\Search" => \StackGuru\Commands\Google\Search,
+    ];
+
 
     /**
      * Initialize a CommandRegistry object.
      *
-     * @param array $commandFolders = []
+     * @param array $commandFolders A list of folders with command files to be loaded.
      */
     function __construct (array $commandFolders)
     {
         // Load all given folders into the registry.
         foreach ($commandFolders as $folder)
-            $this->commands = array_merge($this->commands, $this->loadCommands($folder));
+            $this->loadCommands($folder);
     }
 
 
     /**
      * Returns the command instance and trimmed query for the latest relative command in the string.
      *
+     * @param string $query The full
+     *
      * @return array instance and new query string after matched command
      */
 	public function parseQuery (string $query) : array
 	{
-        echo "Parsing query: ", $query, PHP_EOL;
         $prevCommand = null;
         $nextCommand = Utils\Commands::getFirstWordFromString($query);
 
@@ -52,7 +69,7 @@ class CommandRegistry
             "instance" => null
         ];
 
-        $maxChain = 10;
+
         $depth = 0;
 
         $commands = $this->commands;
@@ -64,10 +81,10 @@ class CommandRegistry
             // The first word, aka command, wasn't valid.
             // The first word is not a command.
             //
-            // assumption1: $commands is always an array
+            // Assumption 1: $commands is always an array
             //
-            // assumption2: if there are no matches, it might be a default command..
-            //                   Google.google = default..
+            // Assumption 2: if there are no matches, it might be a default command..
+            //               e.g. Google.google = default..
             if (!isset($commands[$nextCommand])) {
                 if (null === $prevCommand || !isset($commands[$prevCommand])) {
                     return $response;
@@ -76,7 +93,7 @@ class CommandRegistry
                 $command = $commands[$prevCommand];
                 $nextCommand = strtolower($command::DEFAULT); // get default command from main command class
 
-                // check for programming mistakes
+                // Check for programming mistakes
                 if (null === $nextCommand) {
                     // error!!!!!
                     throw new RuntimeException("ERROR! Commands default was null: $query");
@@ -107,7 +124,9 @@ class CommandRegistry
 	}
 
     /**
-     * @return array of all commands in the registry
+     * Returns all commands that are active.
+     *
+     * @return array All commands in the registry.
      */
     public function getAll () : array
     {
@@ -115,7 +134,11 @@ class CommandRegistry
     }
 
     /**
-     * @return array subcommands for given command
+     * Finds all the subcommands for a given command.
+     *
+     * @param string $key Command name
+     *
+     * @return array Subcommands for given command
      */
     public function getSubcommands (string $key) : array
     {
@@ -128,43 +151,131 @@ class CommandRegistry
     }
 
     /**
-     * Get all the commands in given folder(s).
+     * Load all the commands in given folder(s) recursively.
+     *
+     * @param string $commandFolder Path to the top folder.
+     *
+     * @return array A map of [command]
      */
     private function loadCommands (string $commandFolder) : array
     {
         // Check if path exists
-        if (!is_dir($commandFolder)) {
+        if (!is_dir($commandFolder))
             throw new \RuntimeException("Folder ".$commandFolder." doesn't exist");
-        }
 
         // Find command files
         $commandFiles = Utils\Filesystem::dig($commandFolder, true);
-
-
-        // Temporary store of commands only from the file set.
-        $commands = array();
 
         // Iterate over file set to load all .php files in the given folder,
         // and store an instance of the command in the registry.
         foreach ($commandFiles as $fileSet) {
             foreach ($fileSet as $folder => $files) {
                 foreach ($files as $filename) {
-                    // Infer class name from filename and construct an instance of it.
+                    // Infer class namespace and class name from path.
                     $classNamespace = ucfirst(basename($folder));
                     $className = ucfirst(basename($filename, '.php'));
-                    $class = "\\StackGuru\\Commands\\${classNamespace}\\${className}";
-                    if (class_exists($class)) {
-                        $interfaces = class_implements($class);
-                        if (isset($interfaces["StackGuru\\CommandInterface"]) || $className === $classNamespace) {
-                            $commandName = strtolower($className); // eg. Google, Service, etc.
-                            $instance = new $class();
-                            $commands[strtolower($classNamespace)][$commandName] = $instance;
-                        }
-                    }
+                    // When filename and folder name are the same, the command
+                    // is the primary command under which subcommands are hosted.
+                    $isPrimaryCommand = $className === $classNamespace;
+
                 }
             }
         }
+    }
 
-        return $commands;
+    private static function normalizeCommandPath(array $cmdPath) : array
+    {
+        $newCmdPath = [];
+        foreach ($cmdPath as $part)
+            $newCmdPath[] = strtolower($cmdPath);
+
+        return $newCmdPath;
+    }
+
+    private function getCommand (string ...$cmdPath) : Command
+    {
+        // Validate command path
+        $pathLength = sizeof($cmdPath);
+        if ($pathLength == 0)
+            throw new RuntimeException("Invalid command path (zero length)")
+
+        // Try to find command in registry by traversing through the hashmap.
+        $command = $this->commands;
+        foreach ($cmdPath as $part) {
+            $part = strtolower($part);
+            if (!isset($command[$part])) {
+                $command = null;
+                break;
+            }
+        }
+
+        return $command;
+    }
+
+    private function loadCommand (string ...$cmdPath) : Command
+    {
+        // Normalize and validate command path
+        $cmdPath = self::normalizeCommandPath($cmdPath);
+        $pathLength = sizeof($cmdPath)
+        if ($pathLength == 0)
+            throw new RuntimeException("Invalid command path (zero length)")
+
+        // See if command is already registered
+        $command = $this->getCommand($cmdPath...);
+        if ($command !== null)
+            return $command;
+
+        // Build fully qualified class name
+        $classNameParts = array();
+        foreach ($cmdPath as $cmd)
+            $classNameParts[] = ucfirst($cmd);
+
+        $fullClassName = self::COMMAND_NAMESPACE . "\\" . implode("\\", $classNameParts);
+        if (!class_exists($fullClassName))
+            return null;
+
+        $commandOptions = array(
+            "parent" => null,
+        );
+
+        if ($pathLength >= 2) {
+            $lastCmds = array_slice($cmds, -2);
+            $classNamespace = $lastCmds[0];
+            $className = $lastCmds[1];
+
+            // When namespace and class name are the same, the command is
+            // the primary command for that namespace.
+            $isPrimaryCommand = strtolower($className) === strtolower($classNamespace);
+
+            // Load parent/primary command for subcommand.
+            if (!$isPrimaryCommand) {
+                // Set parent path so that the last namespace and classname are equal.
+                $parentPath = $cmdPath;
+                $parentPath[$pathLength - 1] = $parentPath[$pathLength - 2];
+                $commandOptions["parent"] = $this->loadCommand(...$parentPath);
+            }
+        }
+
+        // Register the command if it's either a primary command
+        // or if it implements the command interface.
+        //
+        // TODO: All commands, including primary commands, should
+        // implement the CommandInterface.
+        $interfaces = class_implements($class);
+        if ($isPrimaryCommand || isset($interfaces[self::COMMAND_INTERFACE])) {
+            $commandName = strtolower($className); // eg. Google, Service, etc.
+            $instance = new $class($commandOptions);
+            $this->registerCommand($cmdPath, $instance, true)
+        }
+    }
+
+    private function registerCommand(array $cmdPath, Command $command, bool $force = null) : bool {
+        // See if command is already registered
+        if (!$force) {
+            if ($this->getCommand(...$cmdPath) !== null)
+                return false;
+        }
+
+        // Create nested hashmap inside $commands for the command path.
     }
 }

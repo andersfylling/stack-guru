@@ -2,7 +2,7 @@
 
 namespace StackGuru\Commands\Google;
 
-class Google extends \StackGuru\Commands\BaseCommand
+class Google extends \StackGuru\Command
 {
     const DESCRIPTION = "link to google";
     const URL = "https://www.google.com/";

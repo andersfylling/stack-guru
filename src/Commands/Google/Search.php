@@ -4,7 +4,7 @@ namespace StackGuru\Commands\Google;
 
 use StackGuru\CoreLogic\Utils;
 
-class Search extends Google implements \StackGuru\CommandInterface
+class Search extends \StackGuru\Command implements \StackGuru\CommandInterface
 {
     const COMMAND_NAME = "google";
     const DESCRIPTION = "something about the search command";

@@ -2,7 +2,7 @@
 
 namespace StackGuru\Commands\Drug;
 
-class Drug extends \StackGuru\Commands\BaseCommand
+class Drug extends \StackGuru\Command
 {
     const DESCRIPTION = "find drug information";
     const DEFAULT = "Info"; // default command

@@ -2,7 +2,7 @@
 
 namespace StackGuru\Commands\Help;
 
-class Help extends \StackGuru\Commands\BaseCommand
+class Help extends \StackGuru\Command
 {
     const COMMAND_NAME = "help";
     const DESCRIPTION = "returns a list of available bot commands";

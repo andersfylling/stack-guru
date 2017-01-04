@@ -16,22 +16,18 @@ class Commands
         return trim($result);
     }
 
-    public static function firstWordIsACommand (string $query) : string
+    public static function firstWordIsACommand (string $query, array $commands) : string
     {
-        return self::wordIsACommand(self::getFirstWordFromString($query));
+        return self::wordIsACommand(self::getFirstWordFromString($query), $commands);
     }
 
-    public static function wordIsACommand (string $word, array $arr = null) : string
+    public static function wordIsACommand (string $word, array $commands) : string
     {
-        if (null === $arr) {
-            return self::wordIsACommand($word, self::$commands);
-        }
-
         if (self::wordIsASubCommand($word, $arr)) {
             return $word;
         }
 
-        foreach ($arr as $val) {
+        foreach ($commands as $val) {
             if (is_array($val)) {
                 $vv = self::wordIsACommand($word, $val);
                 if ('' !== $vv) {
@@ -43,8 +39,8 @@ class Commands
         return '';
     }
 
-    public static function wordIsASubCommand (string $word, array $arr) : bool
+    public static function wordIsASubCommand (string $word, array $subcommands) : bool
     {
-        return isset($arr[$word]);
+        return isset($subcommands[$word]);
     }
 }

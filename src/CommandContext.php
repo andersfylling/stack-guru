@@ -8,8 +8,4 @@ class CommandContext
     public $cmdRegistry; // \StackGuru\CommandRegistry
     public $parent; // \StackGuru\CommandInterface
     public $message; // \Discord\Parts\Channel\Message
-
-    public function __construct()
-    {
-    }
 }

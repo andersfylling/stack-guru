@@ -2,7 +2,7 @@
 
 namespace StackGuru\Commands\Service;
 
-class Status extends Service implements \StackGuru\CommandInterface
+class Status extends \StackGuru\Command implements \StackGuru\CommandInterface
 {
     const COMMAND_NAME = "status";
     const DESCRIPTION = "Shows information about the bot running, memory usage.";

@@ -9,7 +9,7 @@
 namespace StackGuru\Commands\Service;
 
 
-class Service extends \StackGuru\Commands\BaseCommand
+class Service extends \StackGuru\Command implements \StackGuru\CommandInterface
 {
     const DESCRIPTION = "bot service commands";
     const DEFAULT = "Shutdown";
@@ -19,4 +19,8 @@ class Service extends \StackGuru\Commands\BaseCommand
         parent::__construct();
     }
 
+    public function process (string $query, \StackGuru\CommandContext $ctx = null) : string
+    {
+        echo "Not yet implemented", PHP_EOL;
+    }
 }

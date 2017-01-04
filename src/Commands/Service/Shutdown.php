@@ -2,7 +2,7 @@
 
 namespace StackGuru\Commands\Service;
 
-class Shutdown extends Service implements \StackGuru\CommandInterface
+class Shutdown extends \StackGuru\Command implements \StackGuru\CommandInterface
 {
     const COMMAND_NAME = "shutdown";
     const DESCRIPTION = "something about the shutdown command";
