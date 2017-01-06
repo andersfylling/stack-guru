@@ -6,6 +6,15 @@
  * Time: 22.57
  */
 
+// Make sure that the php version is correct
+// echo PHP_VERSION_ID;
+if (701000 > PHP_VERSION_ID) { // 7.1
+    echo "Your php version is too old: ", phpversion(), PHP_EOL;
+    echo "Please upgrade to version or higher: 7.1", PHP_EOL;
+    exit;
+}
+
+
 // Handle incomming terminal arguments.
 $terminal_args = [];
 require __DIR__."/terminalArgumentsHandler.php";
@@ -13,6 +22,9 @@ require __DIR__."/terminalArgumentsHandler.php";
 
 // Autoload classes
 require __DIR__."/autoload.php";
+
+
+
 
 
 use \StackGuru\BotEvent;
