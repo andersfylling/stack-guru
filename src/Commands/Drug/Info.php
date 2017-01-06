@@ -24,7 +24,7 @@ class Info extends Drug implements \StackGuru\CommandInterface
 
         [
             "id" => 14389,
-            "trivialName" => "modafinil",
+            "name" => "modafinil",
             "dose" => "100", //mg
             "duration" => "9t - 15t", // t m s must be specified
             "effects" => [],
