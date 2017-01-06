@@ -4,8 +4,8 @@ namespace StackGuru\Commands\Service;
 
 class Status extends \StackGuru\Command implements \StackGuru\CommandInterface
 {
-    const COMMAND_NAME = "status";
-    const DESCRIPTION = "Shows information about the bot running, memory usage.";
+    protected $name = "status";
+    protected $description = "Shows information about the bot running, memory usage.";
 
 
     private function time_elapsed () : string

@@ -31,10 +31,10 @@ $cmdRegistry = new \StackGuru\CommandRegistry([DEFAULT_COMMANDS_FOLDER]);
 
 // Debug output
 {
-    $commands = $cmdRegistry->getAll();
+    $commands = $cmdRegistry->getCommands();
     echo "Loaded ", sizeof($commands), " commands:", PHP_EOL;
-    foreach ($commands as $command => $subcommands) {
-        echo " * ", $command, " [", implode(", ", array_keys($subcommands)), "]", PHP_EOL;
+    foreach ($commands as $name => $command) {
+        echo " * ", $name, " [", implode(", ", array_keys($command->subcommands)), "]", PHP_EOL;
     }
     echo PHP_EOL;
 }

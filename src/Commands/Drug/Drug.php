@@ -4,11 +4,13 @@ namespace StackGuru\Commands\Drug;
 
 class Drug extends \StackGuru\Command
 {
-    const DESCRIPTION = "find drug information";
-    const DEFAULT = "Info"; // default command
+    protected $name = "drug";
+    protected $description = "find drug information";
+    protected $default = "info"; // default command
 
-    public function __construct()
+
+    public function process (string $query, \StackGuru\CommandContext $ctx = null) : string
     {
-        parent::__construct();
+        return "Not implemented yet";
     }
 }

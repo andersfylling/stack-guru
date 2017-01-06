@@ -6,9 +6,9 @@ use StackGuru\CoreLogic\Utils;
 
 class Search extends \StackGuru\Command implements \StackGuru\CommandInterface
 {
-    const COMMAND_NAME = "google";
-    const DESCRIPTION = "something about the search command";
-    const SEARCH_URL = Google::URL . "search?";
+    protected $name = "search";
+    protected $description = "search";
+
 
     public function process (string $query, \StackGuru\CommandContext $ctx = null) : string
     {

@@ -43,4 +43,26 @@ class Commands
     {
         return isset($subcommands[$word]);
     }
+
+    /**
+     * Normalize a given command path, removing invalid characters and making
+     * it all lowercase.
+     *
+     * @param array $cmdPath Command path selector, as a list of strings for every
+     *                       command in the chain.
+     *
+     * @return array Normalized command path.
+     */
+    public static function normalizeCommandPath (array $cmdPath) : array
+    {
+        $newCmdPath = [];
+
+        foreach ($cmdPath as $part) {
+            $n = strtolower($part);
+            // TODO: Remove invalid characters
+            $newCmdPath[] = $n;
+        }
+
+        return $newCmdPath;
+    }
 }

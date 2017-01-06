@@ -4,8 +4,9 @@ namespace StackGuru\Commands\Service;
 
 class Crash extends \StackGuru\Command implements \StackGuru\CommandInterface
 {
-    const COMMAND_NAME = "shutdown";
-    const DESCRIPTION = "something about the shutdown command";
+    protected $name = "shutdown";
+    protected $description = "something about the shutdown command";
+
 
     public function process (string $query, \StackGuru\CommandContext $ctx = null) : string
     {

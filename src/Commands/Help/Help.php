@@ -4,14 +4,10 @@ namespace StackGuru\Commands\Help;
 
 class Help extends \StackGuru\Command
 {
-    const COMMAND_NAME = "help";
-    const DESCRIPTION = "returns a list of available bot commands";
-    const DEFAULT = "help";
+    protected $name = "help";
+    protected $description = "returns a list of available bot commands";
+    protected $default = "help";
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     public function process (string $query, \StackGuru\CommandContext $ctx = null) : string
     {
