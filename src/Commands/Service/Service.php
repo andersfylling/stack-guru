@@ -9,14 +9,14 @@
 namespace StackGuru\Commands\Service;
 
 
-class Service extends \StackGuru\Command implements \StackGuru\CommandInterface
+class Service extends \StackGuru\Commands\BaseCommand
 {
-    protected $name = "service";
-    protected $description = "bot service commands";
-    protected $default = "Shutdown";
+    protected static $name = "service";
+    protected static $description = "bot service commands";
+    protected static $default = "shutdown";
 
 
-    public function process (string $query, \StackGuru\CommandContext $ctx = null) : string
+    public function process (string $query, ?\StackGuru\Commands\CommandContext $ctx = null) : string
     {
         return "Not implemented yet";
     }

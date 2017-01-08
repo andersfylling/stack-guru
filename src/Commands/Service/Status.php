@@ -2,13 +2,13 @@
 
 namespace StackGuru\Commands\Service;
 
-class Status extends \StackGuru\Command implements \StackGuru\CommandInterface
+class Status extends \StackGuru\Commands\BaseCommand
 {
-    protected $name = "status";
-    protected $description = "Shows information about the bot running, memory usage.";
+    protected static $name = "status";
+    protected static $description = "Shows information about the bot running, memory usage.";
 
 
-    private function time_elapsed () : string
+    private function timeElapsed () : string
     {
     	$secs = time() - STARTUP_TIME;
 
@@ -42,13 +42,13 @@ class Status extends \StackGuru\Command implements \StackGuru\CommandInterface
     }
 
 
-    public function process (string $query, \StackGuru\CommandContext $ctx = null) : string
+    public function process (string $query, ?\StackGuru\Commands\CommandContext $ctx = null) : string
     {
     	$memoryLimitKiB	= round(memory_get_peak_usage(true) / 1024);
     	$memoryLimitMiB	= number_format($memoryLimitKiB / 1024, 1, ',', ' ');
     	$memoryKiB 		= round(memory_get_usage(false) / 1024);
         $memoryMiB 		= number_format($memoryKiB / 1024, 1, ',', ' ');
-        $elapsedTime 	= trim($this->time_elapsed());
+        $elapsedTime 	= trim($this->timeElapsed());
 
 
         $response = "```markdown\n" .

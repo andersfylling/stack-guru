@@ -4,13 +4,13 @@ namespace StackGuru\Commands\Google;
 
 use StackGuru\CoreLogic\Utils;
 
-class Search extends \StackGuru\Command implements \StackGuru\CommandInterface
+class Search extends \StackGuru\Commands\BaseCommand
 {
-    protected $name = "search";
-    protected $description = "search";
+    protected static $name = "search";
+    protected static $description = "search";
 
 
-    public function process (string $query, \StackGuru\CommandContext $ctx = null) : string
+    public function process (string $query, ?\StackGuru\Commands\CommandContext $ctx = null) : string
     {
         $args = explode(' ', $query);
 

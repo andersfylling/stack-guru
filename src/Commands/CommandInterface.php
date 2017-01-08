@@ -5,7 +5,7 @@
  * @author http://github.com/sciencefyll
  */
 
-namespace StackGuru;
+namespace StackGuru\Commands;
 
 /**
  *

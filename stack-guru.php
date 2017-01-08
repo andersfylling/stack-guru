@@ -41,8 +41,8 @@ $bot = new \StackGuru\CoreLogic\Bot([
 ]);
 
 // Setup command registry.
-const DEFAULT_COMMANDS_FOLDER = __DIR__ . "/src/Commands";
-$cmdRegistry = new \StackGuru\CommandRegistry([DEFAULT_COMMANDS_FOLDER]);
+$cmdRegistry = new \StackGuru\CommandRegistry();
+$cmdRegistry->loadCommandFolder(__DIR__ . "/src/Commands", "StackGuru\\Commands");
 
 // Debug output
 {
@@ -78,7 +78,7 @@ $messages_all_excluding_bot     = function (\Discord\Parts\Channel\Message $mess
         ];
 
         $response = $rudeNZTResponses[array_rand($rudeNZTResponses, 1)];
-        \StackGuru\CoreLogic\Utils\Response::sendResponse($response, $message);
+        Utils\Response::sendResponse($response, $message);
     }
 };
 
@@ -104,7 +104,7 @@ $messages_other_to_bot          = function (\Discord\Parts\Channel\Message $mess
 
     $command = $data["instance"];
     if ($command === null) {
-        \StackGuru\CoreLogic\Utils\Response::sendResponse("I'm sorry. It seems I cannot find your command. Please try the command: help", $message);
+        Utils\Response::sendResponse("I'm sorry. It seems I cannot find your command. Please try the command: help", $message);
         return;
     }
     $query = $data["query"];
@@ -119,7 +119,7 @@ $messages_other_to_bot          = function (\Discord\Parts\Channel\Message $mess
     // Run command and send a response if the return is not null.
     $response = $command->process($query, $context);
     if ($response !== null) {
-        \StackGuru\CoreLogic\Utils\Response::sendResponse($response, $message);
+        Utils\Response::sendResponse($response, $message);
     }
 };
 

@@ -4,13 +4,13 @@ namespace StackGuru\Commands\Google;
 
 use StackGuru\CoreLogic\Utils;
 
-class Image extends \StackGuru\Command implements \StackGuru\CommandInterface
+class Image extends \StackGuru\Commands\BaseCommand
 {
-    protected $name = "image";
-    protected $description = "search images";
+    protected static $name = "image";
+    protected static $description = "search images";
 
 
-    public function process (string $query, \StackGuru\CommandContext $ctx = null) : string
+    public function process (string $query, ?\StackGuru\Commands\CommandContext $ctx = null) : string
     {
         $args = explode(' ', trim($query) . ' ');
 

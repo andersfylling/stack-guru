@@ -2,14 +2,14 @@
 
 namespace StackGuru\Commands\Drug;
 
-class Drug extends \StackGuru\Command
+class Drug extends \StackGuru\Commands\BaseCommand
 {
-    protected $name = "drug";
-    protected $description = "find drug information";
-    protected $default = "info"; // default command
+    protected static $name = "drug";
+    protected static $description = "find drug information";
+    protected static $default = "info"; // default sub-command
 
 
-    public function process (string $query, \StackGuru\CommandContext $ctx = null) : string
+    public function process (string $query, ?\StackGuru\Commands\CommandContext $ctx = null) : string
     {
         return "Not implemented yet";
     }

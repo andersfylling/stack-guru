@@ -14,15 +14,16 @@ abstract class BaseCommand implements CommandInterface
 
     public function __construct($options = array())
     {
-        // Use class name by default as command name
-        if (empty(static::name))
-            static::name = strtolower($this->getClassName());
-
         if (isset($options['parent']))
             $this->parent = $options['parent'];
     }
 
-    public static function getName() : string { return static::$name; }
+    public static function getName() : string {
+        // Use class name by default as command name
+        if (empty(static::$name))
+          return strtolower($this->getClassName());
+        return static::$name;
+    }
     public static function getAliases() : array { return static::$aliases; }
     public static function getDescription() : string { return static::$description; }
 

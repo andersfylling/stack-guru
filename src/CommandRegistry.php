@@ -37,24 +37,10 @@ class CommandRegistry
         // "command_alias" => \StackGuru\CommandInterface,
     ];
 
-    // Hashmap for commands by fully qualified class name. For internal use only.
-    private $commandReflections = null;
-
-
-    /**
-     * Initialize a CommandRegistry object.
-     *
-     * @param array $commandFolders A list of folders with command files to be loaded.
-     */
-    function __construct (array $commandFolders)
-    {
-        // Use SplObjectStorage as hashmap for command class reflections.
-        $this->commandReflections = new SplObjectStorage();
-
-        // Load all given folders into the registry.
-        foreach ($commandFolders as $folder)
-            $this->loadCommandFolder($folder);
-    }
+    // Hashmap for command reflections by fully qualified class name. For internal use only.
+    private $commandReflections = [
+        // "\StackGuru\Commands\Google\Search" => \StackGuru\Commands\CommandReflection,
+    ];
 
 
     /**
@@ -177,32 +163,36 @@ class CommandRegistry
     /**
      * Load all the commands in given folder(s) recursively.
      *
-     * @param string $commandFolder Path to the top folder.
+     * @param string $path Path to the top commands folder.
+     * @param string $namespace Namespace of the commands folder.
      *
      * @return array A list of loaded commands.
      */
-    private function loadCommandFolder (string $commandFolder) : array
+    public function loadCommandFolder (string $path, string $namespace) : array
     {
         // Check if path exists
-        if (!is_dir($commandFolder))
-            throw new \RuntimeException("Folder ".$commandFolder." doesn't exist");
+        if (!is_dir($path))
+            throw new \RuntimeException("Folder ".$path." doesn't exist");
+
+        $namespace = trim($namespace, "\\");
 
         // Find command files
-        $commandFiles = Utils\Filesystem::dig($commandFolder, false, true);
+        $commandFiles = Utils\Filesystem::dig($path, false, true);
 
         $commands = [];
 
         // Iterate over file set to load all .php files in the given folder,
         // and store an instance of the command in the registry.
+        //
         // TODO: Use SPL RecursiveDirectoryIterator to get files of all depths.
         foreach ($commandFiles as $fileSet) {
             foreach ($fileSet as $folder => $files) {
                 foreach ($files as $filename) {
-                    // Infer class namespace and class name from path.
-                    $classNamespace = ucfirst(basename($folder));
+                    // Infer relative command namespace and class name from path.
+                    $relNamespace = ucfirst(basename($folder));
                     $className = ucfirst(basename($filename, '.php'));
 
-                    $command = $this->loadCommand($classNamespace, $className);
+                    $command = $this->loadCommand($namespace, $relNamespace, $className);
                     if ($command !== null)
                         $commands[] = $command;
                 }
@@ -212,28 +202,64 @@ class CommandRegistry
         return $commands;
     }
 
-    private function loadCommand (string ...$path) : ?Commands\CommandReflection
+    // TODO: Make more compatible with non-native commands.
+    private function loadCommand (string $namespace, string ...$classPath) : ?Commands\CommandReflection
     {
-        // Normalize and validate command path
-        $cmdPath = Utils\Commands::normalizeCommandPath($cmdPath);
-        $pathLength = sizeof($cmdPath);
+        // Validate class path
+        $pathLength = sizeof($classPath);
         if ($pathLength == 0)
-            throw new RuntimeException("Invalid command path (zero length)");
+            throw new RuntimeException("Invalid class path (zero length)");
 
         // Build fully qualified class name
-        $classNameParts = array_map("ucfirst", $cmdPath);
-        $fqcn = Utils\Commands::fullClassName($classNameParts)
+        // $classPath = array_map("strtolower", $classPath);
+        // $classPath = array_map("ucfirst", $classPath);
+        $fqcn = Utils\Commands::getFullClassName($namespace, ...$classPath);
 
         if (!class_exists($fqcn))
             return null;
 
         // Create command class reflection
-        $reflect = new Commands\CommandReflection($fqcn);
+        $reflect = new Commands\CommandReflection($fqcn, $namespace);
 
         // Validate command class
-        if (!$reflect->validate())
+        if (!$reflect->validateCommand())
             return null;
 
+        // Register the command class
+        if (!$this->registerCommand($reflect))
+            return null;
+
+        return $reflect;
+    }
+
+
+    /**
+     * Register a command class.
+     *
+     * @param Commands\CommandReflection $reflect Reflection of a Command class.
+     *
+     * @return bool Success
+     */
+    private function registerCommand (Commands\CommandReflection $reflect) : bool {
+        // Get fully qualified class name
+        $fqcn = $reflect->getName();
+
+        // See if command is already registered
+        if (isset($this->commandReflections[$fqcn]))
+            return false;
+
+        $commandName = $fqcn::getName();
+        $commandAliases = $fqcn::getAliases();
+        $commandDepth = $reflect->getCommandDepth($reflect);
+
+        echo "Registering command:", PHP_EOL;
+        echo "  * Name: ", $commandName, PHP_EOL;
+        echo "  * Aliases: ", implode(",", $commandAliases), PHP_EOL;
+        echo "  * Depth: ", $commandDepth, PHP_EOL;
+
+        // TODO: Replace code below with functional code for saving a reference
+        //       to the parent command.
+        //
         // if ($pathLength >= 2) {
         //     $lastCmds = array_slice($cmdPath, -2);
         //     $commandNamespace = $lastCmds[0];
@@ -252,84 +278,20 @@ class CommandRegistry
         //     }
         // }
 
-        // Register the command class
-        if (!$this->registerCommand($reflect))
-            return null;
-
-        return $reflect;
-    }
-
-
-    /**
-     * Register a command class.
-     *
-     * @param ReflectionClass $reflect Reflection of a Command class.
-     *
-     * @return bool Success
-     */
-    private function registerCommand ($reflect) : bool {
-        // Get fully qualified class name
-        $fqcn = $reflect->getName();
-
-        // See if command is already registered
-        if ($this->commandReflections->contains($fqcn)))
-            return false;
-
-        // Validate command
-        if (!Utils\Commands::validateCommandClass($reflect))
-            return false;
-
-        $commandName = $fqcn::getName();
-        $commandAliases = $fqcn::getAliases();
-        $commandDepth = Utils\Commands::getCommandDepth($reflect);
-
-        echo "Registering command:", PHP_EOL;
-        echo "  * Name: ", $commandName, PHP_EOL;
-        echo "  * Aliases: ", implode(",", $commandAliases), PHP_EOL;
-        echo "  * Depth: ", $commandDepth, PHP_EOL;
-
         // Register to commandReflections hashmap
-        $this->commandReflections->attach($reflect);
+        $this->commandReflections[$fqcn] = $reflect;
 
-        // Register top-level commands to commandsByName hashmap
-        $depth = $reflect->getCommandDepth();
-        if ($depth == 1) {
-            $this->commandsByName[$commandName] = $command;
-        }
+        // TODO: Register top-level commands to commandsByName hashmap
+        // $path = $reflect->getCommandPath();
+        // ...
 
         // Register aliases
         foreach ($commandAliases as $alias) {
-            $this->commandsByAlias[$alias] = $command;
+            $this->commandsByAlias[$alias] = $reflect;
         }
 
         return true;
     }
 
-    /**
-     * Get the canonical command path (chain of command names) for a given command.
-     * This is to be used for determining the key for $commands.
-     *
-     * TODO: This method should reside inside Command and use the commands name,
-     *       rather than the class name.
-     *
-     * @param CommandInterface $cmd Command
-     *
-     * @return string Command path for command (e.g. ["google", "search"])
-     */
-    private function getCommandPath (CommandInterface $cmd) : string {
-        // Get fully qualified class name
-        $fqcn = $cmd->getFullClassName();
 
-        // Remove top-level command namespace from class name.
-        if (strpos($fqcn, self::COMMAND_NAMESPACE) === 0)
-            $fqcn = substr($fqcn, strlen(self::COMMAND_NAMESPACE));
-
-        // Trim preceding namespace separators.
-        $fqcn = ltrim($fqcn, "\\");
-
-        $path = explode("\\", $fqcn);
-        $path = Utils\Commands::normalizeCommandPath($path);
-
-        return $path;
-    }
 }

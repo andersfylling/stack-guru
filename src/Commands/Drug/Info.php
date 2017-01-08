@@ -4,10 +4,10 @@ namespace StackGuru\Commands\Drug;
 
 use StackGuru\CoreLogic\Utils;
 
-class Info extends \StackGuru\Command
+class Info extends \StackGuru\Commands\BaseCommand
 {
-    protected $name = "info";
-    protected $description = "something about the info command";
+    protected static $name = "info";
+    protected static $description = "something about the info command";
 
     const QUERY_URLS = ["https://www.ncbi.nlm.nih.gov/pubmed/?term="];
 
@@ -104,10 +104,10 @@ class Info extends \StackGuru\Command
      * Retrieves information about a known drug.
      *
      * @param  string                         $query [Message input from the user after the commands have been stripped off.]
-     * @param  \StackGuru\CommandContext|null $ctx   [context class to access parent object, among others.]
+     * @param  ?\StackGuru\Commands\CommandContext|null $ctx   [context class to access parent object, among others.]
      * @return string                                [response to be sent.]
      */
-    public function process (string $query, \StackGuru\CommandContext $ctx = null) : string
+    public function process (string $query, ?\StackGuru\Commands\CommandContext $ctx = null) : string
     {
         $args = explode(' ', $query);
 

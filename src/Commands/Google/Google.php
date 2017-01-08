@@ -2,20 +2,15 @@
 
 namespace StackGuru\Commands\Google;
 
-class Google extends \StackGuru\Command
+class Google extends \StackGuru\Commands\BaseCommand
 {
-    protected $name = "google";
-    protected $description = "link to google";
-    protected $default = "search"; // default command
+    protected static $name = "google";
+    protected static $description = "link to google";
+    protected static $default = "search"; // default command
 
     public const URL = "https://www.google.com/";
     public const SEARCH_URL = self::URL . "search?";
 
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     public static function queryBuilder(array $query = []) : string
     {
@@ -24,7 +19,7 @@ class Google extends \StackGuru\Command
         return http_build_query($query);
     }
 
-    public function process (string $query, \StackGuru\CommandContext $ctx = null) : string
+    public function process (string $query, ?\StackGuru\Commands\CommandContext $ctx = null) : string
     {
         return "Not implemented yet";
     }
