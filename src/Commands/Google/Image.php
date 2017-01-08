@@ -4,8 +4,11 @@ namespace StackGuru\Commands\Google;
 
 use StackGuru\CoreLogic\Utils;
 
+
 class Image extends \StackGuru\Commands\BaseCommand
 {
+    use UrlHelper;
+
     protected static $name = "image";
     protected static $description = "search images";
 
@@ -20,7 +23,7 @@ class Image extends \StackGuru\Commands\BaseCommand
             $query = "Why am I such an asshole?";
         }
 
-        $link = Google::SEARCH_URL . Gooogle::queryBuilder(['q' => $query]);
+        $link = $this->buildSearchUrl(['q' => $query]);
 
         $msg = "Let me google that for you..\n" . $link;
         if ($ctx)

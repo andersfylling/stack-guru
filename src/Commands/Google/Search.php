@@ -4,6 +4,7 @@ namespace StackGuru\Commands\Google;
 
 use StackGuru\CoreLogic\Utils;
 
+
 class Search extends \StackGuru\Commands\BaseCommand
 {
     protected static $name = "search";
@@ -20,7 +21,7 @@ class Search extends \StackGuru\Commands\BaseCommand
             $query = "Why am I such an asshole?";
         }
 
-        $link = Search::SEARCH_URL . $this->queryBuilder(['q' => $query]);
+        $link = $this->buildSearchUrl(['q' => $query]);
 
         return $link;
     }
