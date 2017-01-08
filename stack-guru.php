@@ -6,13 +6,16 @@
  * Time: 22.57
  */
 
-// Make sure that the php version is correct
-// echo PHP_VERSION_ID;
-if (701000 > PHP_VERSION_ID) { // 7.1
-    echo "Your php version is too old: ", phpversion(), PHP_EOL;
-    echo "Please upgrade to version or higher: 7.1", PHP_EOL;
-    exit;
-}
+ define("MIN_PHP_VERSION", "7.1.0");
+
+ // Make sure that the php version is correct
+ $version = explode('.', MIN_PHP_VERSION);
+ define('MIN_PHP_VERSION_ID', ($version[0] * 10000 + $version[1] * 100 + $version[2]));
+ if (PHP_VERSION_ID < MIN_PHP_VERSION_ID) {
+     echo "Your php version is too old: ", phpversion(), PHP_EOL;
+     echo "Please upgrade to version or higher: ", MIN_PHP_VERSION, PHP_EOL;
+     exit;
+ }
 
 
 // Handle incomming terminal arguments.
