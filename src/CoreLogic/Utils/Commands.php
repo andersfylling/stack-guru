@@ -8,6 +8,9 @@ namespace StackGuru\CoreLogic\Utils;
  */
 class Commands
 {
+
+
+
     public static function getFirstWordFromString (string $str) : string
     {
         $result = strstr(ltrim($str), ' ', true);
@@ -42,6 +45,21 @@ class Commands
     public static function wordIsASubCommand (string $word, array $subcommands) : bool
     {
         return isset($subcommands[$word]);
+    }
+
+
+
+    /**
+     * Assemble a fully qualified class name for the given relative class name
+     * components.
+     *
+     * @param string ...$shortClassName  Class name, or components, relative
+     *                                   to the command namespace.
+     *
+     * @return string Fully qualified class name
+     */
+    public static function getFullClassName (string ...$shortClassName) : string {
+        return \StackGuru\COMMAND_NAMESPACE . "\\" . implode("\\", $shortClassName);
     }
 
     /**

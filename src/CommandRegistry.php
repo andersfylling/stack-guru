@@ -3,6 +3,11 @@
 namespace StackGuru;
 
 use \StackGuru\CoreLogic\Utils;
+use \StackGuru\Commands;
+
+
+const COMMAND_NAMESPACE = "StackGuru\\Commands";
+const COMMAND_INTERFACE = "StackGuru\\Commands\\CommandInterface";
 
 
 /**
@@ -15,9 +20,6 @@ use \StackGuru\CoreLogic\Utils;
  */
 class CommandRegistry
 {
-    const COMMAND_NAMESPACE = "StackGuru\\Commands";
-    const COMMAND_INTERFACE = "StackGuru\\CommandInterface";
-
     const MAX_DEPTH = 10; // Maximum recursion depth for loading commands/subcommands
 
 
@@ -36,10 +38,7 @@ class CommandRegistry
     ];
 
     // Hashmap for commands by fully qualified class name. For internal use only.
-    private $commandsByClassname = [
-        // "\StackGuru\Commands\Google\Google" => \StackGuru\Commands\Google\Google,
-        // "\StackGuru\Commands\Google\Search" => \StackGuru\Commands\Google\Search,
-    ];
+    private $commandReflections = null;
 
 
     /**
@@ -49,6 +48,9 @@ class CommandRegistry
      */
     function __construct (array $commandFolders)
     {
+        // Use SplObjectStorage as hashmap for command class reflections.
+        $this->commandReflections = new SplObjectStorage();
+
         // Load all given folders into the registry.
         foreach ($commandFolders as $folder)
             $this->loadCommandFolder($folder);
@@ -75,7 +77,7 @@ class CommandRegistry
 
         $depth = 0;
 
-        $commands = $this->commands;
+        $commands = $this->commandsByName;
 
         while ($depth++ < $maxChain) {
             // Update command to the new first word..
@@ -137,6 +139,42 @@ class CommandRegistry
     }
 
     /**
+     * Finds a registered command class by a given command path.
+     * The command path may be longer than the actual
+     */
+    public function getCommandClass (string ...$cmdPath) : ?Command
+    {
+        $command = null;
+
+        // Normalize and validate command path
+        $cmdPath = Utils\Commands::normalizeCommandPath($cmdPath);
+
+        // Find top-level command
+        $topCmd = array_shift($cmdPath);
+        if ($topCmd === null)
+            return null;
+
+        if (isset($this->commandsByName[$topCmd])) {
+            $command = $this->commandsByName[$topCmd];
+        }
+        else if (isset($this->commandsByAlias[$topCmd])) {
+            $command = $this->commandsByAlias[$topCmd];
+        }
+        if ($command == null)
+            return null;
+
+        // Traverse through subcommands
+        foreach ($cmdPath as $part) {
+            if (isset($command->subcommands[$part]))
+                $command = $command->subcommands[$part];
+            else
+                return null;
+        }
+
+        return $command;
+    }
+
+    /**
      * Load all the commands in given folder(s) recursively.
      *
      * @param string $commandFolder Path to the top folder.
@@ -174,131 +212,88 @@ class CommandRegistry
         return $commands;
     }
 
-    private function getCommand (string ...$cmdPath) : ?Command
+    private function loadCommand (string ...$path) : ?Commands\CommandReflection
     {
         // Normalize and validate command path
         $cmdPath = Utils\Commands::normalizeCommandPath($cmdPath);
         $pathLength = sizeof($cmdPath);
         if ($pathLength == 0)
             throw new RuntimeException("Invalid command path (zero length)");
-
-        // Find top-level command
-        $firstPart = array_shift($cmdPath);
-        $command = null;
-        if (isset($this->commandsByName[$firstPart])) {
-            $command = $this->commandsByName[$firstPart];
-        }
-        else if (isset($this->commandsByAlias[$firstPart])) {
-            $command = $this->commandsByAlias[$firstPart];
-        }
-        if ($command == null)
-            return null;
-
-        // Traverse through subcommands
-        foreach ($cmdPath as $part) {
-            if (isset($command->subcommands[$part]))
-            {
-                $command = $command->subcommands[$part];
-            }
-            else {
-                return null;
-            }
-        }
-
-        return $command;
-    }
-
-    private function loadCommand (string ...$cmdPath) : ?Command
-    {
-        // Normalize and validate command path
-        $cmdPath = Utils\Commands::normalizeCommandPath($cmdPath);
-        $pathLength = sizeof($cmdPath);
-        if ($pathLength == 0)
-            throw new RuntimeException("Invalid command path (zero length)");
-
-        // See if command is already registered
-        $command = $this->getCommand(...$cmdPath);
-        if ($command !== null)
-            return $command;
 
         // Build fully qualified class name
-        $classNameParts = array();
-        foreach ($cmdPath as $cmd)
-            $classNameParts[] = ucfirst($cmd);
+        $classNameParts = array_map("ucfirst", $cmdPath);
+        $fqcn = Utils\Commands::fullClassName($classNameParts)
 
-        $fqcn = "\\" . self::COMMAND_NAMESPACE . "\\" . implode("\\", $classNameParts);
         if (!class_exists($fqcn))
             return null;
 
-        $parent = null;
+        // Create command class reflection
+        $reflect = new Commands\CommandReflection($fqcn);
 
-        if ($pathLength >= 2) {
-            $lastCmds = array_slice($cmdPath, -2);
-            $classNamespace = $lastCmds[0];
-            $className = $lastCmds[1];
+        // Validate command class
+        if (!$reflect->validate())
+            return null;
 
-            // When namespace and class name are the same, the command is
-            // the primary command for that namespace.
-            $isPrimaryCommand = strtolower($className) === strtolower($classNamespace);
-
-            // Load parent/primary command for subcommand.
-            if (!$isPrimaryCommand) {
-                // Set parent path so that the last namespace and classname are equal.
-                $parentPath = $cmdPath;
-                $parentPath[$pathLength - 1] = $parentPath[$pathLength - 2];
-                $parent = $this->loadCommand(...$parentPath);
-            }
-        }
-
-        // Register the command if it's either a primary command
-        // or if it implements the command interface.
+        // if ($pathLength >= 2) {
+        //     $lastCmds = array_slice($cmdPath, -2);
+        //     $commandNamespace = $lastCmds[0];
+        //     $commandName = $lastCmds[1];
         //
-        // TODO: All commands, including primary commands, should
-        // implement the CommandInterface.
-        $interfaces = class_implements($fqcn);
-        if ($isPrimaryCommand || isset($interfaces[self::COMMAND_INTERFACE])) {
-            // Initialize command
-            $options = array(
-                "parent" => $parent,
-            );
-            $command = new $fqcn($options);
-            $commandName = $command->getName();
-            // Add command to parent's subcommands if command has a parent
-            if ($parent !== null) {
-                $parent->subcommands[$commandName] = $command;
-            }
-            $this->registerCommand($command);
-            return $command;
-        }
+        //     // When namespace and class name are the same, the command is
+        //     // the primary command for that namespace.
+        //     $isPrimaryCommand = strtolower($className) === strtolower($classNamespace);
+        //
+        //     // Load parent/primary command for subcommand.
+        //     if (!$isPrimaryCommand) {
+        //         // Set parent path so that the last namespace and classname are equal.
+        //         $parentPath = $cmdPath;
+        //         array_pop($parentPath);
+        //         $parent = $this->loadCommand(...$parentPath);
+        //     }
+        // }
 
-        return null;
+        // Register the command class
+        if (!$this->registerCommand($reflect))
+            return null;
+
+        return $reflect;
     }
 
+
     /**
-     * Register a command instance.
+     * Register a command class.
      *
-     * @param CommandInterface $command
+     * @param ReflectionClass $reflect Reflection of a Command class.
      *
      * @return bool Success
      */
-    private function registerCommand (CommandInterface $command) : bool {
-        $fqcn = $command->getFullClassName();
-        $commandName = $command->getName();
-        $commandAliases = $command->getAliases();
-
-        echo "Registering command:", PHP_EOL;
-        echo "  Name: ", $commandName, PHP_EOL;
-        echo "  Aliases: ", implode(",", $commandAliases), PHP_EOL;
+    private function registerCommand ($reflect) : bool {
+        // Get fully qualified class name
+        $fqcn = $reflect->getName();
 
         // See if command is already registered
-        if (isset($this->commandsByClassname[$fqcn]))
+        if ($this->commandReflections->contains($fqcn)))
             return false;
 
-        // Register to commandsByClassname hashmap
-        $this->commandsByClassname[$fqcn] = $command;
+        // Validate command
+        if (!Utils\Commands::validateCommandClass($reflect))
+            return false;
+
+        $commandName = $fqcn::getName();
+        $commandAliases = $fqcn::getAliases();
+        $commandDepth = Utils\Commands::getCommandDepth($reflect);
+
+        echo "Registering command:", PHP_EOL;
+        echo "  * Name: ", $commandName, PHP_EOL;
+        echo "  * Aliases: ", implode(",", $commandAliases), PHP_EOL;
+        echo "  * Depth: ", $commandDepth, PHP_EOL;
+
+        // Register to commandReflections hashmap
+        $this->commandReflections->attach($reflect);
 
         // Register top-level commands to commandsByName hashmap
-        if ($command->parent === null) {
+        $depth = $reflect->getCommandDepth();
+        if ($depth == 1) {
             $this->commandsByName[$commandName] = $command;
         }
 

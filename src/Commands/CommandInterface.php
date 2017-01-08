@@ -14,9 +14,11 @@ interface CommandInterface
 {
     public function __construct();
 
-    public function getName() : string;
-    public function getAliases() : array;
-    public function getDescription() : string;
+    public static function getName() : string;
+    public static function getAliases() : array;
+    public static function getDescription() : string;
+
+    public function getParent() : ?CommandInterface;
 
     // Execute the command with the given query and context.
     public function process (string $query, CommandContext $ctx) : string;

@@ -1,8 +1,8 @@
 <?php
 
-namespace StackGuru;
+namespace StackGuru\Commands;
 
-class CommandContext
+class Context
 {
     public $bot; // \StackGuru\CoreLogic\Bot
     public $cmdRegistry; // \StackGuru\CommandRegistry
