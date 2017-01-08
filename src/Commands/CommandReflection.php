@@ -3,15 +3,18 @@
 namespace StackGuru\Commands;
 
 
-class CommandReflection extends ReflectionClass
+class CommandReflection extends \ReflectionClass
 {
+    private const COMMAND_INTERFACE = CommandInterface::class;
+
     private $commandNamespace = none;
     private $commandInterface = none;
 
 
-    public function __construct($className, $commandNamespace, $commandInterface) {
+    public function __construct($className, $commandNamespace) {
+        parent::__construct($className);
+
         $this->commandNamespace = $commandNamespace;
-        $this->commandInterface = $commandInterface;
     }
 
     /**
@@ -28,7 +31,7 @@ class CommandReflection extends ReflectionClass
             return false;
 
         // Class must implement command interface
-        if (!$this->implementsInterface[$this->commandInterface])
+        if (!$this->implementsInterface(self::COMMAND_INTERFACE))
             return false;
 
         // Class must reside in the commands namespace
@@ -39,7 +42,7 @@ class CommandReflection extends ReflectionClass
     }
 
     public function isInNamespace (string $namespace) : bool {
-        $namespace = ltrim($namespace, "\\");
+        $namespace = trim($namespace, "\\") . "\\";
         return strpos($this->getName(), $namespace) === 0;
     }
 
@@ -71,7 +74,7 @@ class CommandReflection extends ReflectionClass
 
         if ($depth >= 2) {
             $classNamespace = $parts[$depth - 2];
-            $className = $reflect->getShortName();
+            $className = $this->getShortName();
 
             // If class name is same as namespace, command is primary command,
             // therefore substract a depth level.
