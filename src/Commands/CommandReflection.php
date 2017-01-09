@@ -5,10 +5,7 @@ namespace StackGuru\Commands;
 
 class CommandReflection extends \ReflectionClass
 {
-    private const COMMAND_INTERFACE = CommandInterface::class;
-
-    private $commandNamespace = none;
-    private $commandInterface = none;
+    private $commandNamespace = null;
 
 
     public function __construct($className, $commandNamespace) {
@@ -31,7 +28,7 @@ class CommandReflection extends \ReflectionClass
             return false;
 
         // Class must implement command interface
-        if (!$this->implementsInterface(self::COMMAND_INTERFACE))
+        if (!$this->implementsInterface(CommandInterface::class))
             return false;
 
         // Class must reside in the commands namespace
@@ -53,7 +50,7 @@ class CommandReflection extends \ReflectionClass
     public function getRelativeClassName () : string {
         $fqcn = $this->getName();
         if (!$this->inCommandNamespace())
-            throw new RuntimeException("Command class ".$fqcn." does not reside in ".$this->commandNamespace);
+            throw new \RuntimeException("Command class ".$fqcn." does not reside in ".$this->commandNamespace);
 
         $relName = substr($fqcn, strlen($this->commandNamespace));
         return $relName;
@@ -64,7 +61,7 @@ class CommandReflection extends \ReflectionClass
      *
      * @param ReflectionClass $reflect Reflection of command class.
      *
-     * @return int Depth of class. Returns -1 if command depth can't be determined.
+     * @return int Command depth
      */
     public function getCommandDepth () : int {
         $relName = $this->getRelativeClassName();

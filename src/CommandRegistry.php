@@ -82,12 +82,12 @@ class CommandRegistry
                 }
 
                 $command = $commands[$prevCommand];
-                $nextCommand = strtolower($command::DEFAULT); // get default command from main command class
+                $nextCommand = strtolower($command::$default); // get default command from main command class
 
                 // Check for programming mistakes
                 if (null === $nextCommand) {
                     // error!!!!!
-                    throw new RuntimeException("ERROR! Commands default was null: $query");
+                    throw new \RuntimeException("ERROR! Commands default was null: $query");
                 }
             }
 
@@ -208,7 +208,7 @@ class CommandRegistry
         // Validate class path
         $pathLength = sizeof($classPath);
         if ($pathLength == 0)
-            throw new RuntimeException("Invalid class path (zero length)");
+            throw new \RuntimeException("Invalid class path (zero length)");
 
         // Build fully qualified class name
         // $classPath = array_map("strtolower", $classPath);
@@ -250,7 +250,7 @@ class CommandRegistry
 
         $commandName = $fqcn::getName();
         $commandAliases = $fqcn::getAliases();
-        $commandDepth = $reflect->getCommandDepth($reflect);
+        $commandDepth = $reflect->getCommandDepth();
 
         echo "Registering command:", PHP_EOL;
         echo "  * Name: ", $commandName, PHP_EOL;
