@@ -215,7 +215,7 @@ class CommandRegistry
         // $classPath = array_map("ucfirst", $classPath);
         $fqcn = Utils\Commands::getFullClassName($namespace, ...$classPath);
 
-        if (!class_exists($fqcn))
+        if (!class_exists($fqcn, true))
             return null;
 
         // Create command class reflection
