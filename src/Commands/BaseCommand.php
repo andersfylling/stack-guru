@@ -8,45 +8,28 @@ abstract class BaseCommand implements CommandInterface
     protected static $aliases = []; // List of top-level aliases for the command.
     protected static $description = ""; // Short summary of the commands purpose.
 
-    // For use by CommandRegistry only.
-    protected $parent = null; // The parent command instance.
-    protected $subcommands = []; // Subcommand hashmap.
-
-    public function __construct($options = array())
-    {
-        if (isset($options['parent']))
-            $this->parent = $options['parent'];
-    }
-
-    public static function getName() : string {
-        // Use class name by default as command name
-        if (empty(static::$name))
-          return strtolower($this->getClassName());
-        return static::$name;
-    }
-    public static function getAliases() : array { return static::$aliases; }
-    public static function getDescription() : string { return static::$description; }
-
-    public function getParent() : ?CommandInterface { return $this->parent; }
-    public function getSubcommands() : array { return $this->subcommands; }
-
+    // TODO: Show Help for command by default.
     abstract public function process (string $query, CommandContext $ctx = null) : string;
 
-    final public function getFullClassName() : string
+    final public static function getName() : string
     {
-        return get_class($this);
+        // Use class name by default as command name
+        $name = empty(static::$name) ? static::getClassName() : static::$name;
+
+        return strtolower($name);
     }
 
-    final public function getClassName() : string
+    final public static function getAliases() : array
     {
-        $classname = $this->getFullClassName();
-        if ($pos = strrpos($classname, '\\'))
-            return substr($classname, $pos + 1);
-        return $classname;
+        return static::$aliases;
+    }
+    final public static function getDescription() : string
+    {
+        return static::$description;
     }
 
-    final public function addSubcommand(CommandInterface $subcommand) {
-        $name = $subcommand->getName();
-        $this->subcommands[$name] = $subcommand;
+    final public static function getClassName() : string
+    {
+        return substr(strrchr(static::class, '\\'), 1);
     }
 }

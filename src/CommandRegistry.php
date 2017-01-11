@@ -46,7 +46,7 @@ class CommandRegistry
     /**
      * Returns the command instance and trimmed query for the latest relative command in the string.
      *
-     * @param string $query The full
+     * @param string $query The full query to the bot.
      *
      * @return array Instance and new query string after matched command
      */
@@ -211,8 +211,6 @@ class CommandRegistry
             throw new \RuntimeException("Invalid class path (zero length)");
 
         // Build fully qualified class name
-        // $classPath = array_map("strtolower", $classPath);
-        // $classPath = array_map("ucfirst", $classPath);
         $fqcn = Utils\Commands::getFullClassName($namespace, ...$classPath);
 
         if (!class_exists($fqcn, true))
@@ -240,7 +238,8 @@ class CommandRegistry
      *
      * @return bool Success
      */
-    private function registerCommand (Commands\CommandReflection $reflect) : bool {
+    private function registerCommand (Commands\CommandReflection $reflect) : bool
+    {
         // Get fully qualified class name
         $fqcn = $reflect->getName();
 
