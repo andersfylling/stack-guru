@@ -1,14 +1,9 @@
 <?php
-/**
- * interface for all commands to be written
- *
- * @author http://github.com/sciencefyll
- */
 
-namespace StackGuru\Commands;
+namespace StackGuru\Core\Command;
 
 /**
- *
+ * CommandInterface must be implemented by all bot commands.
  */
 interface CommandInterface
 {
@@ -18,9 +13,6 @@ interface CommandInterface
     public static function getAliases() : array;
     public static function getDescription() : string;
 
-    public function getParent() : ?CommandInterface;
-
     // Execute the command with the given query and context.
-    public function process (string $query, CommandContext $ctx) : string;
-
+    public function process (string $query, ?CommandContext $ctx) : string;
 }

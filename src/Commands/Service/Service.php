@@ -1,22 +1,19 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: anders
- * Date: 11/6/16
- * Time: 2:18 AM
- */
 
 namespace StackGuru\Commands\Service;
 
+use StackGuru\Core\Command\AbstractCommand;
+use StackGuru\Core\Command\CommandContext;
 
-class Service extends \StackGuru\Commands\BaseCommand
+
+class Service extends AbstractCommand
 {
     protected static $name = "service";
     protected static $description = "bot service commands";
     protected static $default = "shutdown";
 
 
-    public function process (string $query, ?\StackGuru\Commands\CommandContext $ctx = null) : string
+    public function process (string $query, ?CommandContext $ctx) : string
     {
         return "Not implemented yet";
     }

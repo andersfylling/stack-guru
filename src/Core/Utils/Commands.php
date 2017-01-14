@@ -1,16 +1,14 @@
 <?php
 
-namespace StackGuru\CoreLogic\Utils;
+namespace StackGuru\Core\Utils;
+
 
 /**
  * Commands contains helper functions for the command system.
  * These are mostly string functions.
  */
-class Commands
+abstract class Commands
 {
-
-
-
     public static function getFirstWordFromString (string $str) : string
     {
         $result = strstr(ltrim($str), ' ', true);
@@ -46,8 +44,6 @@ class Commands
     {
         return isset($subcommands[$word]);
     }
-
-
 
     /**
      * Assemble a fully qualified class name for the given relative class name

@@ -2,13 +2,17 @@
 
 namespace StackGuru\Commands\Help;
 
-class Help extends \StackGuru\Commands\BaseCommand
+use StackGuru\Core\Command\AbstractCommand;
+use StackGuru\Core\Command\CommandContext;
+
+
+class Help extends AbstractCommand
 {
     protected static $name = "help";
     protected static $description = "returns a list of available bot commands";
 
 
-    public function process (string $query, ?\StackGuru\Commands\CommandContext $ctx = null) : string
+    public function process (string $query, ?CommandContext $ctx) : string
     {
         // Encapsulate command list in code block
         $helptext = "```markdown\n";

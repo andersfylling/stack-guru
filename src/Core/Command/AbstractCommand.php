@@ -1,15 +1,19 @@
 <?php
 
-namespace StackGuru\Commands;
+namespace StackGuru\Core\Command;
 
-abstract class BaseCommand implements CommandInterface
+abstract class AbstractCommand implements CommandInterface
 {
     protected static $name = ""; // Name of the command.
     protected static $aliases = []; // List of top-level aliases for the command.
     protected static $description = ""; // Short summary of the commands purpose.
 
+    public function __construct()
+    {
+    }
+
     // TODO: Show Help for command by default.
-    abstract public function process (string $query, CommandContext $ctx = null) : string;
+    abstract public function process (string $query, ?CommandContext $ctx) : string;
 
     final public static function getName() : string
     {

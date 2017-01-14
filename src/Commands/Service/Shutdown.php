@@ -2,13 +2,17 @@
 
 namespace StackGuru\Commands\Service;
 
-class Shutdown extends \StackGuru\Commands\BaseCommand
+use StackGuru\Core\Command\AbstractCommand;
+use StackGuru\Core\Command\CommandContext;
+
+
+class Shutdown extends AbstractCommand
 {
     protected static $name = "shutdown";
     protected static $description = "something about the shutdown command";
 
 
-    public function process (string $query, ?\StackGuru\Commands\CommandContext $ctx = null) : string
+    public function process (string $query, ?CommandContext $ctx) : string
     {
         $args = explode(' ', trim($query) . ' ');
         return "gkdfjhlg";

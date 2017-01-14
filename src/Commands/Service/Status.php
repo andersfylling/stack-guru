@@ -2,11 +2,37 @@
 
 namespace StackGuru\Commands\Service;
 
-class Status extends \StackGuru\Commands\BaseCommand
+use StackGuru\Core\Command\AbstractCommand;
+use StackGuru\Core\Command\CommandContext;
+
+
+class Status extends AbstractCommand
 {
     protected static $name = "status";
     protected static $description = "Shows information about the bot running, memory usage.";
 
+
+    public function process (string $query, ?CommandContext $ctx) : string
+    {
+       $memoryLimitKiB	= round(memory_get_peak_usage(true) / 1024);
+       $memoryLimitMiB	= number_format($memoryLimitKiB / 1024, 1, ',', ' ');
+       $memoryKiB 		= round(memory_get_usage(false) / 1024);
+        $memoryMiB 		= number_format($memoryKiB / 1024, 1, ',', ' ');
+        $elapsedTime 	= trim($this->timeElapsed());
+
+
+        $response = "```markdown\n" .
+                   "# Memory\n" .
+                   sprintf("* Used:      %20s", "{$memoryKiB}KiB ({$memoryMiB}MiB)") . "\n" .
+                   sprintf("* Allocated: %20s", "{$memoryLimitKiB}KiB ({$memoryLimitMiB}MiB)") . "\n" .
+                   "\n" .
+                   "# History\n" .
+                   sprintf("* Runtime:   %20s", $elapsedTime) . "\n" .
+                   "\n" .
+                   "```";
+
+        return $response;
+    }
 
     private function timeElapsed () : string
     {
@@ -39,28 +65,5 @@ class Status extends \StackGuru\Commands\BaseCommand
 	    }
 
 	    return join(' ', $ret);
-    }
-
-
-    public function process (string $query, ?\StackGuru\Commands\CommandContext $ctx = null) : string
-    {
-    	$memoryLimitKiB	= round(memory_get_peak_usage(true) / 1024);
-    	$memoryLimitMiB	= number_format($memoryLimitKiB / 1024, 1, ',', ' ');
-    	$memoryKiB 		= round(memory_get_usage(false) / 1024);
-        $memoryMiB 		= number_format($memoryKiB / 1024, 1, ',', ' ');
-        $elapsedTime 	= trim($this->timeElapsed());
-
-
-        $response = "```markdown\n" .
-        			"# Memory\n" .
-        			sprintf("* Used:      %20s", "{$memoryKiB}KiB ({$memoryMiB}MiB)") . "\n" .
-        			sprintf("* Allocated: %20s", "{$memoryLimitKiB}KiB ({$memoryLimitMiB}MiB)") . "\n" .
-        			"\n" .
-        			"# History\n" .
-        			sprintf("* Runtime:   %20s", $elapsedTime) . "\n" .
-        			"\n" .
-        			"```";
-
-        return $response;
     }
 }

@@ -1,17 +1,24 @@
 <?php
 
-namespace StackGuru\Commands;
+namespace StackGuru\Core\Command;
 
 
 class CommandReflection extends \ReflectionClass
 {
-    private $commandNamespace = null;
+    private $namespace;
 
 
-    public function __construct($className, $commandNamespace) {
-        parent::__construct($className);
+    /**
+     * Construct a CommandReflection.
+     *
+     * @param string $namespace Namespace prefix of command.
+     * @param string $fqcn Fully qualified class name of command.
+     */
+    public function __construct(string $namespace, string $fqcn)
+    {
+        parent::__construct($fqcn);
 
-        $this->commandNamespace = $commandNamespace;
+        $this->namespace = $namespace;
     }
 
     /**
@@ -22,7 +29,8 @@ class CommandReflection extends \ReflectionClass
      *
      * @return bool True if class is a valid command.
      */
-    public function validateCommand () : bool {
+    public function validateCommand () : bool
+    {
         // Don't register abstract classes, interfaces, etc.
         if (!$this->isInstantiable())
             return false;
@@ -32,27 +40,30 @@ class CommandReflection extends \ReflectionClass
             return false;
 
         // Class must reside in the commands namespace
-        if (!$this->inCommandNamespace())
+        if (!$this->innamespace())
             return false;
 
         return true;
     }
 
-    public function isInNamespace (string $namespace) : bool {
+    public function isInNamespace (string $namespace) : bool
+    {
         $namespace = trim($namespace, "\\") . "\\";
         return strpos($this->getName(), $namespace) === 0;
     }
 
-    public function inCommandNamespace () : bool {
-        return $this->isInNamespace($this->commandNamespace);
+    public function inCommandNamespace () : bool
+    {
+        return $this->isInNamespace($this->namespace);
     }
 
-    public function getRelativeClassName () : string {
+    public function getRelativeClassName () : string
+    {
         $fqcn = $this->getName();
         if (!$this->inCommandNamespace())
-            throw new \RuntimeException("Command class ".$fqcn." does not reside in ".$this->commandNamespace);
+            throw new \RuntimeException("Command class ".$fqcn." does not reside in ".$this->namespace);
 
-        $relName = substr($fqcn, strlen($this->commandNamespace));
+        $relName = substr($fqcn, strlen($this->namespace));
         return $relName;
     }
 
@@ -63,7 +74,8 @@ class CommandReflection extends \ReflectionClass
      *
      * @return int Command depth
      */
-    public function getCommandDepth () : int {
+    public function getCommandDepth () : int
+    {
         $relName = $this->getRelativeClassName();
 
         $parts = explode("\\", $relName);

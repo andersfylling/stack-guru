@@ -1,14 +1,7 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Anders
- * Date: 31.10.2016
- * Time: 21.22
- */
 
+namespace StackGuru\Core;
 
-
-namespace StackGuru\CoreLogic;
 use \Discord\Discord;
 use \Discord\WebSockets\Event;
 

@@ -2,9 +2,11 @@
 
 namespace StackGuru\Commands\Drug;
 
-use StackGuru\CoreLogic\Utils;
+use StackGuru\Core\Command\AbstractCommand;
+use StackGuru\Core\Command\CommandContext;
 
-class Info extends \StackGuru\Commands\BaseCommand
+
+class Info extends AbstractCommand
 {
     protected static $name = "info";
     protected static $description = "something about the info command";
@@ -34,6 +36,52 @@ class Info extends \StackGuru\Commands\BaseCommand
             "resources" => ["https://examine.com/supplements/modafinil/", "https://psychonautwiki.org/wiki/Modafinil"]
         ]
     ];
+
+
+    /**
+     * Retrieves information about a known drug.
+     *
+     * @param  string $query Message input from the user after the commands have been stripped off.
+     * @param  ?CommandContext $ctx   Context class to access parent object, among others.
+     *
+     * @return string Response to be sent.
+     */
+    public function process (string $query, ?CommandContext $ctx) : string
+    {
+        $args = explode(' ', $query);
+
+        var_dump($args);
+
+        $result = '';
+
+        if (2 <= sizeof($args)) {
+            $result .= $this->getProperty($args[0], $args[1]);
+
+            if ('' === $result) {
+                $args = [$args[0]]; // so that the next if picks it up and returns all the data.
+            }
+        }
+
+
+        if (1 === sizeof($args)) {
+            $results = $this->getDatasheet($args[0]);
+
+            foreach ($results as $key => $value) {
+                $result .= $key . ": " . $this->parseValue($key, $value) . PHP_EOL;
+            }
+        }
+
+
+        // in cae result is empty
+        if (empty($result) || 1 >= strlen($result)) {
+            $result = "Not found!";
+        }
+        else {
+            $result = PHP_EOL . strtoupper($args[0]) . PHP_EOL . $result;
+        }
+
+        return $result;
+    }
 
 
     private function getProperty (string $drugname, string $category, array $drugData = null) // :int, :string, :array.....
@@ -93,54 +141,5 @@ class Info extends \StackGuru\Commands\BaseCommand
         }
 
         return $value;
-    }
-
-
-
-
-
-
-    /**
-     * Retrieves information about a known drug.
-     *
-     * @param  string                         $query [Message input from the user after the commands have been stripped off.]
-     * @param  ?\StackGuru\Commands\CommandContext|null $ctx   [context class to access parent object, among others.]
-     * @return string                                [response to be sent.]
-     */
-    public function process (string $query, ?\StackGuru\Commands\CommandContext $ctx = null) : string
-    {
-        $args = explode(' ', $query);
-
-        var_dump($args);
-
-        $result = '';
-
-        if (2 <= sizeof($args)) {
-            $result .= $this->getProperty($args[0], $args[1]);
-
-            if ('' === $result) {
-                $args = [$args[0]]; // so that the next if picks it up and returns all the data.
-            }
-        }
-
-
-        if (1 === sizeof($args)) {
-            $results = $this->getDatasheet($args[0]);
-
-            foreach ($results as $key => $value) {
-                $result .= $key . ": " . $this->parseValue($key, $value) . PHP_EOL;
-            }
-        }
-
-
-        // in cae result is empty
-        if (empty($result) || 1 >= strlen($result)) {
-            $result = "Not found!";
-        }
-        else {
-            $result = PHP_EOL . strtoupper($args[0]) . PHP_EOL . $result;
-        }
-
-        return $result;
     }
 }

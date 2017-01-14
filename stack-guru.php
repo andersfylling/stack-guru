@@ -17,31 +17,27 @@
      exit;
  }
 
-
 // Handle incomming terminal arguments.
 $terminal_args = [];
 require __DIR__."/terminalArgumentsHandler.php";
-
 
 // Autoload classes
 require __DIR__."/autoload.php";
 
 
-
-
-
-use \StackGuru\BotEvent;
-use \StackGuru\CoreLogic\Utils;
+// Start of bot logic
+use \StackGuru\Core\BotEvent;
+use \StackGuru\Core\Utils;
 
 
 // Setup bot instance
-$bot = new \StackGuru\CoreLogic\Bot([
+$bot = new \StackGuru\Core\Bot([
     "discord"   => ST_DISCORD_SETTINGS,
     "database"  => ST_DATABASE_SETTINGS
 ]);
 
 // Setup command registry.
-$cmdRegistry = new \StackGuru\CommandRegistry();
+$cmdRegistry = new \StackGuru\Core\Command\Registry();
 $cmdRegistry->loadCommandFolder(__DIR__ . "/src/Commands", "StackGuru\\Commands");
 
 // Debug output
@@ -124,13 +120,12 @@ $messages_other_to_bot          = function (\Discord\Parts\Channel\Message $mess
 };
 
 
-
-// Add listeners
-$bot->state(\StackGuru\BotEvent::MESSAGE_ALL_I_SELF,           $messages_all_including_bot);
-$bot->state(\StackGuru\BotEvent::MESSAGE_ALL_E_SELF,           $messages_all_excluding_bot);
-$bot->state(\StackGuru\BotEvent::MESSAGE_FROM_SELF,            $messages_from_bot);
-$bot->state(\StackGuru\BotEvent::MESSAGE_SELF_TO_SELF,         $messages_bot_to_bot);
-$bot->state(\StackGuru\BotEvent::MESSAGE_OTHERS_TO_SELF,       $messages_other_to_bot);
+// Add callbacks
+$bot->state(BotEvent::MESSAGE_ALL_I_SELF,           $messages_all_including_bot);
+$bot->state(BotEvent::MESSAGE_ALL_E_SELF,           $messages_all_excluding_bot);
+$bot->state(BotEvent::MESSAGE_FROM_SELF,            $messages_from_bot);
+$bot->state(BotEvent::MESSAGE_SELF_TO_SELF,         $messages_bot_to_bot);
+$bot->state(BotEvent::MESSAGE_OTHERS_TO_SELF,       $messages_other_to_bot);
 
 
 // Run the bot

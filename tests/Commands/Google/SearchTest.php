@@ -1,7 +1,7 @@
 <?php
 
-
 use PHPUnit\Framework\TestCase;
+
 
 class SearchTest extends TestCase
 {

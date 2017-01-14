@@ -2,10 +2,12 @@
 
 namespace StackGuru\Commands\Google;
 
-use StackGuru\CoreLogic\Utils;
+use StackGuru\Core\Command\AbstractCommand;
+use StackGuru\Core\Command\CommandContext;
+use StackGuru\Core\Utils;
 
 
-class Image extends \StackGuru\Commands\BaseCommand
+class Image extends AbstractCommand
 {
     use UrlHelper;
 
@@ -13,7 +15,7 @@ class Image extends \StackGuru\Commands\BaseCommand
     protected static $description = "search images";
 
 
-    public function process (string $query, ?\StackGuru\Commands\CommandContext $ctx = null) : string
+    public function process (string $query, ?CommandContext $ctx) : string
     {
         $args = explode(' ', trim($query) . ' ');
 

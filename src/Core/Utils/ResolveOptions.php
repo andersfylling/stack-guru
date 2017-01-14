@@ -1,9 +1,10 @@
 <?php
 
-namespace StackGuru\CoreLogic\Utils;
+namespace StackGuru\Core\Utils;
 
 use \Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
-use Symfony\Component\OptionsResolver\Exception\NoSuchOptionException;
+use \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException;
+
 
 /**
  * Class ResolveOptions
@@ -13,7 +14,7 @@ use Symfony\Component\OptionsResolver\Exception\NoSuchOptionException;
  * @access public
  * @package CoreLogicUtils
  */
-class ResolveOptions
+abstract class ResolveOptions
 {
     /**
      * Verify given array to contain set keys, otherwise throw exception.

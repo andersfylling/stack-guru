@@ -1,8 +1,9 @@
 <?php
 
-namespace StackGuru\CoreLogic\Utils;
+namespace StackGuru\Core\Utils;
 
-class Filesystem
+
+abstract class Filesystem
 {
     /*
      * Finds all .php files in the given folder and all subfolders.

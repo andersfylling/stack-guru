@@ -2,7 +2,7 @@
 
 namespace StackGuru\Commands\Google;
 
-use StackGuru\CoreLogic\Utils;
+use StackGuru\Core\Utils;
 
 
 trait UrlHelper
