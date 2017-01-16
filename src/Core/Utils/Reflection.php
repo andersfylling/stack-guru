@@ -46,7 +46,7 @@ abstract class Reflection
     public static function getRelativeClass(string $namespace, string $fqcn): string
     {
         if (!self::isInNamespace($fqcn, $namespace))
-            throw new \ReflectionClass("Command class ".$fqcn." does not reside in ".$this->namespace);
+            throw new \ReflectionException("Command class ".$fqcn." does not reside in ".$this->namespace);
 
         $relativeClass = substr($fqcn, strlen($namespace));
         return $relativeClass;
