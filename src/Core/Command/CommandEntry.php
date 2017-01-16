@@ -83,6 +83,11 @@ class CommandEntry
         return $this->fqcn;
     }
 
+    public function getRelativeClass(): string
+    {
+        return Utils\Reflection::getRelativeClass($this->namespace, $this->fqcn);
+    }
+
     public function getName(): string
     {
         return $this->fqcn::getName();
@@ -93,27 +98,9 @@ class CommandEntry
         return $this->fqcn::getAliases();
     }
 
-    /**
-     * Validates a command class, making sure it is instantiable and implements
-     * the CommandInterface.
-     *
-     * @return bool True if class is a valid command.
-     */
-    public function validate(): bool
+    public function getDescription(): string
     {
-        // Don't register abstract classes, interfaces, etc.
-        if (!$this->reflection->isInstantiable())
-            return false;
-
-        // Class must implement command interface
-        if (!$this->reflection->implementsInterface(CommandInterface::class))
-            return false;
-
-        // Class must reside in the commands namespace
-        if (!Utils\Reflection::isInNamespace($this->fqcn, $this->namespace))
-            return false;
-
-        return true;
+        return $this->fqcn::getDescription();
     }
 
     /**
@@ -137,9 +124,27 @@ class CommandEntry
         return $depth;
     }
 
-    public function getRelativeClass(): string
+    /**
+     * Validates a command class, making sure it is instantiable and implements
+     * the CommandInterface.
+     *
+     * @return bool True if class is a valid command.
+     */
+    public function validate(): bool
     {
-        return Utils\Reflection::getRelativeClass($this->namespace, $this->fqcn);
+        // Don't register abstract classes, interfaces, etc.
+        if (!$this->reflection->isInstantiable())
+            return false;
+
+        // Class must implement command interface
+        if (!$this->reflection->implementsInterface(CommandInterface::class))
+            return false;
+
+        // Class must reside in the commands namespace
+        if (!Utils\Reflection::isInNamespace($this->fqcn, $this->namespace))
+            return false;
+
+        return true;
     }
 
     public function createInstance(): CommandInterface
