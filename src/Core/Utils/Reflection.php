@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace StackGuru\Core\Utils;
 
 const NAMESPACE_SEPARATOR = '\\';
+
 
 abstract class Reflection
 {

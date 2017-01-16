@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace StackGuru\Core\Utils;
 
@@ -37,7 +38,7 @@ abstract class StringParser
 	 * @param  int    $n        Number of words you want to extract.
 	 * @return array           	Empty if no words were extracted.
 	 */
-	public static function getFirstWords (string $sentence, int $n) : array
+	public static function getFirstWords(string $sentence, int $n): array
 	{
 		$blocks = str_split($sentence); // in C: converts char array, faster than explode in theory..
 
@@ -50,7 +51,7 @@ abstract class StringParser
 			$word = "";
 
 			// Iterate the blocks until a whitespace is hit
-			while ($p < $len && ' ' !== $blocks[$p]) {
+			while (' ' !== $blocks[$p]) {
 				$word .= $blocks[$p];
 
 				// Go to the next char

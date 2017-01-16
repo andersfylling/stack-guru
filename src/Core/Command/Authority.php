@@ -1,13 +1,14 @@
 <?php
+declare(strict_types=1);
+
+namespace StackGuru\Core\Command;
+
+
 /**
  * Should check for roles.... but havent design how it should function at the moments being
  *
  * @author http://github.com/sciencefyll
  */
-
-namespace StackGuru\Core\Command;
-
-
 class Authority
 {
     private $users;

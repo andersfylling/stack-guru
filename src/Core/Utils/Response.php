@@ -1,23 +1,22 @@
 <?php
+declare(strict_types=1);
 
 namespace StackGuru\Core\Utils;
 
 
 abstract class Response
 {
-
-
     /**
      * @param string $str
      * @param \Discord\Parts\Channel\Message|null $message
      * @param \Closure|null $callback
      * @param bool|null $private
      */
-    public static function sendResponse (
+    public static function sendResponse(
         string                          $str,
         \Discord\Parts\Channel\Message  $message    = null,
         boolean                         $private    = null,
-        \Closure                        $callback   = null
+        ?\Closure                       $callback   = null
     ) {
         if (null === $message && true === DEVELOPMENT) {
             echo "Message was not sent: {$str}" . PHP_EOL;

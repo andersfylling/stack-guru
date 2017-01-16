@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace StackGuru\Core\Utils;
 
@@ -22,16 +23,17 @@ abstract class ResolveOptions
      * @param array $options Elements to verify/confirm has the $requirements
      * @param array $requirements Elements that must exist within the $options class
      * @param bool $keysMustBeString
+     *
      * @return array $options Nothing gets changed. But gives a nicer syntax. Potentially more to come.
      *
      * @see \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
      * @see \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
      */
-    public static function verify (
+    public static function verify(
         array $options = [],
         array $requirements = [],
         boolean $keysMustBeString = null
-    ) : array
+    ): array
     {
         /*
          * make sure each key is a string.
