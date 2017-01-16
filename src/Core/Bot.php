@@ -46,7 +46,7 @@ class Bot extends Database
         // Events to trigger a message update.
         $messageEvents = [
             DiscordEvent::MESSAGE_CREATE,
-            DiscordEvent::MESSAGE_UPDATE,
+            // DiscordEvent::MESSAGE_UPDATE, // disabled due to errors in DiscordPHP
             DiscordEvent::MESSAGE_DELETE,
             DiscordEvent::MESSAGE_DELETE_BULK
         ];
@@ -127,7 +127,6 @@ class Bot extends Database
             if (!$message->channel->is_private) {
                 // Keeps track of whether or not the bot has been referenced.
                 $referenced = false;
-
 
                 // Convert the object to an array.
                 //
