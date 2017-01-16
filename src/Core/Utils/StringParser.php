@@ -5,6 +5,21 @@ namespace StackGuru\Core\Utils;
 
 abstract class StringParser
 {
+    /**
+     * Get the first word from a given string
+     *
+     * @param string $str Input string.
+     *
+     * @return string First word from input string.
+     */
+    public static function getFirstWord(string $str): string
+    {
+        $result = strstr(ltrim($str), ' ', true);
+        $result = (false === $result ? $str : $result);
+
+        return trim($result);
+    }
+
 	/**
 	 * Returns an array of strings extracted from a given sentence.
 	 * The strings are the words, white space is used as a delimiter.

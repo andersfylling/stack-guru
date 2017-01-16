@@ -9,44 +9,6 @@ namespace StackGuru\Core\Utils;
  */
 abstract class Commands
 {
-    public static function getFirstWordFromString(string $str): string
-    {
-        $result = strstr(ltrim($str), ' ', true);
-        $result = (false === $result ? $str : $result);
-
-        return trim($result);
-    }
-
-    public static function firstWordIsACommand(string $query, array $commands): string
-    {
-        return self::wordIsACommand(self::getFirstWordFromString($query), $commands);
-    }
-
-    public static function wordIsACommand(string $word, array $commands): string
-    {
-        if (self::wordIsASubCommand($word, $arr)) {
-            return $word;
-        }
-
-        foreach ($commands as $val) {
-            if (is_array($val)) {
-                $vv = self::wordIsACommand($word, $val);
-                if ('' !== $vv) {
-                    return $vv;
-                }
-            }
-        }
-
-        return '';
-    }
-
-    public static function wordIsASubCommand(string $word, array $subcommands): bool
-    {
-        return isset($subcommands[$word]);
-    }
-
-
-
     /**
      * Normalize a given command path, removing invalid characters and making
      * it all lowercase.
@@ -129,5 +91,25 @@ abstract class Commands
         }
 
         return null;
+    }
+
+    /**
+     * Returns the depth level of a command.
+     *
+     * @param string $relativeClass Class name relative to the command namespace.
+     *
+     * @return int Command depth
+     */
+    public static function getCommandDepth(string $relativeClass): int
+    {
+        $parts = explode(NAMESPACE_SEPARATOR, $relativeClass);
+        $depth = sizeof($parts);
+
+        // If class name is same as namespace, the command is a primary command,
+        // therefore substract a depth level.
+        if (self::isPrimaryCommand($relativeClass))
+            $depth -= 1;
+
+        return $depth;
     }
 }

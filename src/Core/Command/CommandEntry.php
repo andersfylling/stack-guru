@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace StackGuru\Core\Command;
 
@@ -20,16 +21,17 @@ class CommandEntry
     protected $parent; // ?CommandEntry
     protected $children = []; // [ "name" => CommandEntry, ... ]
 
+
     /**
      * Construct a Command object.
      *
-     * @param string $namespace Full command namespace (must begin with \).
+     * @param string $namespace Command namespace.
      * @param string $relativeClass Class name relative to the namespace.
      */
     public function __construct(string $namespace, string $relativeClass)
     {
-        $this->namespace = $namespace;
-        $this->relativeClass = $relativeClass;
+        $this->namespace = rtrim($namespace, '\\');
+        $this->relativeClass = trim($relativeClass, '\\');
 
         $fqcn = Utils\Reflection::getFullClass($namespace, $relativeClass);
         $this->fqcn = $fqcn;
@@ -37,91 +39,72 @@ class CommandEntry
         $this->reflection = new \ReflectionClass($fqcn);
     }
 
-    public function getParent(): ?Command
+
+    /**
+     * Aliases for getting static properties from command classes.
+     */
+
+    public function getName(): string { return $this->fqcn::getName(); }
+    public function getAliases(): array { return $this->fqcn::getAliases(); }
+    public function getDescription(): string { return $this->fqcn::getDescription(); }
+    public function getDefault(): ?string { return $this->fqcn::getDefault(); }
+
+
+    /**
+     * Getters for reflection properties.
+     */
+
+    public function getNamespace(): string { return $this->namespace; }
+    public function getRelativeClass(): string { $this->relativeClass; }
+    public function getClass(): string { return $this->fqcn; }
+    public function getCommandDepth(): int
     {
-        return $this->parent;
+        return Utils\Commands::getCommandDepth($this->relativeClass);
     }
 
-    public function setParent(CommandEntry $parent): void
+
+    /**
+     * Parent/child methods.
+     */
+
+    public function getParent(): ?CommandEntry { return $this->parent; }
+    public function setParent(CommandEntry $command): void
     {
-        $this->parent = $parent;
+        $this->parent = $command;
     }
 
-    public function getChildren(): array
-    {
-        return $this->children;
-    }
-
-    public function getChild(string $name): ?Command
+    public function getChildren(): array { return $this->children; }
+    public function getChild(string $name): ?CommandEntry
     {
         if (isset($this->children[$name]))
             return $this->children[$name];
         return null;
     }
-
-    public function addChild(CommandEntry $child): void
+    public function getDefaultChild(): ?CommandEntry
     {
-        $name = $child->getName();
+        $name = $this->getDefault();
+        if (!empty($name))
+            return $this->getChild($name);
+        return null;
+    }
+    public function addChild(CommandEntry $command): void
+    {
+        $name = $command->getName();
 
         // Check if child name is already taken - could indicate programming mistake.
         if (isset($this->children[$name]))
         {
+            $child = $this->children[$name];
             throw new \ReflectionException(
                 "Command name conflict for '".$name."' ".
-                "between '".$child->getClass()."' and '".$this->children[$name]->getClass()."'");
+                "between '".$command->getClass()."' and '".$child->getClass()."'");
         }
 
         // Set self as parent for child command
-        $child->setParent($this);
+        $command->setParent($this);
 
         // Register child
-        $this->children[$name] = $child;
-    }
-
-    public function getClass(): string
-    {
-        return $this->fqcn;
-    }
-
-    public function getRelativeClass(): string
-    {
-        return Utils\Reflection::getRelativeClass($this->namespace, $this->fqcn);
-    }
-
-    public function getName(): string
-    {
-        return $this->fqcn::getName();
-    }
-
-    public function getAliases(): array
-    {
-        return $this->fqcn::getAliases();
-    }
-
-    public function getDescription(): string
-    {
-        return $this->fqcn::getDescription();
-    }
-
-    /**
-     * Returns the depth level of a command.
-     *
-     * @return int Command depth
-     */
-    public function getDepth(): int
-    {
-        $relativeClass = $this->getRelativeClass();
-
-        $parts = explode("\\", $relativeClass);
-        $depth = sizeof($parts);
-        $primary = Utils\Commands::isPrimaryCommand($relativeClass);
-
-        // If class name is same as namespace, command is primary command,
-        // therefore substract a depth level.
-        if ($primary)
-            $depth -= 1;
-
-        return $depth;
+        $this->children[$name] = $command;
     }
 
     /**
@@ -141,12 +124,17 @@ class CommandEntry
             return false;
 
         // Class must reside in the commands namespace
-        if (!Utils\Reflection::isInNamespace($this->fqcn, $this->namespace))
+        if (!Utils\Reflection::isInNamespace($this->namespace, $this->fqcn))
             return false;
 
         return true;
     }
 
+    /**
+     * Create a new command instance.
+     *
+     * @return CommandInterface Command object
+     */
     public function createInstance(): CommandInterface
     {
         $instance = $this->reflection->newInstance();

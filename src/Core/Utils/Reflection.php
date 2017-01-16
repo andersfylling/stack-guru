@@ -14,7 +14,7 @@ abstract class Reflection
      *
      * @return bool
      */
-    public static function isInNamespace(string $fqcn, string $namespace): bool
+    public static function isInNamespace(string $namespace, string $fqcn): bool
     {
         $fqcn = trim($fqcn, NAMESPACE_SEPARATOR);
         $namespace = trim($namespace, NAMESPACE_SEPARATOR) . NAMESPACE_SEPARATOR;
@@ -26,7 +26,7 @@ abstract class Reflection
      * components.
      *
      * @param string $namespace Namespace
-     * @param string ...$relativeClass Class name relative to the namespace.
+     * @param string ...$relativeClass Class name relative to the namespace
      *
      * @return string Fully qualified class name
      */
@@ -45,10 +45,22 @@ abstract class Reflection
      */
     public static function getRelativeClass(string $namespace, string $fqcn): string
     {
-        if (!self::isInNamespace($fqcn, $namespace))
+        if (!self::isInNamespace($namespace, $fqcn))
             throw new \ReflectionException("Command class ".$fqcn." does not reside in ".$this->namespace);
 
         $relativeClass = substr($fqcn, strlen($namespace));
         return $relativeClass;
+    }
+
+    /**
+     * Get the short class name of a full class name .
+     *
+     * @param string $className Full class name (including namespaces).
+     *
+     * @return string Class name without namespaces
+     */
+    public static function getShortClassName(string $className): string
+    {
+        return substr(strrchr($className, '\\'), 1);
     }
 }

@@ -18,7 +18,7 @@ trait QueryRouter
     {
         // Local vars
         $command = null;
-        $token = Utils\Commands::getFirstWordFromString($query);
+        $token = Utils\StringParser::getFirstWord($query);
 
         // Search names and aliases for first token
         if (!empty($token))
@@ -35,25 +35,31 @@ trait QueryRouter
         if ($command !== null) {
             for ($depth = 1; $depth <= static::MAX_DEPTH; ++$depth) {
                 // Update command to the new first word..
-                $token = Utils\Commands::getFirstWordFromString($query);
+                $token = Utils\StringParser::getFirstWord($query);
                 if (empty($token))
                     break;
 
                 // Check if next word is a subcommand
                 $child = $command->getChild($token);
-                if ($child === null)
-                {
-                    // TODO: If word is not a subcommand, get default subcommand from class.
-                    break;
+                if ($child === null) {
+                    // Try to use default subcommand
+                    $child = $command->getDefaultChild();
+                    if ($child !== null) {
+                        // Skip trimming the query when using default subcommand
+                        $command = $child;
+                        break;
+                    } else {
+                        // Use last found command and break out of loop
+                        break;
+                    }
                 }
 
                 // Command was found, assign subcommand as working command.
                 $command = $child;
 
-                // Trim command word from the query string if exists
-                // TBD: Is this needed?
+                // Trim command word from the query string
                 // if ($token === ltrim(substr($query, 0, strlen($token))))
-                //     $query = ltrim(substr($query, strlen($token)));
+                $query = ltrim(substr($query, strlen($token)));
             }
         }
 
