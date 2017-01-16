@@ -1,13 +1,21 @@
 <?php
 
-namespace StackGuru\CoreLogic\Utils;
+namespace StackGuru\Core\Utils;
 
-class Filesystem
+
+abstract class Filesystem
 {
     /*
      * Finds all .php files in the given folder and all subfolders.
+     *
+     * @param string $folder Folder to search recursively.
+     * @param bool $includeFolder Toggle whether to create a folder => files map.
+     * @param bool $ignoreFiles Toggle whether to ignore files and only scan through
+     *                          subfolders.
+     *
+     * @return array List of files and folder => files mappings.
      */
-    public static function dig (string $folder, bool $ignoreFiles = null) : array
+    public static function dig (string $folder, bool $includeFolder = null, bool $ignoreFiles = null) : array
     {
         $files = [];
         foreach (glob($folder . "/*") as $path)
@@ -20,14 +28,14 @@ class Filesystem
                 }
             }
             else if (is_dir($path)) {
-                $dirFiles = self::dig($path);
+                $dirFiles = self::dig($path, true, false);
                 if (sizeof($dirFiles) > 0) {
                     $files[] = $dirFiles;
                 }
             }
         }
 
-        if ($ignoreFiles !== true) {
+        if ($includeFolder === true) {
             return [$folder => $files];
         } else {
             return $files;

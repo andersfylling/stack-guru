@@ -2,21 +2,19 @@
 
 namespace StackGuru\Commands\Google;
 
-class Google extends \StackGuru\Commands\BaseCommand
+use StackGuru\Core\Command\AbstractCommand;
+use StackGuru\Core\Command\CommandContext;
+
+
+class Google extends AbstractCommand
 {
-    const DESCRIPTION = "link to google";
-    const URL = "https://www.google.com/";
-    const DEFAULT = "Search"; // default command
+    protected static $name = "google";
+    protected static $description = "link to google";
+    protected static $default = "search"; // default command
 
-    public function __construct()
+
+    public function process(string $query, ?CommandContext $ctx): string
     {
-        parent::__construct();
-    }
-
-    public final function queryBuilder(array $query = []) : string
-    {
-        \StackGuru\CoreLogic\Utils\ResolveOptions::verify($query, []); // anything is allowed
-
-        return http_build_query($query);
+        return "Not implemented yet";
     }
 }

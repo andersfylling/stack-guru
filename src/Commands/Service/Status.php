@@ -2,13 +2,39 @@
 
 namespace StackGuru\Commands\Service;
 
-class Status extends Service implements \StackGuru\CommandInterface
+use StackGuru\Core\Command\AbstractCommand;
+use StackGuru\Core\Command\CommandContext;
+
+
+class Status extends AbstractCommand
 {
-    const COMMAND_NAME = "status";
-    const DESCRIPTION = "Shows information about the bot running, memory usage.";
+    protected static $name = "status";
+    protected static $description = "Shows information about the bot running, memory usage.";
 
 
-    private function time_elapsed () : string
+    public function process (string $query, ?CommandContext $ctx) : string
+    {
+       $memoryLimitKiB	= round(memory_get_peak_usage(true) / 1024);
+       $memoryLimitMiB	= number_format($memoryLimitKiB / 1024, 1, ',', ' ');
+       $memoryKiB 		= round(memory_get_usage(false) / 1024);
+        $memoryMiB 		= number_format($memoryKiB / 1024, 1, ',', ' ');
+        $elapsedTime 	= trim($this->timeElapsed());
+
+
+        $response = "```markdown\n" .
+                   "# Memory\n" .
+                   sprintf("* Used:      %20s", "{$memoryKiB}KiB ({$memoryMiB}MiB)") . "\n" .
+                   sprintf("* Allocated: %20s", "{$memoryLimitKiB}KiB ({$memoryLimitMiB}MiB)") . "\n" .
+                   "\n" .
+                   "# History\n" .
+                   sprintf("* Runtime:   %20s", $elapsedTime) . "\n" .
+                   "\n" .
+                   "```";
+
+        return $response;
+    }
+
+    private function timeElapsed () : string
     {
     	$secs = time() - STARTUP_TIME;
 
@@ -39,28 +65,5 @@ class Status extends Service implements \StackGuru\CommandInterface
 	    }
 
 	    return join(' ', $ret);
-    }
-
-
-    public function process (string $query, \StackGuru\CommandContext $ctx = null) : string
-    {
-    	$memoryLimitKiB	= round(memory_get_peak_usage(true) / 1024);
-    	$memoryLimitMiB	= number_format($memoryLimitKiB / 1024, 1, ',', ' ');
-    	$memoryKiB 		= round(memory_get_usage(false) / 1024);
-        $memoryMiB 		= number_format($memoryKiB / 1024, 1, ',', ' ');
-        $elapsedTime 	= trim($this->time_elapsed());
-
-
-        $response = "```markdown\n" .
-        			"# Memory\n" .
-        			sprintf("* Used:      %20s", "{$memoryKiB}KiB ({$memoryMiB}MiB)") . "\n" .
-        			sprintf("* Allocated: %20s", "{$memoryLimitKiB}KiB ({$memoryLimitMiB}MiB)") . "\n" .
-        			"\n" .
-        			"# History\n" .
-        			sprintf("* Runtime:   %20s", $elapsedTime) . "\n" .
-        			"\n" .
-        			"```";
-
-        return $response;
     }
 }

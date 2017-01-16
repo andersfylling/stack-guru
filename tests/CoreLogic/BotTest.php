@@ -2,6 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 
+
 class BotTest extends TestCase
 {
 
@@ -12,7 +13,7 @@ class BotTest extends TestCase
     public function testUpdateCommands ()
     {
         $s = true;
-        $bot = new \StackGuru\CoreLogic\Bot([], $s);
+        $bot = new \StackGuru\Core\Bot([], $s);
 
 
         //$this->assertEquals($commands->getCommands(), $bot->getCommands());
@@ -23,7 +24,7 @@ class BotTest extends TestCase
         return; //TODO UPDATE THIS PLEASE, new file called Commands now..
 
         $s = true;
-        $bot = new \StackGuru\CoreLogic\Bot([], $s);
+        $bot = new \StackGuru\Core\Bot([], $s);
 
         $config = [
             "folder" => "./src/Commands"
@@ -82,7 +83,7 @@ class BotTest extends TestCase
      */
     private function setupBot (boolean $shutup, array $options = [], Callable $callback = null, boolean $start = null)
     {
-        $bot = new \StackGuru\CoreLogic\Bot($options, $shutup);
+        $bot = new \StackGuru\Core\Bot($options, $shutup);
 
         if ($start !== null) {
             $bot->run();

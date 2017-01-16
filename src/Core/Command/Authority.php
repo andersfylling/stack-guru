@@ -5,7 +5,7 @@
  * @author http://github.com/sciencefyll
  */
 
-namespace StackGuru\Commands;
+namespace StackGuru\Core\Command;
 
 
 class Authority
@@ -14,7 +14,7 @@ class Authority
     private $tokens; //used to identify someone as idk a developer, admin what not
     private $roles;
 
-    function __construct()
+    public function __construct()
     {
         //this should be stored in a json file. tokens randomized
 
@@ -45,9 +45,8 @@ class Authority
     /**
      * @param $id String: username + discriminator (discord style)
      */
-    function getRole ($id)
+    public function getRole ($id)
     {
 
     }
-
 }

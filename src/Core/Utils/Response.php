@@ -1,15 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: anders
- * Date: 11/5/16
- * Time: 3:12 PM
- */
 
-namespace StackGuru\CoreLogic\Utils;
+namespace StackGuru\Core\Utils;
 
 
-class Response
+abstract class Response
 {
 
 
@@ -45,7 +39,7 @@ class Response
                 if (true === DEVELOPMENT) {
                     echo "Response: {$str}", PHP_EOL;
                 }
-                
+
                 if (false === TESTING) {
                     $message->author->sendMessage($str)->then($callback);
                 }
@@ -58,7 +52,7 @@ class Response
                 if (true === DEVELOPMENT) {
                     echo "Response: {$str}", PHP_EOL;
                 }
-                
+
                 if (false === TESTING) {
                     $message->author->user->sendMessage($str)->then($callback);
                 }
@@ -73,7 +67,7 @@ class Response
             if (true === DEVELOPMENT) {
                 echo "Response: {$str}", PHP_EOL;
             }
-            
+
             if (false === TESTING) {
                 $message->reply($str)->then($callback);
             }

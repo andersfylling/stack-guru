@@ -1,12 +1,14 @@
 <?php
-namespace StackGuru;
+
+namespace StackGuru\Core;
+
 
 /**
  * Class BOTEVENT contains different const for keeping a record over what STATE to run commands in
  *
  * SELF = this bot AKA stack-guru
  */
-class BotEvent
+abstract class BotEvent
 {
     //    REFERENCE                   	ID                            		// SENDER (IF)  -> RECEIVER
     const MESSAGE_ALL_I_SELF        	= "message_all";                	// *            -> *

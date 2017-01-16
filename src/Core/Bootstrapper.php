@@ -1,13 +1,12 @@
 <?php
+
+namespace StackGuru\Core;
+
 /**
  * Loads all the possible commands.
  *
  * @author http://github.com/sciencefyll
  */
-
-namespace StackGuru\CoreLogic;
-
-
 class Bootstrapper
 {
     private $commands;
