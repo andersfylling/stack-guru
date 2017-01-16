@@ -8,7 +8,7 @@ use StackGuru\Core\Command\CommandContext;
 
 class Crash extends AbstractCommand
 {
-    protected static $name = "shutdown";
+    protected static $name = "crash";
     protected static $description = "something about the shutdown command";
 
 

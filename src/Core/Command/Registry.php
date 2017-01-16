@@ -17,42 +17,72 @@ class Registry
 {
     const MAX_DEPTH = 10; // Maximum recursion depth for loading commands/subcommands
 
+    use QueryRouter;
 
-    // Hashmap for commands by name.
+
+    // Associative array for commands by name.
     // This only contains the top-level commands, and subcommands can be reached
     // by accessing $command->subcommands.
-    private $commandsByName = [
-        // "command_name" => \StackGuru\CommandInterface,
+    private $commands = [
+        // "command_name" => \StackGuru\Commands\CommandEntry,
     ];
 
     // Hashmap for commands by alias.
     // This can contain top-level commands and subcommands, since all command aliases
     // are registered on the top-level.
-    private $commandsByAlias = [
-        // "command_alias" => \StackGuru\CommandInterface,
+    private $commandAliases = [
+        // "command_alias" => \StackGuru\Commands\CommandEntry,
     ];
 
-    // Hashmap for command reflections by fully qualified class name. For internal use only.
-    private $commandReflections = [
-        // "\StackGuru\Commands\Google\Search" => \StackGuru\Commands\CommandReflection,
+    // Associative array for command nodes by fully qualified class name.
+    // For internal use only.
+    private $commandClasses = [
+        // "\StackGuru\Commands\Google\Search" => \StackGuru\Commands\CommandEntry
     ];
 
+
+    public function __construct()
+    {
+    }
+
+    /**
+     * Returns command tree.
+     *
+     * @return array A hashmap of name => command.
+     */
+    public function getCommands(): array
+    {
+        return $this->commands;
+    }
+
+    /**
+     * Returns all command classes.
+     *
+     * @return array A hashmap of name => command.
+     */
+    public function getCommandClasses(): array
+    {
+        return $this->commandClasses;
+    }
 
     /**
      * Load all the commands in given folder(s) recursively.
      *
-     * @param string $path Path to the top commands folder.
-     * @param string $namespace Namespace of the folder.
+     * @param string $namespace Full namespace of the folder (must begin with \).
+     * @param string $path Path to the folder containing commands.
      *
      * @return array A list of loaded commands.
      */
-    public function loadCommandFolder (string $path, string $namespace) : array
+    public function loadCommandFolder(string $namespace, string $path): array
     {
+        // Fix namespace if not fully qualified
+        if (substr($namespace, 0, 1) != '\\')
+            $namespace = '\\' . $namespace;
+        $namespace = rtrim($namespace, '\\');
+
         // Check if path exists
         if (!is_dir($path))
             throw new \RuntimeException("Folder ".$path." doesn't exist");
-
-        $namespace = trim($namespace, "\\");
 
         // Find command files
         $commandFiles = Utils\Filesystem::dig($path, false, true);
@@ -67,10 +97,12 @@ class Registry
             foreach ($fileSet as $folder => $files) {
                 foreach ($files as $filename) {
                     // Infer relative command namespace and class name from path.
-                    $relNamespace = ucfirst(basename($folder));
+                    $relativeNamespace = ucfirst(basename($folder));
                     $className = ucfirst(basename($filename, '.php'));
 
-                    $command = $this->loadCommand($namespace, $relNamespace, $className);
+                    $relativeClass = $relativeNamespace . '\\' . $className;
+
+                    $command = $this->loadCommand($namespace, $relativeClass);
                     if ($command !== null)
                         $commands[] = $command;
                 }
@@ -80,93 +112,96 @@ class Registry
         return $commands;
     }
 
-
     /**
-     * Returns the command instance and trimmed query for the latest relative command in the string.
+     * Load a command class into the registry and return node object.
+     * If the command is already loaded, the existing node is returned.
      *
-     * @param string $query The full query to the bot.
+     * @param string $namespace Full command namespace prefix (must begin with \).
+     * @param string $relativeClass Class name relative to the namespace.
      *
-     * @return array Instance and new query string after matched command
+     * @return ?CommandEntry Command node.
      */
-	public function parseQuery (string $query) : array
-	{
-        $prevCommand = null;
-        $nextCommand = Utils\Commands::getFirstWordFromString($query);
+    public function loadCommand(string $namespace, string $relativeClass): ?CommandEntry
+    {
+        // Check if namespace is fully qualified
+        if (substr($namespace, 0, 1) != '\\')
+            throw new \RuntimeException("Namespace ".$namespace." is not fully qualified");
 
-        $response = [
-            "query" => $query,
-            "instance" => null
-        ];
+        $fqcn = Utils\Reflection::getFullClass($namespace, $relativeClass);
 
+        // Check if class exists and try to autoload it
+        if (!class_exists($fqcn, true))
+            return null;
 
-        $depth = 0;
+        $command = $this->createCommandEntry($namespace, $relativeClass);
+        if ($command === null)
+            return null;
 
-        $commands = $this->commandsByName;
+        // See if command is already registered
+        if (isset($this->commandClasses[$fqcn]))
+            return $this->commandClasses[$fqcn];
 
-        while ($depth++ < $maxChain) {
-            // Update command to the new first word..
-            $nextCommand = Utils\Commands::getFirstWordFromString($query);
+        // Get command properties
+        $commandName = $command->getName();
+        $commandAliases = $command->getAliases();
 
-            // The first word, aka command, wasn't valid.
-            // The first word is not a command.
-            //
-            // Assumption 1: $commands is always an array
-            //
-            // Assumption 2: if there are no matches, it might be a default command..
-            //               e.g. Google.google = default..
-            if (!isset($commands[$nextCommand])) {
-                if (null === $prevCommand || !isset($commands[$prevCommand])) {
-                    return $response;
-                }
-
-                $command = $commands[$prevCommand];
-                $nextCommand = strtolower($command::$default); // get default command from main command class
-
-                // Check for programming mistakes
-                if (null === $nextCommand) {
-                    // error!!!!!
-                    throw new \RuntimeException("ERROR! Commands default was null: $query");
-                }
+        // Register command with parent, if exists
+        $parentClass = Utils\Commands::getParentClass($relativeClass);
+        if ($parentClass !== null) {
+            $parent = $this->loadCommand($namespace, $parentClass);
+            if ($parent !== null) {
+                $parent->addChild($command);
             }
-
-
-            // Find command(s) in registry.
-            $commands = $commands[$nextCommand]; // go into the new sub array or extract the object
-
-            // Remove the command word from the query string if exists
-            if ($nextCommand === ltrim(substr($query, 0, strlen($nextCommand))))
-                $query = ltrim(substr($query, strlen($nextCommand)));
-            $prevCommand = $nextCommand;
-
-            $response["query"] = trim($query);
-
-            // if $commands isnt an array anymore, but an object. its a match!
-            if (is_object($commands)) {
-                $response["instance"] = $commands;
-
-                return $response;
-            }
-
         }
 
-        return $response; // assumed to never be called..
-	}
+        // Register top-level commands to command tree
+        if (Utils\Commands::isTopLevelCommand($relativeClass)) {
+            if (isset($this->commands[$commandName]))
+                throw new \ReflectionError("Command '".$name."' already exists");
 
-    /**
-     * Returns all commands that are active.
-     *
-     * @return array A hashmap of name => command.
-     */
-    public function getCommands () : array
+            $this->commands[$commandName] = $command;
+        }
+
+        // Register aliases
+        foreach ($commandAliases as $alias) {
+            if (isset($this->commandAliases[$alias]))
+                throw new \ReflectionError("Command alias '".$alias."' already exists");
+
+            $this->commandAliases[$alias] = $command;
+        }
+
+        // Register class
+        $this->commandClasses[$fqcn] = $command;
+
+        return $command;
+    }
+
+    private function createCommandEntry(string $namespace, string $relativeClass): ?CommandEntry
     {
-        return $this->commandsByName;
+        try {
+            // Build command node
+            $command = new CommandEntry($namespace, $relativeClass);
+
+            // Validate command class
+            if (!$command->validate())
+                return null;
+
+            return $command;
+        } catch (\ReflectionException $e) {
+            echo "Error creating command entry: ", $e->getMessage(), PHP_EOL;
+
+            return null;
+        }
+
+        return null;
     }
 
     /**
      * Finds a registered command class by a given command path.
-     * The command path may be longer than the actual
+     * The command path may be longer than the actual path to the command,
+     * so that a full query can be used as argument.
      */
-    public function getCommandClass (string ...$cmdPath) : ?CommandReflection
+    public function getCommandClass(string ...$cmdPath): ?CommandEntry
     {
         $command = null;
 
@@ -179,10 +214,10 @@ class Registry
             return null;
 
         // Search names and aliases
-        if (isset($this->commandsByName[$topCmd])) {
-            $command = $this->commandsByName[$topCmd];
-        } else if (isset($this->commandsByAlias[$topCmd])) {
-            $command = $this->commandsByAlias[$topCmd];
+        if (isset($this->commands[$topCmd])) {
+            $command = $this->commands[$topCmd];
+        } else if (isset($this->commandAliases[$topCmd])) {
+            $command = $this->commandAliases[$topCmd];
         }
 
         if ($command == null)
@@ -190,96 +225,13 @@ class Registry
 
         // Traverse through subcommands
         foreach ($cmdPath as $part) {
-            if (isset($command->subcommands[$part]))
-                $command = $command->subcommands[$part];
+            $child = $command->getChild($part);
+            if ($child !== null)
+                $command = $child;
             else
-                return null;
+                break;
         }
 
         return $command;
     }
-
-
-    /**
-     * Load a command class into the registry.
-     *
-     * @param string $namespace Command namespace prefix.
-     * @param ...string $classPath Path to class relative to the namespace prefix.
-     *
-     * @return ?CommandReflection Command reflection.
-     */
-    public function loadCommand (string $namespace, string ...$classPath) : ?CommandReflection
-    {
-        // Validate class path
-        $pathLength = sizeof($classPath);
-        if ($pathLength == 0)
-            throw new \RuntimeException("Invalid class path (zero length)");
-
-        // Build fully qualified class name
-        $fqcn = Utils\Commands::getFullClassName($namespace, ...$classPath);
-
-        // Autoload class if it exists
-        if (!class_exists($fqcn, true))
-            return null;
-
-        // Create command class reflection
-        $reflection = new CommandReflection($namespace, $fqcn);
-
-        // Validate command class
-        if (!$reflection->validateCommand())
-            return null;
-
-        // Get fully qualified class name
-        $fqcn = $reflection->getName();
-
-        // See if command is already registered
-        if (isset($this->commandReflections[$fqcn]))
-            return $this->commandReflections[$fqcn];
-
-        $commandName = $fqcn::getName();
-        $commandAliases = $fqcn::getAliases();
-        $commandDepth = $reflection->getCommandDepth();
-
-        echo "Registering command:", PHP_EOL;
-        echo "  * Name: ", $commandName, PHP_EOL;
-        echo "  * Aliases: ", implode(",", $commandAliases), PHP_EOL;
-        echo "  * Depth: ", $commandDepth, PHP_EOL;
-
-        // TODO: Replace code below with functional code for saving a reference
-        //       to the parent command.
-        //
-        // if ($pathLength >= 2) {
-        //     $lastCmds = array_slice($cmdPath, -2);
-        //     $commandNamespace = $lastCmds[0];
-        //     $commandName = $lastCmds[1];
-        //
-        //     // When namespace and class name are the same, the command is
-        //     // the primary command for that namespace.
-        //     $isPrimaryCommand = strtolower($className) === strtolower($classNamespace);
-        //
-        //     // Load parent/primary command for subcommand.
-        //     if (!$isPrimaryCommand) {
-        //         // Set parent path so that the last namespace and classname are equal.
-        //         $parentPath = $cmdPath;
-        //         array_pop($parentPath);
-        //         $parent = $this->loadCommand(...$parentPath);
-        //     }
-        // }
-
-        // Register to commandReflections hashmap
-        $this->commandReflections[$fqcn] = $reflection;
-
-        // TODO: Register top-level commands to commandsByName hashmap
-        // $path = $reflection->getCommandPath();
-        // ...
-
-        // Register aliases
-        foreach ($commandAliases as $alias) {
-            $this->commandsByAlias[$alias] = $reflection;
-        }
-
-        return $reflection;
-    }
-
-
 }

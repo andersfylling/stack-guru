@@ -38,14 +38,15 @@ $bot = new \StackGuru\Core\Bot([
 
 // Setup command registry.
 $cmdRegistry = new \StackGuru\Core\Command\Registry();
-$cmdRegistry->loadCommandFolder(__DIR__ . "/src/Commands", "StackGuru\\Commands");
+$cmdRegistry->loadCommandFolder("StackGuru\\Commands", __DIR__ . "/src/Commands");
 
 // Debug output
 {
     $commands = $cmdRegistry->getCommands();
     echo "Loaded ", sizeof($commands), " commands:", PHP_EOL;
     foreach ($commands as $name => $command) {
-        echo " * ", $name, " [", implode(", ", array_keys($command->subcommands)), "]", PHP_EOL;
+        $subcommands = array_keys($command->getChildren());
+        echo " * ", $name, " [", implode(", ", $subcommands), "]", PHP_EOL;
     }
     echo PHP_EOL;
 }
@@ -94,29 +95,33 @@ $messages_other_to_bot          = function (\Discord\Parts\Channel\Message $mess
 {
     // Stuff to be called in this state.
     echo "messages_other_to_bot", PHP_EOL;
-
-    // Parse query to find the command instance and get the remaining arguments.
-    $data = $cmdRegistry->parseQuery($message->content);
-
-    $command = $data["instance"];
-    if ($command === null) {
-        Utils\Response::sendResponse("I'm sorry. It seems I cannot find your command. Please try the command: help", $message);
-        return;
-    }
-    $query = $data["query"];
-
-    // Build command context so the command has references back to the bot
-    // and other commands.
-    $context = new \StackGuru\CommandContext();
-    $context->bot = $bot;
-    $context->cmdRegistry = $cmdRegistry;
-    $context->message = $message;
-
-    // Run command and send a response if the return is not null.
-    $response = $command->process($query, $context);
-    if ($response !== null) {
-        Utils\Response::sendResponse($response, $message);
-    }
+    //
+    // // Parse query to find the command instance and get the remaining arguments.
+    // $result = $cmdRegistry->parseCommandQuery($message->content);
+    // var_dump($result);
+    //
+    // $command = $result["command"];
+    // if ($command === null) {
+    //     Utils\Response::sendResponse("I'm sorry. It seems I cannot find your command. Please try the command: help", $message);
+    //     return;
+    // }
+    // $query = $result["query"];
+    //
+    // // Create command instance
+    // $instance = $command->createInstance();
+    //
+    // // Build command context so the command has references back to the bot
+    // // and other commands.
+    // $context = new \StackGuru\Core\Command\CommandContext();
+    // $context->bot = $bot;
+    // $context->cmdRegistry = $cmdRegistry;
+    // $context->message = $message;
+    //
+    // // Run command and send a response if the return is not null.
+    // $response = $instance->process($query, $context);
+    // if ($response !== null) {
+    //     Utils\Response::sendResponse($response, $message);
+    // }
 };
 
 
