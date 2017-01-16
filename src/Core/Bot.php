@@ -3,12 +3,12 @@
 namespace StackGuru\Core;
 
 use \Discord\Discord;
-use \Discord\WebSockets\Event;
+use \Discord\WebSockets\Event as DiscordEvent;
 
 
 class Bot extends Database
 {
-    private $discord    = \Discord\Discord::class;
+    private $discord; // \Discord\Discord
 
     private $callbacks  = [
         // string "callback_name"   => [callable, callable, ... ],
@@ -45,14 +45,14 @@ class Bot extends Database
     {
         // Events to trigger a message update.
         $messageEvents = [
-            Event::MESSAGE_CREATE,
-            Event::MESSAGE_UPDATE,
-            Event::MESSAGE_DELETE,
-            Event::MESSAGE_DELETE_BULK
+            DiscordEvent::MESSAGE_CREATE,
+            DiscordEvent::MESSAGE_UPDATE,
+            DiscordEvent::MESSAGE_DELETE,
+            DiscordEvent::MESSAGE_DELETE_BULK
         ];
 
         // When the app is ready, listen for messages.
-        $this->discord->on("ready", function (\Discord\Discord $self) use ($messageEvents) {
+        $this->discord->on("ready", function (Discord $self) use ($messageEvents) {
             // Message events
             foreach ($messageEvents as $event) {
                 $self->on($event, function (\Discord\Parts\Channel\Message $message) use ($event) {
