@@ -30,9 +30,13 @@ trait QueryRouter
             }
         }
 
-        // Iterate over words (tokens) in query to find the command with the longest
-        // matching sub-command chain.
+        // Look for subcommand
         if ($command !== null) {
+            // Remove first token from query
+            $query = ltrim(substr($query, strlen($token)));
+
+            // Iterate over words (tokens) in query to find the command
+            // with the longest matching sub-command chain.
             for ($depth = 1; $depth <= static::MAX_DEPTH; ++$depth) {
                 // Update command to the new first word..
                 $token = Utils\StringParser::getFirstWord($query);
