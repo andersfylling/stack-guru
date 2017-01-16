@@ -2,6 +2,8 @@
 
 namespace StackGuru\Core\Command;
 
+use \StackGuru\Core\Utils;
+
 
 trait QueryRouter
 {
