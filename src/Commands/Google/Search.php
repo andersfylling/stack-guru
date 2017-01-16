@@ -9,11 +9,13 @@ use StackGuru\Core\Utils;
 
 class Search extends AbstractCommand
 {
+    use UrlHelper;
+    
     protected static $name = "search";
     protected static $description = "search";
 
 
-    public function process (string $query, ?CommandContext $ctx) : string
+    public function process(string $query, ?CommandContext $ctx): string
     {
         $args = explode(' ', $query);
 
@@ -23,7 +25,7 @@ class Search extends AbstractCommand
             $query = "Why am I such an asshole?";
         }
 
-        $link = $this->buildSearchUrl(['q' => $query]);
+        $link = self::buildSearchUrl(['q' => $query]);
 
         return $link;
     }

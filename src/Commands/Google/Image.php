@@ -10,7 +10,7 @@ use StackGuru\Core\Utils;
 class Image extends AbstractCommand
 {
     use UrlHelper;
-
+    
     protected static $name = "image";
     protected static $description = "search images";
 
@@ -25,7 +25,7 @@ class Image extends AbstractCommand
             $query = "Why am I such an asshole?";
         }
 
-        $link = $this->buildSearchUrl(['q' => $query]);
+        $link = self::buildSearchUrl(['q' => $query]);
 
         $msg = "Let me google that for you..\n" . $link;
         if ($ctx)
