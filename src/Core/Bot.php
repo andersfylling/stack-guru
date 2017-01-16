@@ -56,6 +56,8 @@ class Bot extends Database
             // Message events
             foreach ($messageEvents as $event) {
                 $self->on($event, function (\Discord\Parts\Channel\Message $message) use ($event) {
+                    // Discord has it's own exception handler, so we have to catch exceptions from
+                    // our message handler ourselves.
                     try {
                         $this->incoming($message, $event);
                     } catch (\Throwable $e) {
@@ -70,7 +72,7 @@ class Bot extends Database
         try {
             $this->discord->run();
         } catch (\Throwable $e) {
-            echo $e;
+            echo $e, PHP_EOL;
         }
     }
 
