@@ -4,6 +4,7 @@ namespace StackGuru\Commands\Help;
 
 use StackGuru\Core\Command\AbstractCommand;
 use StackGuru\Core\Command\CommandContext;
+use StackGuru\Core\Command\CommandEntry;
 
 
 class Help extends AbstractCommand
@@ -12,7 +13,7 @@ class Help extends AbstractCommand
     protected static $description = "returns a list of available bot commands";
 
 
-    public function process (string $query, ?CommandContext $ctx) : string
+    public function process(string $query, ?CommandContext $ctx): string
     {
         // Encapsulate command list in code block
         $helptext = "```markdown\n";
@@ -20,23 +21,18 @@ class Help extends AbstractCommand
         $helptext .= "# Available commands\n";
 
         // Print all commands
-        $commands = $ctx->cmdRegistry->getAll();
-        foreach ($commands as $command => $subcommands) {
-            // Remove main command from subcommands
-            $mainCommand = $subcommands[$command];
-            unset($subcommands[$command]);
+        $commands = $ctx->cmdRegistry->getCommands();
+        foreach ($commands as $name => $command) {
+            $commandTree = self::getCommandTreeString($command);
 
-            // Print command and subcommands
-            $cmdline = "* !{$command}";
-            if (sizeof($subcommands) > 0) {
-                $cmdline .= " [" . implode(", ", array_keys($subcommands)) ."]";
-            }
+            // Print command with subcommand tree
+            $cmdline = "* !{$commandTree}";
 
             // Pad command names to align command descriptions
             $cmdline = sprintf("%-40s", $cmdline);
 
             // Add command description
-            $description = $mainCommand::DESCRIPTION;
+            $description = $command->getDescription();
             if (!empty($description)) {
                 $cmdline .= " - {$description}";
             }
@@ -46,5 +42,18 @@ class Help extends AbstractCommand
         $helptext .= "```";
 
         return $helptext;
+    }
+
+    private static function getCommandTreeString(CommandEntry $command): string
+    {
+        $str = $command->getName();
+        $children = $command->getChildren();
+        if (sizeof($children) > 0) {
+            $subtrees = [];
+            foreach ($children as $name => $child)
+                $subtrees[] = self::getCommandTreeString($child);
+            $str .= " [" . implode(", ", $subtrees) ."]";
+        }
+        return $str;
     }
 }
