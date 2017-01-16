@@ -11,7 +11,7 @@ class StringParserTest extends TestCase
     /**
      * @dataProvider getFirstWordsDataProvider
      */
-    public function testGetFirstWords ($sentence, $words, $expected)
+    public function testGetFirstWords($sentence, $words, $expected)
     {
         $result = Utils\StringParser::getFirstWords($sentence, $words);
         $this->assertEquals($expected, $result);

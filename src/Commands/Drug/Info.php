@@ -24,7 +24,6 @@ class Info extends AbstractCommand
     //  alias: string[]
     //  resources: string[]
     private $datas = [
-
         [
             "id" => 14389,
             "name" => "modafinil",
@@ -46,7 +45,7 @@ class Info extends AbstractCommand
      *
      * @return string Response to be sent.
      */
-    public function process (string $query, ?CommandContext $ctx) : string
+    public function process(string $query, ?CommandContext $ctx): string
     {
         $args = explode(' ', $query);
 
@@ -84,7 +83,7 @@ class Info extends AbstractCommand
     }
 
 
-    private function getProperty (string $drugname, string $category, array $drugData = null) // :int, :string, :array.....
+    private function getProperty(string $drugname, string $category, array $drugData = null): mixed // :int, :string, :array.....
     {
         // set drug record
         $drug = [];
@@ -113,7 +112,7 @@ class Info extends AbstractCommand
         return $category .": " . $this->parseValue($category, $drug[$category]);
     }
 
-    private function getDatasheet (string $drugname) : array
+    private function getDatasheet(string $drugname): array
     {
         $drug = [];
 
@@ -130,7 +129,7 @@ class Info extends AbstractCommand
         return $drug;
     }
 
-    private function parseValue (string $key, $value)
+    private function parseValue(string $key, $value): string
     {
         if (is_array($value)) {
             $value = implode(", ", $value);

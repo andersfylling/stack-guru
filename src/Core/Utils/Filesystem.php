@@ -16,7 +16,7 @@ abstract class Filesystem
      *
      * @return array List of files and folder => files mappings.
      */
-    public static function dig (string $folder, bool $includeFolder = null, bool $ignoreFiles = null) : array
+    public static function dig(string $folder, bool $includeFolder = null, bool $ignoreFiles = null): array
     {
         $files = [];
         foreach (glob($folder . "/*") as $path)

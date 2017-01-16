@@ -21,7 +21,7 @@ class Bot extends Database
      * @param array $options = []
      * @param bool $shutup
      */
-    function __construct(array $options = [], bool $shutup = null)
+    public function __construct(array $options = [], bool $shutup = null)
     {
         // Used for testing the bot methods
         if ($shutup !== null && $shutup === true) {
@@ -93,7 +93,7 @@ class Bot extends Database
 
     /**
      * Probably the worst function i've written in my life.
-     *  If you can even call this a function.
+     * If you can even call this a function.
      *
      * TODO: a method that takes any message and return a object for dealing with the content if it's a command.
      *
@@ -168,7 +168,7 @@ class Bot extends Database
             // The incoming message is for the bot.
             $this->runScripts(BotEvent::MESSAGE_OTHERS_TO_SELF, $message, $event);
         }
-    } // METHOD END: public incoming (\Discord\Parts\Channel\Message $in, \Discord\Discord $self)
+    }
 
 
 

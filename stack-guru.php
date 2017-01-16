@@ -52,13 +52,13 @@ $cmdRegistry->loadCommandFolder("StackGuru\\Commands", __DIR__ . "/src/Commands"
 }
 
 // Event handlers for different states
-$messages_all_including_bot     = function (\Discord\Parts\Channel\Message $message, string $event)
+$messages_all_including_bot     = function(\Discord\Parts\Channel\Message $message, string $event)
 {
     // Stuff to be called in this state.
     echo "---", PHP_EOL, "$event: $message->content", PHP_EOL;
 };
 
-$messages_all_excluding_bot     = function (\Discord\Parts\Channel\Message $message, string $event)
+$messages_all_excluding_bot     = function(\Discord\Parts\Channel\Message $message, string $event)
 {
     // Stuff to be called in this state.
     echo "messages_all_excluding_bot", PHP_EOL;
@@ -79,19 +79,19 @@ $messages_all_excluding_bot     = function (\Discord\Parts\Channel\Message $mess
     }
 };
 
-$messages_from_bot              = function (\Discord\Parts\Channel\Message $message, string $event)
+$messages_from_bot              = function(\Discord\Parts\Channel\Message $message, string $event)
 {
     // Stuff to be called in this state.
     echo "messages_from_bot", PHP_EOL;
 };
 
-$messages_bot_to_bot            = function (\Discord\Parts\Channel\Message $message, string $event)
+$messages_bot_to_bot            = function(\Discord\Parts\Channel\Message $message, string $event)
 {
     // Stuff to be called in this state.
     echo "messages_bot_to_bot", PHP_EOL;
 };
 
-$messages_other_to_bot          = function (\Discord\Parts\Channel\Message $message, string $event) use ($bot, $cmdRegistry)
+$messages_other_to_bot          = function(\Discord\Parts\Channel\Message $message, string $event) use ($bot, $cmdRegistry)
 {
     // Stuff to be called in this state.
     echo "messages_other_to_bot", PHP_EOL;

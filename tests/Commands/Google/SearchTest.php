@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 
 class SearchTest extends TestCase
 {
-    public function testResponse ()
+    public function testResponse()
     {
         $google = new \StackGuru\Commands\Google\Search();
 

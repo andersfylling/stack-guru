@@ -12,16 +12,16 @@ class Status extends AbstractCommand
     protected static $description = "Shows information about the bot running, memory usage.";
 
 
-    public function process (string $query, ?CommandContext $ctx) : string
+    public function process(string $query, ?CommandContext $ctx): string
     {
        $memoryLimitKiB	= round(memory_get_peak_usage(true) / 1024);
        $memoryLimitMiB	= number_format($memoryLimitKiB / 1024, 1, ',', ' ');
        $memoryKiB 		= round(memory_get_usage(false) / 1024);
-        $memoryMiB 		= number_format($memoryKiB / 1024, 1, ',', ' ');
-        $elapsedTime 	= trim($this->timeElapsed());
+       $memoryMiB 		= number_format($memoryKiB / 1024, 1, ',', ' ');
+       $elapsedTime 	= trim($this->timeElapsed());
 
 
-        $response = "```markdown\n" .
+       $response = "```markdown\n" .
                    "# Memory\n" .
                    sprintf("* Used:      %20s", "{$memoryKiB}KiB ({$memoryMiB}MiB)") . "\n" .
                    sprintf("* Allocated: %20s", "{$memoryLimitKiB}KiB ({$memoryLimitMiB}MiB)") . "\n" .
@@ -34,7 +34,7 @@ class Status extends AbstractCommand
         return $response;
     }
 
-    private function timeElapsed () : string
+    private function timeElapsed(): string
     {
     	$secs = time() - STARTUP_TIME;
 

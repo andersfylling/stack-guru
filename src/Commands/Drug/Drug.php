@@ -13,7 +13,7 @@ class Drug extends AbstractCommand
     protected static $default = "info"; // default sub-command
 
 
-    public function process (string $query, ?CommandContext $ctx) : string
+    public function process(string $query, ?CommandContext $ctx): string
     {
         return "Not implemented yet";
     }

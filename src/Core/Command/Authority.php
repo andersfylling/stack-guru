@@ -24,7 +24,6 @@ class Authority
             "developers",
             "administrators",
             "moderators",
-
         ];
 
         // username + discriminator
@@ -46,7 +45,7 @@ class Authority
     /**
      * @param $id String: username + discriminator (discord style)
      */
-    public function getRole ($id)
+    public function getRole($id)
     {
 
     }

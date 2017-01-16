@@ -5,12 +5,10 @@ use PHPUnit\Framework\TestCase;
 
 class BotTest extends TestCase
 {
-
-
     /**
      *
      */
-    public function testUpdateCommands ()
+    public function testUpdateCommands()
     {
         $s = true;
         $bot = new \StackGuru\Core\Bot([], $s);
@@ -19,7 +17,7 @@ class BotTest extends TestCase
         //$this->assertEquals($commands->getCommands(), $bot->getCommands());
     }
 
-    public function testLoadCommands ()
+    public function testLoadCommands()
     {
         return; //TODO UPDATE THIS PLEASE, new file called Commands now..
 
@@ -81,7 +79,7 @@ class BotTest extends TestCase
      * @param bool|null $start
      * @return \StackGuru\CoreLogic\Bot
      */
-    private function setupBot (boolean $shutup, array $options = [], Callable $callback = null, boolean $start = null)
+    private function setupBot(boolean $shutup, array $options = [], Callable $callback = null, boolean $start = null)
     {
         $bot = new \StackGuru\Core\Bot($options, $shutup);
 

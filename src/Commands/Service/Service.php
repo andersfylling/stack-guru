@@ -13,7 +13,7 @@ class Service extends AbstractCommand
     protected static $default = "shutdown";
 
 
-    public function process (string $query, ?CommandContext $ctx) : string
+    public function process(string $query, ?CommandContext $ctx): string
     {
         return "Not implemented yet";
     }

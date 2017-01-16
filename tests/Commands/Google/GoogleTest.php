@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 
 class GoogleTest extends TestCase
 {
-    public function testQueryBuilder ()
+    public function testQueryBuilder()
     {
         $google = new \StackGuru\Commands\Google\Google();
 

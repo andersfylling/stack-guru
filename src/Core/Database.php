@@ -1,15 +1,15 @@
 <?php
-/**
- * Initiates a database connection to the server if possible.
- *
- * @author http://github.com/sciencefyll
- */
 
 namespace StackGuru\Core;
 
 use \PDO;
 
 
+/**
+ * Initiates a database connection to the server if possible.
+ *
+ * @author http://github.com/sciencefyll
+ */
 class Database
 {
     /*
@@ -18,7 +18,7 @@ class Database
     protected $db = null;
 
 
-    function __construct (array $options = [])
+    function __construct(array $options = [])
     {
         /*
          * Verify parameter to have required keys
