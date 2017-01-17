@@ -9,12 +9,4 @@
 define("DEVELOPMENT", 		$terminal_args["DEVELOPMENT"]);
 define("TESTING", 			$terminal_args["TESTING"]);
 define("STARTUP_TIME",		time());
-
-
-// PHP_VERSION_ID
-// Used to check php version in a interger format. 7.0.14 => 70014
-if (!defined('PHP_VERSION_ID')) {
-    $version = explode('.', PHP_VERSION);
-
-    define('PHP_VERSION_ID', ($version[0] * 10000 + $version[1] * 100 + $version[2]));
-}
+define("PROJECT_DIR",		__DIR__);
