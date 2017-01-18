@@ -1,10 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace StackGuru\Core;
 
 use \Discord\Discord;
 use \Discord\WebSockets\Event as DiscordEvent;
-
 
 class Bot extends Database
 {
@@ -13,6 +13,8 @@ class Bot extends Database
     private $callbacks  = [
         // string "callback_name"   => [callable, callable, ... ],
     ];
+
+    private $cmdRegistry;
 
 
     /**
@@ -23,6 +25,7 @@ class Bot extends Database
      */
     public function __construct(array $options = [], bool $shutup = null)
     {
+
         // Used for testing the bot methods
         if ($shutup !== null && $shutup === true) {
             return;
@@ -33,6 +36,21 @@ class Bot extends Database
 
         // Setup database connection
         Database::__construct($options["database"]);
+
+        // Setup command registry.
+        $this->cmdRegistry = new \StackGuru\Core\Command\Registry();
+        $this->cmdRegistry->loadCommandFolder("StackGuru\\Commands", PROJECT_DIR . "/src/Commands");
+
+        // Debug output
+        if (true === DEVELOPMENT) {
+            $commands = $this->cmdRegistry->getCommands();
+            echo "Loaded ", sizeof($commands), " commands:", PHP_EOL;
+            foreach ($commands as $name => $command) {
+                $subcommands = array_keys($command->getChildren());
+                echo " * ", $name, " [", implode(", ", $subcommands), "]", PHP_EOL;
+            }
+            echo PHP_EOL;
+        }
 
         // Set up a discord instance
         $this->discord = new Discord($options["discord"]);
@@ -46,7 +64,7 @@ class Bot extends Database
         // Events to trigger a message update.
         $messageEvents = [
             DiscordEvent::MESSAGE_CREATE,
-            // DiscordEvent::MESSAGE_UPDATE, // disabled due to errors in DiscordPHP
+            // DiscordEvent::MESSAGE_UPDATE, // disabled due to errors in Discord
             DiscordEvent::MESSAGE_DELETE,
             DiscordEvent::MESSAGE_DELETE_BULK
         ];
@@ -167,6 +185,34 @@ class Bot extends Database
 
             // The incoming message is for the bot.
             $this->runScripts(BotEvent::MESSAGE_OTHERS_TO_SELF, $message, $event);
+        }
+
+
+        // It's a command. handle it.
+        // Parse query to find the command and get the remaining query.
+        $result = $this->cmdRegistry->parseCommandQuery($message->content);
+
+        $command = $result["command"];
+        if ($command === null) {
+            Utils\Response::sendResponse("I'm sorry. It seems I cannot find your command. Please try the command: help", $message);
+            return;
+        }
+        $query = $result["query"];
+
+        // Create command instance
+        $instance = $command->createInstance();
+
+        // Build command context so the command has references back to the bot
+        // and other commands.
+        $context = new \StackGuru\Core\Command\CommandContext();
+        $context->bot = $bot;
+        $context->cmdRegistry = $this->cmdRegistry;
+        $context->message = $message;
+
+        // Run command and send a response if the return is not null.
+        $response = $instance->process($query, $context);
+        if ($response !== null) {
+            Utils\Response::sendResponse($response, $message);
         }
     }
 
