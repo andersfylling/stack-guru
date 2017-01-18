@@ -9,4 +9,4 @@
 define("DEVELOPMENT", 		$terminal_args["DEVELOPMENT"]);
 define("TESTING", 			$terminal_args["TESTING"]);
 define("STARTUP_TIME",		time());
-define("PROJECT_DIR",		__DIR__);
+define("PROJECT_DIR",		substr(__DIR__, 0, -strlen("config"))); // removed the config name form string
