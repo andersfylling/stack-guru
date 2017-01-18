@@ -17,19 +17,21 @@ class Image extends AbstractCommand
 
     public function process (string $query, ?CommandContext $ctx) : string
     {
-        $args = explode(' ', trim($query) . ' ');
+        $args = explode(' ', $query);
 
-        if (sizeof($args) !== 0) {
+        if (sizeof($args) >= 1 && 0 !== strlen($args[0])) {
             $query = implode(" ", $args);
         } else {
             $query = "Why am I such an asshole?";
         }
 
-        $link = self::buildSearchUrl(['q' => $query]);
+        $link = self::buildSearchUrl([
+            'q' => $query,
+            "tbm" => "isch"
+        ]);
 
-        $msg = "Let me google that for you..\n" . $link;
         if ($ctx)
-            Utils\Response::sendResponse($msg, $ctx->message);
+            Utils\Response::sendResponse($link, $ctx->message);
 
         return $link;
     }

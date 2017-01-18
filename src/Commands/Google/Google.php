@@ -13,8 +13,8 @@ class Google extends AbstractCommand
     protected static $default = "search"; // default command
 
 
-    public function process(string $query, ?CommandContext $ctx): string
+    public function process(string $query, ?CommandContext $ctx) : string
     {
-        return "Not implemented yet";
+        return "Not implemented yet"; 
     }
 }
