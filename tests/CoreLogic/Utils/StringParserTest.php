@@ -3,7 +3,7 @@
 
 use PHPUnit\Framework\TestCase;
 
-use \StackGuru\CoreLogic\Utils;
+use \StackGuru\Core\Utils;
 
 
 class StringParserTest extends TestCase
@@ -26,10 +26,10 @@ class StringParserTest extends TestCase
         //   ...
         // ]
         return [
-            [ "a",      1,  ["a"] ],     // most simple case
-            [ "a b c",  2,  ["a", "b"] ],   // regular extraction
+            [ "a",      1,  ["a"]           ], // most simple case
+            [ "a b c",  2,  ["a", "b"]      ], // regular extraction
             [ "a b c",  5,  ["a", "b", "c"] ], // more words than present in sentence
-            [ "a b c",  0,  [] ],      // no words
+            [ "a b c",  0,  []              ], // no words
         ];
     }
 }

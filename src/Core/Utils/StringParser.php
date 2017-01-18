@@ -51,7 +51,7 @@ abstract class StringParser
 			$word = "";
 
 			// Iterate the blocks until a whitespace is hit
-			while (' ' !== $blocks[$p]) {
+			while ($p < $len && ' ' !== $blocks[$p]) {
 				$word .= $blocks[$p];
 
 				// Go to the next char
