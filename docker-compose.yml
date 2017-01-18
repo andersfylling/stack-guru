@@ -1,0 +1,17 @@
+bot:
+  build: .
+  links:
+    - db
+  volumes:
+    - ./:/app
+  environment:
+    STACKGURU_ENV: development
+db:
+  image: mysql:5.7
+  ports:
+    - "3306:3306"
+  environment:
+    MYSQL_ROOT_PASSWORD: 123456
+    MYSQL_USER: dev
+    MYSQL_PASSWORD: 123456
+    MYSQL_DATABASE: stackguru
