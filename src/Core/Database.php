@@ -55,7 +55,7 @@ class Database
         }
 
         $exists = $this->db->query('SHOW TABLES');
-        if ($exists->rowCount() == 0) {
+        if (false && $exists->rowCount() == 0) { //TODO: this is disabled due to shitty code.
             //create content
             $this->db->exec( file_get_contents($this->file) );
         }
