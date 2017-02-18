@@ -29,7 +29,15 @@ class Scanner extends AbstractCommand
 
     public function getUsers(?CommandContext $ctx)
     {
-        return $ctx->discord->users;
+        $users = $ctx->message->channel->guild->members;
+        $ret = [];
+
+        // For some reasons there might be duplicates here... thank discordphp team.
+        //foreach()
+        //
+        var_dump($users);
+
+        return $users;
     }
 
     public function getRoles(?CommandContext $ctx)

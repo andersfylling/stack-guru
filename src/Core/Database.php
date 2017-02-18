@@ -61,4 +61,8 @@ class Database
         }
     }
 
+    
+    public function saveUser(){}
+    public function saveRole(){}
+
 }
