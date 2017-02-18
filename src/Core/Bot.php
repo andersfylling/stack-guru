@@ -8,6 +8,8 @@ use \Discord\WebSockets\Event as DiscordEvent;
 
 class Bot extends Database
 {
+    public $guild;
+
     private $discord; // \Discord\Discord
 
     private $callbacks  = [
@@ -33,6 +35,7 @@ class Bot extends Database
 
         // Verify parameter to have required keys
         $options = Utils\ResolveOptions::verify($options, ["discord", "database"]);
+        $this->guild = null;
 
         // Setup database connection
         Database::__construct($options["database"]);
@@ -188,6 +191,14 @@ class Bot extends Database
         }
 
 
+        // Check that the guild has been initiated.
+        $t_ = "initiate";
+        if (null === $this->guild && substr($message->content, 0, strlen($t_)) != $t_) {
+            Utils\Response::sendResponse("Guild have not been specified! Run \"!initiate\"", $message);
+            return;
+        }
+
+
         // It's a command. handle it.
         // Parse query to find the command and get the remaining query.
         $result = $this->cmdRegistry->parseCommandQuery($message->content);
@@ -205,9 +216,10 @@ class Bot extends Database
         // Build command context so the command has references back to the bot
         // and other commands.
         $context = new \StackGuru\Core\Command\CommandContext();
-        $context->bot = $bot;
+        $context->bot = $this;
         $context->cmdRegistry = $this->cmdRegistry;
         $context->message = $message;
+        $context->discord = $this->discord;
 
         // Run command and send a response if the return is not null.
         $response = $instance->process($query, $context);

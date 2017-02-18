@@ -10,4 +10,5 @@ class CommandContext
     public $cmdRegistry; // \StackGuru\Core\Command\Registry
     public $parent;      // \StackGuru\Core\Command\CommandInterface
     public $message;     // \Discord\Parts\Channel\Message
+    public $discord;	 // Discord
 }
