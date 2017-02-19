@@ -9,8 +9,8 @@ use StackGuru\Core\Command\CommandContext;
 class Scanner extends AbstractCommand
 {
     protected static $name = "scanner";
-    protected static $description = "find drug information";
-    protected static $default = "info"; // default sub-command
+    protected static $description = "Scan guild for all users";
+    protected static $default = ""; // default sub-command
 
 
     public function process(string $query, ?CommandContext $ctx): string
