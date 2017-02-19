@@ -9,8 +9,8 @@ use StackGuru\Core\Command\CommandContext;
 class Save extends AbstractCommand
 {
     protected static $name = "save";
-    protected static $description = "save scanned users";
-    protected static $default = "info"; // default sub-command
+    protected static $description = "Save scanned users";
+    protected static $default = ""; // default sub-command
 
 
     public function process(string $query, ?CommandContext $ctx): string
