@@ -15,11 +15,12 @@ class Scanner extends AbstractCommand
 
     public function process(string $query, ?CommandContext $ctx): string
     {
+
     	$users = $this->getUsers($ctx);
         $roles = $this->getRoles($ctx);
         var_dump($roles);
     	$list = "";
-    	foreach($ctx->message->channel->guild->members as $key => $value) {
+    	foreach($this->getUsers($ctx) as $key => $value) {
 		    $list .= $value->username . PHP_EOL;
 		    //var_dump($value);
 		}
@@ -35,8 +36,7 @@ class Scanner extends AbstractCommand
         // For some reasons there might be duplicates here... thank discordphp team.
         //foreach()
         //
-        var_dump($users);
-
+        
         return $users;
     }
 

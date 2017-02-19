@@ -6,6 +6,7 @@ namespace StackGuru\Core\Command;
 use \StackGuru\Core\Utils;
 
 
+
 trait QueryRouter
 {
     /**
@@ -18,6 +19,7 @@ trait QueryRouter
     public function parseCommandQuery(string $query): array
     {
         // Local vars
+        $parent = null;
         $command = null;
         $token = Utils\StringParser::getFirstWord($query);
 
@@ -51,6 +53,7 @@ trait QueryRouter
                     $child = $command->getDefaultChild();
                     if ($child !== null) {
                         // Skip trimming the query when using default subcommand
+                        $parent = $command;
                         $command = $child;
                         break;
                     } else {
@@ -60,6 +63,7 @@ trait QueryRouter
                 }
 
                 // Command was found, assign subcommand as working command.
+                $parent = $command; 
                 $command = $child;
 
                 // Trim command word from the query string
@@ -69,6 +73,7 @@ trait QueryRouter
         }
 
         return [
+            "parent" => $parent,
             "command" => $command,
             "query" => $query
         ];

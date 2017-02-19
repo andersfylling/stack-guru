@@ -61,8 +61,55 @@ class Database
         }
     }
 
-    
-    public function saveUser(){}
+
+
+
+    public function saveUser(?\Discord\Parts\User\Member $member)
+    {
+        if (null == $member) {
+            return;
+        }
+
+
+        // To store a user, just user transactions:
+        // 
+        // BEGIN;
+        // INSERT INTO User VALUES("282601055215157248");
+        // INSERT INTO UserName VALUES(NULL, "282601055215157248", "Anders", 7237, "https://cdn.discordapp.com/avatars/228846961774559232/ff248f7cee4c3967c8d3309ccde90fdd.jpg?size=1024", FALSE, NULL);
+        // COMMIT;
+        // 
+        // Or not.
+        
+        // Member id
+        $id = $member->user->id;
+
+        // User object
+        $u = $member->user;
+        
+
+        // First create user
+        $stmt = $this->db->prepare("INSERT IGNORE INTO `mydb`.`User` (`discord_id`) VALUES(:discord_id)");
+        $stmt->execute([
+            ":discord_id" => $id
+        ]);
+
+        // add specifics about this user
+        $stmt = $this->db->prepare("INSERT INTO `mydb`.`UserName`(`id`, `User_discord_id`, `username`, `discriminator`, `avatar`, `bot`, `timestamp`) VALUES(NULL, :discord_id, :username, :discriminator, :avatar, :isBot, NULL)");
+        $stmt->execute([
+            ":discord_id" => $id,
+            ":username" => $u->username,
+            ":discriminator" => $u->discriminator,
+            ":avatar" => (null == $u->avatar ? "" : $u->avatar),
+            ":isBot" => (null == $u->bot ? false : true)
+        ]);
+        
+        // Now roles need to be added.
+        // Check if the role exists, if not, use saveRole to save it.
+        
+        
+
+    }
+
     public function saveRole(){}
 
 }

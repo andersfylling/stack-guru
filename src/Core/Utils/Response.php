@@ -31,30 +31,12 @@ abstract class Response
              * For some reason, the author object differs when its a private chat compared to public.
              */
 
-            /*
-             * Private
-             */
-            if (true === $message->channel->is_private) {
-                if (true === DEVELOPMENT) {
-                    echo "Response: {$str}", PHP_EOL;
-                }
-
-                if (false === TESTING) {
-                    $message->author->sendMessage($str)->then($callback);
-                }
+            if (true === DEVELOPMENT) {
+                echo "Response: {$str}", PHP_EOL;
             }
 
-            /*
-             * Public
-             */
-            else {
-                if (true === DEVELOPMENT) {
-                    echo "Response: {$str}", PHP_EOL;
-                }
-
-                if (false === TESTING) {
-                    $message->author->user->sendMessage($str)->then($callback);
-                }
+            if (false === TESTING) {
+                $message->getAuthorAttribute(0)->sendMessage($str)->then($callback);
             }
         }
 

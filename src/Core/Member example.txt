@@ -1,0 +1,182 @@
+{
+  [228846961774559232]=>
+  object(Discord\Parts\User\Member)#402 (9) {
+    ["user"]=>
+    object(Discord\Parts\User\User)#517 (5) {
+      ["id"]=>
+      string(18) "228846961774559232"
+      ["username"]=>
+      string(6) "Anders"
+      ["avatar"]=>
+      string(100) "https://cdn.discordapp.com/avatars/228846961774559232/ff248f7cee4c3967c8d3309ccde90fdd.jpg?size=1024"
+      ["discriminator"]=>
+      string(4) "7237"
+      ["bot"]=>
+      NULL
+    }
+    ["roles"]=>
+    object(Discord\Helpers\Collection)#156 (2) {
+      [244241390555365376]=>
+      object(Discord\Parts\Guild\Role)#332 (9) {
+        ["id"]=>
+        string(18) "244241390555365376"
+        ["name"]=>
+        string(10) "developers"
+        ["color"]=>
+        int(15105570)
+        ["managed"]=>
+        bool(false)
+        ["hoist"]=>
+        bool(true)
+        ["position"]=>
+        int(1)
+        ["permissions"]=>
+        object(Discord\Parts\Permissions\RolePermission)#333 (24) {
+          ["create_instant_invite"]=>
+          bool(true)
+          ["kick_members"]=>
+          bool(true)
+          ["ban_members"]=>
+          bool(true)
+          ["administrator"]=>
+          bool(true)
+          ["manage_channels"]=>
+          bool(true)
+          ["manage_server"]=>
+          bool(true)
+          ["change_nickname"]=>
+          bool(true)
+          ["manage_nicknames"]=>
+          bool(true)
+          ["manage_roles"]=>
+          bool(true)
+          ["read_messages"]=>
+          bool(true)
+          ["send_messages"]=>
+          bool(true)
+          ["send_tts_messages"]=>
+          bool(true)
+          ["manage_messages"]=>
+          bool(true)
+          ["embed_links"]=>
+          bool(true)
+          ["attach_files"]=>
+          bool(true)
+          ["read_message_history"]=>
+          bool(true)
+          ["mention_everyone"]=>
+          bool(true)
+          ["voice_connect"]=>
+          bool(true)
+          ["voice_speak"]=>
+          bool(true)
+          ["voice_mute_members"]=>
+          bool(true)
+          ["voice_deafen_members"]=>
+          bool(false)
+          ["voice_move_members"]=>
+          bool(true)
+          ["voice_use_vad"]=>
+          bool(true)
+          ["bitwise"]=>
+          int(527891519)
+        }
+        ["mentionable"]=>
+        bool(true)
+        ["guild_id"]=>
+        string(18) "244200618854580224"
+      }
+      [280876692501823489]=>
+      object(Discord\Parts\Guild\Role)#350 (9) {
+        ["id"]=>
+        string(18) "280876692501823489"
+        ["name"]=>
+        string(6) "anders"
+        ["color"]=>
+        int(0)
+        ["managed"]=>
+        bool(false)
+        ["hoist"]=>
+        bool(false)
+        ["position"]=>
+        int(1)
+        ["permissions"]=>
+        object(Discord\Parts\Permissions\RolePermission)#351 (24) {
+          ["create_instant_invite"]=>
+          bool(false)
+          ["kick_members"]=>
+          bool(false)
+          ["ban_members"]=>
+          bool(false)
+          ["administrator"]=>
+          bool(false)
+          ["manage_channels"]=>
+          bool(false)
+          ["manage_server"]=>
+          bool(false)
+          ["change_nickname"]=>
+          bool(true)
+          ["manage_nicknames"]=>
+          bool(false)
+          ["manage_roles"]=>
+          bool(false)
+          ["read_messages"]=>
+          bool(true)
+          ["send_messages"]=>
+          bool(false)
+          ["send_tts_messages"]=>
+          bool(false)
+          ["manage_messages"]=>
+          bool(false)
+          ["embed_links"]=>
+          bool(false)
+          ["attach_files"]=>
+          bool(false)
+          ["read_message_history"]=>
+          bool(false)
+          ["mention_everyone"]=>
+          bool(false)
+          ["voice_connect"]=>
+          bool(true)
+          ["voice_speak"]=>
+          bool(true)
+          ["voice_mute_members"]=>
+          bool(false)
+          ["voice_deafen_members"]=>
+          bool(false)
+          ["voice_move_members"]=>
+          bool(false)
+          ["voice_use_vad"]=>
+          bool(true)
+          ["bitwise"]=>
+          int(103810048)
+        }
+        ["mentionable"]=>
+        bool(false)
+        ["guild_id"]=>
+        string(18) "244200618854580224"
+      }
+    }
+    ["deaf"]=>
+    bool(false)
+    ["mute"]=>
+    bool(false)
+    ["joined_at"]=>
+    string(20) "2016-11-04T20:46:04Z"
+    ["guild_id"]=>
+    string(18) "244200618854580224"
+    ["status"]=>
+    string(6) "online"
+    ["game"]=>
+    object(Discord\Parts\User\Game)#557 (3) {
+      ["name"]=>
+      NULL
+      ["url"]=>
+      NULL
+      ["type"]=>
+      NULL
+    }
+    ["nick"]=>
+    NULL
+  }
+}

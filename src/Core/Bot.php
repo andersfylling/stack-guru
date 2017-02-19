@@ -212,14 +212,16 @@ class Bot extends Database
 
         // Create command instance
         $instance = $command->createInstance();
+        $parentCmd = null == $result["parent"] ? null : $result["parent"]->createInstance();
 
         // Build command context so the command has references back to the bot
         // and other commands.
-        $context = new \StackGuru\Core\Command\CommandContext();
-        $context->bot = $this;
-        $context->cmdRegistry = $this->cmdRegistry;
-        $context->message = $message;
-        $context->discord = $this->discord;
+        $context                = new \StackGuru\Core\Command\CommandContext();
+        $context->bot           = $this;
+        $context->cmdRegistry   = $this->cmdRegistry;
+        $context->message       = $message;
+        $context->discord       = $this->discord;
+        $context->parentCommand = $parentCmd;
 
         // Run command and send a response if the return is not null.
         $response = $instance->process($query, $context);

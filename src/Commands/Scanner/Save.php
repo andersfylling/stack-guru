@@ -15,14 +15,12 @@ class Save extends AbstractCommand
 
     public function process(string $query, ?CommandContext $ctx): string
     {
-    	$d = $ctx->discord;
-    	$users = $d->users;
-    	$list = "";
-    	foreach($ctx->message->channel->guild->members as $key => $value) {
-		    $list .= $value->username . PHP_EOL;
-		    var_dump($value);
-		}
+        $users = $ctx->parentCommand->getUsers($ctx);
 
-        return $list;
+        foreach($users as $user) {
+            $ctx->bot->saveUser($user);
+        }
+
+        return " " . sizeof($users) . " users saved.";
     }
 }

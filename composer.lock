@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "66aae096d3b0a65c6325a43f848f5d4f",
+    "content-hash": "1c4fd4c00b5b7bc450d3120b38e18d84",
     "packages": [
         {
             "name": "TrafficCophp/ByteBuffer",
@@ -1504,6 +1504,73 @@
             "time": "2017-01-25T14:44:14+00:00"
         },
         {
+            "name": "sciencefyll/discord-php",
+            "version": "dev-develop",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sciencefyll/DiscordPHP.git",
+                "reference": "50b1d35f3eb64f3dc6dda1bc7de89354c29b9124"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sciencefyll/DiscordPHP/zipball/50b1d35f3eb64f3dc6dda1bc7de89354c29b9124",
+                "reference": "50b1d35f3eb64f3dc6dda1bc7de89354c29b9124",
+                "shasum": ""
+            },
+            "require": {
+                "cache/array-adapter": "^0.4.2",
+                "guzzlehttp/guzzle": "~5.3|~6.0",
+                "illuminate/support": "^4.0|^5.0",
+                "monolog/monolog": "^1.19",
+                "nesbot/carbon": "^1.18",
+                "php": "^5.6|^7.0",
+                "ratchet/pawl": "0.2.*",
+                "react/datagram": "1.1.*",
+                "react/partial": "^2.0",
+                "react/socket-client": "0.4.*",
+                "symfony/options-resolver": "^2.7|^3.0",
+                "trafficcophp/bytebuffer": "^0.3",
+                "wyrihaximus/react-guzzle-psr7": "^1.0"
+            },
+            "require-dev": {
+                "symfony/var-dumper": "^2.7|^3.0"
+            },
+            "suggest": {
+                "cache/apc-adapter": "Required to use the APC cache driver",
+                "cache/memcache-adapter": "Required to use the Memcache cache driver",
+                "cache/memcached-adapter": "Required to use the Memcached cache driver",
+                "cache/redis-adapter": "Required to use the Redis cache driver",
+                "ext-event": "For a faster, and more performant loop",
+                "ext-libev": "For a faster, and more performant loop",
+                "ext-libevent": "For a faster, and more performant loop. Preferred"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/Discord/functions.php"
+                ],
+                "psr-4": {
+                    "Discord\\": "src/Discord"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Aaron Scherer",
+                    "email": "aequasi@gmail.com"
+                },
+                {
+                    "name": "David Cole",
+                    "email": "david@team-reflex.com"
+                }
+            ],
+            "description": "An unofficial API to interact with the voice and text service Discord.",
+            "time": "2017-02-18 23:38:02"
+        },
+        {
             "name": "symfony/options-resolver",
             "version": "v3.2.4",
             "source": {
@@ -1679,73 +1746,6 @@
             "description": "Symfony Translation Component",
             "homepage": "https://symfony.com",
             "time": "2017-02-16T22:46:52+00:00"
-        },
-        {
-            "name": "team-reflex/discord-php",
-            "version": "dev-develop",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/teamreflex/DiscordPHP.git",
-                "reference": "613c04a1aa9e39d8f3c77465095d626c5ea119f6"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/teamreflex/DiscordPHP/zipball/613c04a1aa9e39d8f3c77465095d626c5ea119f6",
-                "reference": "613c04a1aa9e39d8f3c77465095d626c5ea119f6",
-                "shasum": ""
-            },
-            "require": {
-                "cache/array-adapter": "^0.4.2",
-                "guzzlehttp/guzzle": "~5.3|~6.0",
-                "illuminate/support": "^4.0|^5.0",
-                "monolog/monolog": "^1.19",
-                "nesbot/carbon": "^1.18",
-                "php": "^5.6|^7.0",
-                "ratchet/pawl": "0.2.*",
-                "react/datagram": "1.1.*",
-                "react/partial": "^2.0",
-                "react/socket-client": "0.4.*",
-                "symfony/options-resolver": "^2.7|^3.0",
-                "trafficcophp/bytebuffer": "^0.3",
-                "wyrihaximus/react-guzzle-psr7": "^1.0"
-            },
-            "require-dev": {
-                "symfony/var-dumper": "^2.7|^3.0"
-            },
-            "suggest": {
-                "cache/apc-adapter": "Required to use the APC cache driver",
-                "cache/memcache-adapter": "Required to use the Memcache cache driver",
-                "cache/memcached-adapter": "Required to use the Memcached cache driver",
-                "cache/redis-adapter": "Required to use the Redis cache driver",
-                "ext-event": "For a faster, and more performant loop",
-                "ext-libev": "For a faster, and more performant loop",
-                "ext-libevent": "For a faster, and more performant loop. Preferred"
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "src/Discord/functions.php"
-                ],
-                "psr-4": {
-                    "Discord\\": "src/Discord"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Aaron Scherer",
-                    "email": "aequasi@gmail.com"
-                },
-                {
-                    "name": "David Cole",
-                    "email": "david@team-reflex.com"
-                }
-            ],
-            "description": "An unofficial API to interact with the voice and text service Discord.",
-            "time": "2017-02-14 07:16:32"
         },
         {
             "name": "wyrihaximus/react-guzzle-http-client",
@@ -3155,7 +3155,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "team-reflex/discord-php": 20
+        "sciencefyll/discord-php": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
