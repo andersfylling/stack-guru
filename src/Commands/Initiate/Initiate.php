@@ -23,15 +23,24 @@ class Initiate extends AbstractCommand
             // Store guild object in bot.
             $guild = null;
             foreach ($ctx->discord->guilds as $g) {
-                $ctx->bot->guild = $guild = $g;
+                $guild = $g;
+                break; // unecessary
             }
 
-            $response = "Set guild \"{$guild->name}\" to active guild." . PHP_EOL;
+            if ($ctx->bot->saveGuildID($guild->id)) {
+                $ctx->bot->guild = $guild;
+                $response = "Set guild \"{$guild->name}\" to active guild." . PHP_EOL;
+            }
+            else {
+                $response = "ERROR: Unable to set guild \"{$guild->name}\" as active guild." . PHP_EOL;
+            }
+
         }
 
         // More than one guild exists, you must specify a guild id.
         else {
             $response = "More than one guild, exists. you must specify guildid, PS. this hasn't been implemented. See Initiate.php in Commands.";
+            $response .= PHP_EOL - "Essentially this message is telling you `haha No one likes you`.";
         }
 
 

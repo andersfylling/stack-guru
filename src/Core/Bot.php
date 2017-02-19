@@ -8,6 +8,7 @@ use \Discord\WebSockets\Event as DiscordEvent;
 
 class Bot extends Database
 {
+    private $guildid;
     public $guild;
 
     private $discord; // \Discord\Discord
@@ -57,6 +58,9 @@ class Bot extends Database
 
         // Set up a discord instance
         $this->discord = new Discord($options["discord"]);
+
+        //Load guildID from database
+        $this->guildid = $this->getGuildID();
     }
 
     /**
@@ -74,6 +78,12 @@ class Bot extends Database
 
         // When the app is ready, listen for messages.
         $this->discord->on("ready", function (Discord $self) use ($messageEvents) {
+
+            // set guild id
+            if (isset($this->discord->guilds[$this->guildid])) {
+                $this->guild = $this->discord->guilds[$this->guildid];
+            }
+
             // Message events
             foreach ($messageEvents as $event) {
                 $self->on($event, function (\Discord\Parts\Channel\Message $message) use ($event) {

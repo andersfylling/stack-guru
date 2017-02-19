@@ -112,4 +112,38 @@ class Database
 
     public function saveRole(){}
 
+    /**
+     * Store the guild id to database.
+     * This is then extracted on bot restart or boot time, to get correct guild object.
+     * 
+     * @return [bool] [True if successfully inserted.]
+     */
+    public function saveGuildID(string $guildid) : bool
+    {
+        // Remove all other entries
+        $stmt = $this->db->prepare("TRUNCATE TABLE Guild");
+
+
+        $stmt = $this->db->prepare("INSERT INTO `mydb`.`Guild` (`guild_id`) VALUES(:guild_id)");
+        $stmt->bindParam(":guild_id", $guildid);
+
+        // This does not log any potential errors.. whopsy.
+        // TODO: add error support.
+        return $stmt->execute(); // true on success.
+    }
+
+    public function getGuildID() : string 
+    {
+        $stmt = $this->db->prepare("SELECT * FROM Guild LIMIT 1"); // There will only be one entry, always unless someone ruins the script.
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (null == $row) {
+            return null;
+        }
+        else {
+            return $row["guild_id"];
+        }
+    }
+
 }
