@@ -32,13 +32,13 @@ $bot = new \StackGuru\Core\Bot([
 $messages_all_including_bot     = function(\Discord\Parts\Channel\Message $message, string $event)
 {
     // Stuff to be called in this state.
-    echo "---", PHP_EOL, "$event: $message->content", PHP_EOL;
+    //echo "---", PHP_EOL, "$event: $message->content", PHP_EOL;
 };
 
 $messages_all_excluding_bot     = function(\Discord\Parts\Channel\Message $message, string $event)
 {
     // Stuff to be called in this state.
-    echo "messages_all_excluding_bot", PHP_EOL;
+    //echo "messages_all_excluding_bot", PHP_EOL;
 
     // Be rude to people who say NZT
     if (strpos(strtolower($message->content), "nzt") !== false) {
@@ -59,19 +59,19 @@ $messages_all_excluding_bot     = function(\Discord\Parts\Channel\Message $messa
 $messages_from_bot              = function(\Discord\Parts\Channel\Message $message, string $event)
 {
     // Stuff to be called in this state.
-    echo "messages_from_bot", PHP_EOL;
+    //echo "messages_from_bot", PHP_EOL;
 };
 
 $messages_bot_to_bot            = function(\Discord\Parts\Channel\Message $message, string $event)
 {
     // Stuff to be called in this state.
-    echo "messages_bot_to_bot", PHP_EOL;
+    //echo "messages_bot_to_bot", PHP_EOL;
 };
 
 $messages_other_to_bot          = function(\Discord\Parts\Channel\Message $message, string $event)
 {
     // Stuff to be called in this state.
-    echo "messages_other_to_bot", PHP_EOL;
+    //echo "messages_other_to_bot", PHP_EOL;
 };
 
 

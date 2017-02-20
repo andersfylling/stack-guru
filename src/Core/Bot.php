@@ -71,7 +71,7 @@ class Bot extends Database
         // Events to trigger a message update.
         $messageEvents = [
             DiscordEvent::MESSAGE_CREATE,
-            // DiscordEvent::MESSAGE_UPDATE, // disabled due to errors in Discord
+            DiscordEvent::MESSAGE_UPDATE, // disabled due to errors in Discord
             DiscordEvent::MESSAGE_DELETE,
             DiscordEvent::MESSAGE_DELETE_BULK
         ];

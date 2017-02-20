@@ -4,6 +4,7 @@ namespace StackGuru\Commands\Chatlog;
 
 use StackGuru\Core\Command\AbstractCommand;
 use StackGuru\Core\Command\CommandContext;
+use StackGuru\Core\BotEvent;
 
 
 class Chatlog extends AbstractCommand
@@ -15,8 +16,19 @@ class Chatlog extends AbstractCommand
 
     public function process(string $query, ?CommandContext $ctx): string
     {
+        //var_dump($ctx->bot->guild->channels);
+        //
+        //
+        
+        $ctx->bot->state(BotEvent::MESSAGE_ALL_I_SELF,  [$this, "log"]);
+
 
     	return "hellu";
+    }
+
+    public function log(\Discord\Parts\Channel\Message $message, string $event) 
+    {
+        echo "---LOGGER", PHP_EOL, "$event: $message->content", PHP_EOL;
     }
 
     public function getUsers(?CommandContext $ctx)
