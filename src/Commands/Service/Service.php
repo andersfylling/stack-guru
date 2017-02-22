@@ -10,7 +10,7 @@ class Service extends AbstractCommand
 {
     protected static $name = "service";
     protected static $description = "bot service commands";
-    protected static $default = "shutdown";
+    protected static $default = "status";
 
 
     public function process(string $query, ?CommandContext $ctx): string

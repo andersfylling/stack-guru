@@ -79,12 +79,23 @@ class Bot extends Database
         // When the app is ready, listen for messages.
         $this->discord->on("ready", function (Discord $self) use ($messageEvents) {
 
-            // set guild id
+            // Set active guild
+            // 
             if (isset($this->discord->guilds[$this->guildid])) {
                 $this->guild = $this->discord->guilds[$this->guildid];
             }
 
-            // Message events
+            // Start services
+            // 
+            foreach ($this->cmdRegistry->getCommands() as $command) {
+                // Initiate each service method.
+                // Let the service method know that this is boot time, and choose what to do..
+                $command->service(true);
+            }
+
+
+            // Handle message events
+            // 
             foreach ($messageEvents as $event) {
                 $self->on($event, function (\Discord\Parts\Channel\Message $message) use ($event) {
                     // Discord has it's own exception handler, so we have to catch exceptions from
