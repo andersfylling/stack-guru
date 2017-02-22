@@ -28,18 +28,6 @@ abstract class AbstractCommand implements CommandInterface
     abstract public function process(string $query, ?CommandContext $ctx): string;
 
 
-
-    /**
-     * Optional method service().
-     * This is called at boot time, after cmdRegistry.
-     * This lets the commands created services that runs on bot events.
-     */
-    public function service(bool $boot = null) : void 
-    {
-        return; // do nothing
-    }
-
-
     /**
      * Getters for static command properties.
      */

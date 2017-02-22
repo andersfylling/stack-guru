@@ -87,11 +87,6 @@ class Bot extends Database
 
             // Start services
             // 
-            foreach ($this->cmdRegistry->getCommands() as $command) {
-                // Initiate each service method.
-                // Let the service method know that this is boot time, and choose what to do..
-                $command->service(true);
-            }
 
 
             // Handle message events
