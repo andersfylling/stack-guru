@@ -6,6 +6,23 @@ namespace StackGuru\Core\Utils;
 
 abstract class StringParser
 {
+
+	/**
+	 * Returns a correctly parsed char, using utf8
+	 * @param  int    $start [description]
+	 * @param  int    $stop  [description]
+	 * @return [type]        [description]
+	 */
+	public static function getCharAt(int $pos, string $str) : string
+	{
+		if ($pos + 1 >= strlen($str)) {
+			return '';
+		}
+
+		return mb_substr($str, $pos, $pos + 1, "utf-8");
+	}
+
+
     /**
      * Get the first word from a given string
      *
