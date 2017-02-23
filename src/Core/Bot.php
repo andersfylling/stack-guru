@@ -5,6 +5,7 @@ namespace StackGuru\Core;
 
 use \Discord\Discord;
 use \Discord\WebSockets\Event as DiscordEvent;
+use StackGuru\Core\Utils;
 
 class Bot extends Database
 {
@@ -85,8 +86,13 @@ class Bot extends Database
                 $this->guild = &$this->discord->guilds[$this->guildid];
             }
 
-            // Start services
+            // Add bot status
             // 
+            $game = $this->discord->factory(\Discord\Parts\User\Game::class, ["name" => "!help"]);
+            $this->discord->updatePresence($game, false);
+
+            // Start services
+            //
 
 
             // Handle message events
@@ -215,10 +221,22 @@ class Bot extends Database
             return;
         }
 
+        // make sure message content is of lower case
+        $message->content = strtolower($message->content);
+
+
+        // Check if a help flag has been added: --help, -h. if so we just throw help in front of whatever..
+        // 
+        $flag_help = strpos($message->content, "--help") !== false;
+        $flag_h = strpos($message->content, "-h") !== false;
+        if ("help" !== Utils\StringParser::getFirstWord($message->content) && ($flag_h || $flag_help)) {
+            $message->content = "help " . $message->content;
+        }
+
 
         // It's a command. handle it.
         // Parse query to find the command and get the remaining query.
-        $result = $this->cmdRegistry->parseCommandQuery(strtolower($message->content));
+        $result = $this->cmdRegistry->parseCommandQuery($message->content);
 
         $command = $result["command"];
         if ($command === null) {
