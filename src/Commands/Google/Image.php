@@ -30,9 +30,6 @@ class Image extends AbstractCommand
             "tbm" => "isch"
         ]);
 
-        if ($ctx)
-            Utils\Response::sendResponse($link, $ctx->message);
-
         return $link;
     }
 }
