@@ -54,4 +54,32 @@ abstract class Response
             }
         }
     }
+
+
+    /**
+     * Send a message to the same channel the message came from. maybe rename this to sendUpdate(...)
+     * 
+     * @param string $str
+     * @param \Discord\Parts\Channel\Message|null $message
+     * @param \Closure|null $callback
+     * @param bool|null $private
+     */
+    public static function sendMessage(
+        string                          $str,
+        \Discord\Parts\Channel\Message  $message,
+        ?\Closure                       $callback = null
+    ) {
+        if (null === $message && true === DEVELOPMENT) {
+            echo "Message was not sent: {$str}" . PHP_EOL;
+            return;
+        }
+
+        if (true === DEVELOPMENT) {
+            echo "Response: {$str}", PHP_EOL;
+        }
+
+        if (false === TESTING) {
+            $message->channel->sendMessage($str)->then($callback);
+        }
+    }
 }
