@@ -14,10 +14,11 @@ use StackGuru\Core\Command\CommandContext;
  *
  * This class will be called from a command called Service.
  */
-abstract class AbstractService
+abstract class AbstractService implements ServiceInterface
 {
     protected static $name = ""; // Name of the service.
     protected static $description = ""; // Short summary of the service purpose.
+    protected static $running = false;
 
     public function __construct()
     {
@@ -25,25 +26,55 @@ abstract class AbstractService
 
     // Default methods.
     // Interacts with the database to start, stop or whatever.
-    final public function stop(?CommandContext $ctx) : void
+    // 
+    public function enable(?CommandContext $ctx): bool
+    {
+        if ("" === static::$name) {
+            return false;
+        }
+
+        return $ctx->bot->enableService(static::$name);
+    }
+
+    public function disable(?CommandContext $ctx) 
     {
 
     }
-
-    final public function start(?CommandContext $ctx) : void 
+    
+    // Overwritable
+    public function stop(?CommandContext $ctx) : bool
     {
+
+
+        self::$running = false;
+    }
+
+    public function start(?CommandContext $ctx) : bool 
+    {
+        self::$running = true;
+
+
 
     }
 
-    final public function restart(?CommandContext $ctx) : void 
+    // Generic versions.
+    final public function restart(?CommandContext $ctx) : bool 
     {
-
+        $this->stop($ctx);
+        $this->start($ctx);
+        $this->status($ctx);
     }
 
     // In memory information. No database needed.
-    final public function status(?CommandContext $ctx) : void 
+    final public function status(?CommandContext $ctx) : string 
     {
 
+    }
+
+
+    public function running(): bool 
+    {
+        return self::$running; // not a good way to check....
     }
 
 
@@ -51,7 +82,7 @@ abstract class AbstractService
     /**
      * Abstract functions
      */
-    abstract public function process(string $query, ?CommandContext $ctx): string;
+    //public function process(string $query, ?CommandContext $ctx): string;
 
 
 

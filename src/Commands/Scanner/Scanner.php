@@ -18,7 +18,7 @@ class Scanner extends AbstractCommand
 
     	$users = $this->getUsers($ctx);
         $roles = $this->getRoles($ctx);
-        var_dump($roles);
+        
     	$list = "";
     	foreach($this->getUsers($ctx) as $key => $value) {
 		    $list .= $value->username . PHP_EOL;

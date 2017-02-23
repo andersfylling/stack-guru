@@ -16,6 +16,7 @@ class Bot extends Database
     ];
 
     private $cmdRegistry;
+    private $services;
 
 
     /**
@@ -53,6 +54,18 @@ class Bot extends Database
             }
             echo PHP_EOL;
         }
+
+        // load services
+        $serviceCtx = new \StackGuru\Core\Command\CommandContext();
+        $serviceCtx->bot           = $this;
+        $serviceCtx->guild         = null;
+        $serviceCtx->cmdRegistry   = null;        
+        $serviceCtx->services      = null;
+        $serviceCtx->message       = null;
+        $serviceCtx->discord       = null;
+        $serviceCtx->parentCommand = null;
+        $this->services = new \StackGuru\Core\Service\Services();
+        $this->services->loadServicesFolder("StackGuru\\Services", PROJECT_DIR . "/src/Services", $serviceCtx);
 
         // Set up a discord instance
         $this->discord = new Discord($options["discord"]);
@@ -236,7 +249,8 @@ class Bot extends Database
         $context                = new \StackGuru\Core\Command\CommandContext();
         $context->bot           = $this;
         $context->guild         = $message->channel->guild;
-        $context->cmdRegistry   = $this->cmdRegistry;
+        $context->cmdRegistry   = $this->cmdRegistry;        
+        $context->services      = $this->services;
         $context->message       = $message;
         $context->discord       = $this->discord;
         $context->parentCommand = $parentCmd;
@@ -261,10 +275,32 @@ class Bot extends Database
      *
      * @param string $state
      * @param \Closure $callback
+     *
+     * @return  int index which will always be above 0.
      */
-    public function state(string $state, Callable $callback)
+    public function state(string $state, Callable $callback): int
     {
         $this->callbacks[$state][] = $callback;
+
+        return sizeof($this->callbacks[$state]) - 1;
+    }
+
+    /**
+     * Removes a callback from the 2d array.
+     * 
+     * @param  string $state [description]
+     * @param  int    $index [description]
+     * @return [type]        [description]
+     */
+    public function removeStateCallable(string $state, int $index) 
+    {
+        if (null === $index || 0 > $index) {
+            return;
+        }
+
+        if (isset($this->callbacks[$state]) && isset($this->callbacks[$state][$index])) {
+            unset($this->callbacks[$state][$index]);
+        }
     }
 
     /**

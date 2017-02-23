@@ -58,19 +58,7 @@ $messages_all_excluding_bot_command     = function(\Discord\Parts\Channel\Messag
     //echo "messages_all_excluding_bot_command", PHP_EOL;
 
     // Be rude to people who say NZT
-    if (strpos(strtolower($message->content), "nzt") !== false) {
-        $rudeNZTResponses = [
-            "Really.. NZT!?",
-            "NZT? Who do you think you are!?",
-            "NZT? Shut up human!",
-            "NZT!? You silly little creature.",
-            "NZT? Blæ?",
-            "How about no more NZT you humans"
-        ];
-
-        $response = $rudeNZTResponses[array_rand($rudeNZTResponses, 1)];
-        Utils\Response::sendResponse($response, $message);
-    }
+    
 };
 
 $messages_from_bot              = function(\Discord\Parts\Channel\Message $message, string $event)

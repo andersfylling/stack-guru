@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace StackGuru\Core;
 
@@ -144,6 +145,26 @@ class Database
         else {
             return $row["guild_id"];
         }
+    }
+
+    public function doesServiceExist(string $title): bool 
+    {
+        $stmt = $this->db->prepare("SELECT COUNT(`title`) FROM `Service` WHERE `title` = :title LIMIT 1");
+        $stmt->bindParam(":title", $title, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return 1 == $stmt->fetchColumn();
+    }
+
+    public function enableService(string $title): bool 
+    {
+        $stmt = $this->db->prepare("INSERT IGNORE INTO `mydb`.`Service` (`title`) VALUES (:title)");
+        $stmt->bindParam(":title", $title, PDO::PARAM_STR);
+        $stmt->execute();
+
+        echo 1;
+
+        return 1 === $stmt->rowCount();
     }
 
 }

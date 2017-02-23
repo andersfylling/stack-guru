@@ -102,7 +102,7 @@ class Help extends AbstractCommand
     {
         $nr = sizeof($commands);
 
-        $ttile = "";
+        $title = "";
         $title .= sprintf(self::$printf1, "# Available commands [{$nr}]");
 
         if (0 !== $nr) {
