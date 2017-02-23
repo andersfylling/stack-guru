@@ -39,6 +39,12 @@ $messages_all_excluding_bot     = function(\Discord\Parts\Channel\Message $messa
 {
     // Stuff to be called in this state.
     //echo "messages_all_excluding_bot", PHP_EOL;
+};
+
+$messages_all_excluding_bot_command     = function(\Discord\Parts\Channel\Message $message, string $event)
+{
+    // Stuff to be called in this state.
+    //echo "messages_all_excluding_bot_command", PHP_EOL;
 
     // Be rude to people who say NZT
     if (strpos(strtolower($message->content), "nzt") !== false) {
@@ -78,6 +84,7 @@ $messages_other_to_bot          = function(\Discord\Parts\Channel\Message $messa
 // Add callbacks
 $bot->state(BotEvent::MESSAGE_ALL_I_SELF,           $messages_all_including_bot);
 $bot->state(BotEvent::MESSAGE_ALL_E_SELF,           $messages_all_excluding_bot);
+$bot->state(BotEvent::MESSAGE_ALL_E_COMMAND,        $messages_all_excluding_bot_command);
 $bot->state(BotEvent::MESSAGE_FROM_SELF,            $messages_from_bot);
 $bot->state(BotEvent::MESSAGE_SELF_TO_SELF,         $messages_bot_to_bot);
 $bot->state(BotEvent::MESSAGE_OTHERS_TO_SELF,       $messages_other_to_bot);

@@ -82,7 +82,7 @@ class Bot extends Database
             // Set active guild
             // 
             if (isset($this->discord->guilds[$this->guildid])) {
-                $this->guild = $this->discord->guilds[$this->guildid];
+                $this->guild = &$this->discord->guilds[$this->guildid];
             }
 
             // Start services
@@ -194,6 +194,7 @@ class Bot extends Database
                 //
                 // If so, exit this function.
                 if (!$referenced) {
+                    $this->runScripts(BotEvent::MESSAGE_ALL_E_COMMAND, $message, $event);
                     return;
                 }
 
