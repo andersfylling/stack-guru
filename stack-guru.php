@@ -39,6 +39,16 @@ $messages_all_excluding_bot     = function(\Discord\Parts\Channel\Message $messa
 {
     // Stuff to be called in this state.
     //echo "messages_all_excluding_bot", PHP_EOL;
+    
+    // yo no habla Española
+    if ('¡' == StackGuru\Core\Utils\StringParser::getCharAt(0, $message->content)) {
+        $spanishResponse = [
+            "No hablo español, lo siento"
+        ];
+
+        $response = $spanishResponse[array_rand($spanishResponse, 1)];
+        Utils\Response::sendResponse($response, $message);
+    }
 };
 
 $messages_all_excluding_bot_command     = function(\Discord\Parts\Channel\Message $message, string $event)

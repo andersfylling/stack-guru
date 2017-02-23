@@ -13,6 +13,9 @@ class Help extends AbstractCommand
     protected static $name = "help";
     protected static $description = "returns a list of available bot commands";
 
+    private static $printf1 = "%-27s";
+    private static $printf2 = "%-10s";
+
 
     public function process(string $query, ?CommandContext $ctx): string
     {
@@ -36,10 +39,12 @@ class Help extends AbstractCommand
             $helptext .= "# Command name" . PHP_EOL;
             $helptext .= "* {$command->getName()} {$subcommand->getName()}" . PHP_EOL . PHP_EOL;
 
-            self::showCommandUsage($helptext, [$subcommand->getName()]);
+            self::showCommandUsage($helptext, [$command->getName() . ' ' . $subcommand->getName()]);
 
             $helptext .= "# Description" . PHP_EOL;
             $helptext .= "* {$subcommand->getDescription()}" . PHP_EOL . PHP_EOL;
+
+            self::showMainCommands($helptext, $ctx, $subcommand->getChildren(), $command);
         } 
 
         // A main command
@@ -57,26 +62,7 @@ class Help extends AbstractCommand
 
 
             // Print all subcommands
-            $helptext .= "# Sub-commands" . PHP_EOL;
-            $children = $command->getChildren();
-            foreach ($children as $name => $child) {
-
-                // Print command with subcommand tree
-                $cmdline = "* !{$command->getName()} {$child->getName()}";
-
-                // Pad command names to align command descriptions
-                $cmdline = sprintf("%-30s", $cmdline);
-
-                // Add command description
-                $description = $child->getDescription();
-                if (!empty($description)) {
-                    $cmdline .= " - {$description}";
-                }
-
-                $helptext .= $cmdline . PHP_EOL;
-            }
-
-
+            self::showMainCommands($helptext, $ctx, $command->getChildren(), $command);
         } 
         
 
@@ -84,7 +70,7 @@ class Help extends AbstractCommand
         else {
             self::showCommandUsage($helptext, ["command", "subcommand"]);
 
-            self::showMainCommands($helptext, $ctx);
+            self::showMainCommands($helptext, $ctx, $ctx->cmdRegistry->getCommands());
         }
         
 
@@ -112,29 +98,43 @@ class Help extends AbstractCommand
         $helptext .= PHP_EOL;
     }
 
-    private static function showMainCommands(string &$helptext, ?CommandContext $ctx) : void 
+    private static function showMainCommands(string &$helptext, ?CommandContext $ctx, $commands, $parentCommand = null) : void 
     {
-        $helptext .= "# Available commands" . PHP_EOL;
+        $nr = sizeof($commands);
+
+        $ttile = "";
+        $title .= sprintf(self::$printf1, "# Available commands [{$nr}]");
+
+        if (0 !== $nr) {
+            $title .= sprintf(self::$printf2, "Enabled");
+            $title .= "Description";
+        }
+        
+        $helptext .= $title . PHP_EOL;
 
         // Print all commands
-        $commands = $ctx->cmdRegistry->getCommands();
         foreach ($commands as $name => $command) {
             $commandTree = self::getCommandTreeString($command);
 
             // Print command with subcommand tree
-            
-            $cmdline = "* !{$command->getName()}";
+            if (null === $parentCommand) {
+                $cmdline = "* !{$command->getName()}";
+            }
+            else {
+                $cmdline = "* !{$parentCommand->getName()} {$command->getName()}";
+            }
 
             // Pad command names to align command descriptions
-            $cmdline = sprintf("%-20s", $cmdline);
+            $cmdline  = sprintf(self::$printf1, $cmdline);
+            $cmdline .= sprintf(self::$printf2, "true");
 
             // Add command description
             $description = $command->getDescription();
             if (!empty($description)) {
-                $cmdline .= " - {$description}";
+                $cmdline .= "{$description}";
             }
 
-            $helptext .= $cmdline . "\n";
+            $helptext .= $cmdline . PHP_EOL;
         }
     }
 
