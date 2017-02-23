@@ -33,7 +33,7 @@ class Chatlog extends AbstractCommand
 
     public function getUsers(?CommandContext $ctx)
     {
-        $users = $ctx->message->channel->guild->members;
+        $users = $ctx->guild->members;
         $ret = [];
 
         // For some reasons there might be duplicates here... thank discordphp team.

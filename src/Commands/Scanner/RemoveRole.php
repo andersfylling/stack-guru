@@ -31,14 +31,14 @@ class RemoveRole extends AbstractCommand
 
         $roleid = $output[1];
 
-        if (!isset($ctx->bot->guild->roles[$roleid])) {
+        if (!isset($ctx->guild->roles[$roleid])) {
             return "Role given does not exist in this guild. Talk to bot engineers..";
         }
 
-        $role = $ctx->bot->guild->roles[$roleid];
-        foreach($ctx->bot->guild->members as $member) {
+        $role = $ctx->guild->roles[$roleid];
+        foreach($ctx->guild->members as $member) {
             $member->removeRole($role);
-            $ctx->bot->guild->members->save($member);
+            $ctx->guild->members->save($member);
         } 
 
 

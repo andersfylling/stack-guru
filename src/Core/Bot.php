@@ -9,9 +9,6 @@ use StackGuru\Core\Utils;
 
 class Bot extends Database
 {
-    private $guildid;
-    public $guild;
-
     private $discord; // \Discord\Discord
 
     private $callbacks  = [
@@ -59,9 +56,6 @@ class Bot extends Database
 
         // Set up a discord instance
         $this->discord = new Discord($options["discord"]);
-
-        //Load guildID from database
-        $this->guildid = $this->getGuildID();
     }
 
     /**
@@ -79,12 +73,6 @@ class Bot extends Database
 
         // When the app is ready, listen for messages.
         $this->discord->on("ready", function (Discord $self) use ($messageEvents) {
-
-            // Set active guild
-            // 
-            if (isset($this->discord->guilds[$this->guildid])) {
-                $this->guild = &$this->discord->guilds[$this->guildid];
-            }
 
             // Add bot status
             // 
@@ -214,13 +202,6 @@ class Bot extends Database
         }
 
 
-        // Check that the guild has been initiated.
-        $t_ = "initiate";
-        if (null === $this->guild && substr($message->content, 0, strlen($t_)) != $t_) {
-            Utils\Response::sendResponse("Guild have not been specified! Run \"!initiate\"", $message);
-            return;
-        }
-
         // make sure message content is of lower case
         $message->content = strtolower($message->content);
 
@@ -253,6 +234,7 @@ class Bot extends Database
         // and other commands.
         $context                = new \StackGuru\Core\Command\CommandContext();
         $context->bot           = $this;
+        $context->guild         = &$message->channel->guild;
         $context->cmdRegistry   = $this->cmdRegistry;
         $context->message       = $message;
         $context->discord       = $this->discord;

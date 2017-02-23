@@ -23,8 +23,9 @@ use \StackGuru\Core\Utils;
 
 // Setup bot instance
 $bot = new \StackGuru\Core\Bot([
-    "discord"   => ST_DISCORD_SETTINGS,
-    "database"  => ST_DATABASE_SETTINGS
+    "discord"           => ST_DISCORD_SETTINGS,
+    "database"          => ST_DATABASE_SETTINGS,
+    "loadAllMembers"    => true
 ]);
 
 
