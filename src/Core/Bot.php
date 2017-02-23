@@ -218,11 +218,11 @@ class Bot extends Database
 
         // It's a command. handle it.
         // Parse query to find the command and get the remaining query.
-        $result = $this->cmdRegistry->parseCommandQuery($message->content);
+        $result = $this->cmdRegistry->parseCommandQuery(strtolower($message->content));
 
         $command = $result["command"];
         if ($command === null) {
-            Utils\Response::sendResponse("I'm sorry. It seems I cannot find your command. Please try the command: help", $message);
+            // Utils\Response::sendResponse("I'm sorry. It seems I cannot find your command. Please try the command: help", $message);
             return;
         }
         $query = $result["query"];
