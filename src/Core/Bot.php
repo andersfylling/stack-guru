@@ -172,14 +172,14 @@ class Bot extends Database
                 //
                 // Saves some of the if checks, otherwise these gets so long.
                 $mentioned = isset($mentions[$this->discord->id]);
-                $usedBotReference = strpos($message->content, "<@&240626683487453184>") !== false; //@Bot
+                $usedBotReference = null !== $message->content && strpos($message->content, "<@&240626683487453184>") !== false; //@Bot
                 if (!$referenced && ($mentioned || $usedBotReference)) {
                     $message->content = str_replace("<@" . $this->discord->id . ">", "", $message->content); // removes the mention of bot
                     $referenced = true; // Bot was not mentioned nor was @Bot used: <@&240626683487453184>
                 }
 
                 // Check if the bot was referenced by "!"
-                if (!$referenced && (substr($message->content, 0, 1) === "!")) {
+                if (!$referenced && null !== $message->content && substr($message->content, 0, 1) === "!") {
                     $message->content = ltrim($message->content, "!");
                     $referenced = true;
                 }
@@ -207,10 +207,11 @@ class Bot extends Database
 
 
         // Check if a help flag has been added: --help, -h. if so we just throw help in front of whatever..
+        // This should be rewritten as a service...
         // 
-        $flag_help = strpos($message->content, "--help") !== false;
-        $flag_h = strpos($message->content, "-h") !== false;
-        if ("help" !== Utils\StringParser::getFirstWord($message->content) && ($flag_h || $flag_help)) {
+        $flag_help = null !== $message->content && strpos($message->content, "--help") !== false;
+        $flag_h = null !== $message->content && strpos($message->content, "-h") !== false;
+        if (null !== $message->content && "help" !== Utils\StringParser::getFirstWord($message->content) && ($flag_h || $flag_help)) {
             $message->content = "help " . $message->content;
         }
 
@@ -234,7 +235,7 @@ class Bot extends Database
         // and other commands.
         $context                = new \StackGuru\Core\Command\CommandContext();
         $context->bot           = $this;
-        $context->guild         = &$message->channel->guild;
+        $context->guild         = $message->channel->guild;
         $context->cmdRegistry   = $this->cmdRegistry;
         $context->message       = $message;
         $context->discord       = $this->discord;

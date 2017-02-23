@@ -42,7 +42,7 @@ $messages_all_excluding_bot     = function(\Discord\Parts\Channel\Message $messa
     //echo "messages_all_excluding_bot", PHP_EOL;
     
     // yo no habla Española
-    if ('¡' == StackGuru\Core\Utils\StringParser::getCharAt(0, $message->content)) {
+    if (null !== $message->content && '¡' == StackGuru\Core\Utils\StringParser::getCharAt(0, $message->content)) {
         $spanishResponse = [
             "No hablo español, lo siento"
         ];

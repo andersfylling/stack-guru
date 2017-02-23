@@ -61,9 +61,11 @@ trait QueryRouter
                         break;
                     }
                 }
+                else {
+                    $parent = $command; 
+                }
 
                 // Command was found, assign subcommand as working command.
-                $parent = $command; 
                 $command = $child;
 
                 // Trim command word from the query string
