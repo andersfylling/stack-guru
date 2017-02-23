@@ -65,7 +65,7 @@ class Help extends AbstractCommand
                 $cmdline = "* !{$command->getName()} {$child->getName()}";
 
                 // Pad command names to align command descriptions
-                $cmdline = sprintf("%-20s", $cmdline);
+                $cmdline = sprintf("%-30s", $cmdline);
 
                 // Add command description
                 $description = $child->getDescription();
@@ -87,8 +87,6 @@ class Help extends AbstractCommand
             self::showMainCommands($helptext, $ctx);
         }
         
-
-
 
         $helptext .= "```";
 
