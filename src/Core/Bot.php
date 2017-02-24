@@ -34,15 +34,14 @@ class Bot extends Database
         }
 
         // Verify parameter to have required keys
-        $options = Utils\ResolveOptions::verify($options, ["discord", "database"]);
-        $this->guild = null;
+        $options = Utils\ResolveOptions::verify($options, ["discord", "database", "commands", "services"]);
 
         // Setup database connection
         Database::__construct($options["database"]);
 
         // Setup command registry.
         $this->cmdRegistry = new \StackGuru\Core\Command\Registry();
-        $this->cmdRegistry->loadCommandFolder("StackGuru\\Commands", PROJECT_DIR . "/src/Commands");
+        $this->cmdRegistry->loadCommandFolder($options["commands"]["namespace"], $options["commands"]["folder"]);
 
         // Debug output
         if (true === DEVELOPMENT) {
@@ -65,7 +64,7 @@ class Bot extends Database
         $serviceCtx->discord       = null;
         $serviceCtx->parentCommand = null;
         $this->services = new \StackGuru\Core\Service\Services();
-        $this->services->loadServicesFolder("StackGuru\\Services", PROJECT_DIR . "/src/Services", $serviceCtx);
+        $this->services->loadServicesFolder($options["services"]["namespace"], $options["services"]["folder"], $serviceCtx);
 
         // Set up a discord instance
         $this->discord = new Discord($options["discord"]);
