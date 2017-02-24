@@ -47,7 +47,7 @@ class NZT extends AbstractService
 
 	final public function response(\Discord\Parts\Channel\Message $message, string $event)
 	{
-		if (strpos(strtolower($message->content), "nzt") !== false) {
+		if (null !== $message->content && strpos(strtolower($message->content), "nzt") !== false) {
 	        $rudeNZTResponses = [
 	            "Really.. NZT!?",
 	            "NZT? Who do you think you are!?",
