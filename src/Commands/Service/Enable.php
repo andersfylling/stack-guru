@@ -25,13 +25,7 @@ class Enable extends AbstractCommand
     	if (null === $serviceEntry) {
     		return "The service `{$query}` was not found.";
     	}
-
-    	// Check if service is already running.
-    	// 
-		$title = $serviceEntry->getName();
-    	if ($serviceEntry->running()) {
-    		return "The service `{$title}` is currently running. Run `!service status {$title}` for more.";
-    	}
+    	$title = $serviceEntry->getName();
 
     	// Tell the user that the service is being enabled.
     	Utils\Response::sendMessage("Enabling...", $ctx->message, function () use ($ctx, $serviceEntry, $title) {

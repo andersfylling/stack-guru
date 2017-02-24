@@ -38,7 +38,11 @@ abstract class AbstractService implements ServiceInterface
 
     public function disable(?CommandContext $ctx) 
     {
+        if ("" === static::$name) {
+            return false;
+        }
 
+        return $ctx->bot->disableService(static::$name);
     }
     
     // Overwritable

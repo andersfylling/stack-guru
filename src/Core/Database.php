@@ -162,7 +162,14 @@ class Database
         $stmt->bindParam(":title", $title, PDO::PARAM_STR);
         $stmt->execute();
 
-        echo 1;
+        return 1 === $stmt->rowCount();
+    }
+
+    public function disableService(string $title): bool 
+    {
+        $stmt = $this->db->prepare("DELETE IGNORE FROM `mydb`.`Service` WHERE `title` = :title");
+        $stmt->bindParam(":title", $title, PDO::PARAM_STR);
+        $stmt->execute();
 
         return 1 === $stmt->rowCount();
     }
