@@ -210,9 +210,13 @@ class Bot extends Database
                 $message->content = ltrim($message->content, " ");
             }
 
+            // show that the bot is typing
+            $message->channel->broadcastTyping();
+
             // The incoming message is for the bot.
             $this->runScripts(BotEvent::MESSAGE_OTHERS_TO_SELF, $message, $event);
         }
+
 
 
         // make sure message content is of lower case
@@ -235,7 +239,7 @@ class Bot extends Database
 
         $command = $result["command"];
         if ($command === null) {
-            // Utils\Response::sendResponse("I'm sorry. It seems I cannot find your command. Please try the command: help", $message);
+            Utils\Response::sendMessage("Try running `!help` :)", $message);
             return;
         }
         $query = $result["query"];
