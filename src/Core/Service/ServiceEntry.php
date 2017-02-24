@@ -32,8 +32,6 @@ class ServiceEntry
 
         $this->fullname     = $this->namespace . '\\' . $this->class;
         $this->instance     = null;
-
-        var_dump($this->fullname::getName());
     }
 
     public function isEnabled(\StackGuru\Core\Command\CommandContext $ctx) : bool
