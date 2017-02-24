@@ -32,6 +32,13 @@ class Start extends AbstractCommand
 
     	// Tell the user that the service is being enabled.
     	Utils\Response::sendMessage("Starting...", $ctx->message, function () use ($ctx, $serviceEntry, $title) {
+
+
+            // set service instance, in case it has been stopped or some error happened.
+            if (null === $serviceEntry->getInstance()) {
+                $serviceEntry->createInstance();
+            }
+
 	    	$service = $serviceEntry->getInstance();
 	    	$success = $service->start($ctx);
 
