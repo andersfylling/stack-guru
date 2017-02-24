@@ -10,7 +10,7 @@ use StackGuru\Core\Utils;
 class Start extends AbstractCommand
 {
     protected static $name = "start";
-    protected static $description = "something about the shutdown command";
+    protected static $description = "Starts a service";
 
 
     public function process(string $query, ?CommandContext $ctx): string

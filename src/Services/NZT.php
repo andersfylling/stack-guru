@@ -33,7 +33,7 @@ class NZT extends AbstractService
 
 	final public function stop(?CommandContext $ctx): bool 
 	{
-		// add listener to bot..
+		// remove listener from bot..
         $ctx->bot->removeStateCallable(NZT::EVENT,  $this->index);
         $this->index = null;
 

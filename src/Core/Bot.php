@@ -284,9 +284,14 @@ class Bot extends Database
      */
     public function state(string $state, Callable $callback): int
     {
-        $this->callbacks[$state][] = $callback;
+        if (!isset($this->callbacks[$state])) {
+            $this->callbacks[$state] = [];
+        }
 
-        return sizeof($this->callbacks[$state]) - 1;
+        $index = sizeof($this->callbacks[$state]);
+        $this->callbacks[$state][$index] = $callback;
+
+        return $index;
     }
 
     /**
@@ -303,7 +308,7 @@ class Bot extends Database
         }
 
         if (isset($this->callbacks[$state]) && isset($this->callbacks[$state][$index])) {
-            unset($this->callbacks[$state][$index]);
+            $this->callbacks[$state][$index] = function () {}; // empty array, doesn't scale well. Should use unset and then shift the array.
         }
     }
 
@@ -319,9 +324,10 @@ class Bot extends Database
         if (!isset($this->callbacks[$state])) {
             return;
         }
-        $arr = $this->callbacks[$state];
-        for ($i = sizeof($arr) - 1; $i >= 0; $i -= 1) {
-            call_user_func_array($this->callbacks[$state][$i], [$message, $event]);
+
+        foreach ($this->callbacks[$state] as &$e) {// ($i = sizeof($arr) - 1; $i >= 0; $i -= 1) {
+            call_user_func_array($e, [$message, $event]);
+            //call_user_func_array($this->callbacks[$state][$i], [$message, $event]);
         }
     }
 
