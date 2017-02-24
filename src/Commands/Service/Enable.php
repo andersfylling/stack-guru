@@ -37,7 +37,7 @@ class Enable extends AbstractCommand
     		}
 
 
-	    	// set service instance
+	    	// set service instance, in case it has been stopped or some error happened.
 	    	if (null === $serviceEntry->getInstance()) {
 	    		$serviceEntry->createInstance();
 	    	}
