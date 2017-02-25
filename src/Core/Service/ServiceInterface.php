@@ -16,10 +16,10 @@ interface ServiceInterface
     public static function getDescription(): string;
 
     // default methods.
-    public function stop(?CommandContext $ctx) 		: bool;
-    public function start(?CommandContext $ctx) 	: bool;
-    public function restart(?CommandContext $ctx) 	: bool;
-    public function status(?CommandContext $ctx) 	: string;
+    public function stop(CommandContext $ctx) 		: bool;
+    public function start(CommandContext $ctx) 	: bool;
+    public function restart(CommandContext $ctx) 	: bool;
+    public function status(CommandContext $ctx) 	: string;
 
     public function running(): bool;
 

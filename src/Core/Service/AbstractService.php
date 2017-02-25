@@ -18,7 +18,8 @@ abstract class AbstractService implements ServiceInterface
 {
     protected static $name = ""; // Name of the service.
     protected static $description = ""; // Short summary of the service purpose.
-    protected static $running = false;
+    protected static $callbackIndex = null;
+    protected static $event = null;
 
     public function __construct()
     {
@@ -27,7 +28,7 @@ abstract class AbstractService implements ServiceInterface
     // Default methods.
     // Interacts with the database to start, stop or whatever.
     // 
-    public function enable(?CommandContext $ctx): bool
+    public function enable(CommandContext $ctx): bool
     {
         if ("" === static::$name) {
             return false;
@@ -36,7 +37,7 @@ abstract class AbstractService implements ServiceInterface
         return $ctx->bot->enableService(static::$name);
     }
 
-    public function disable(?CommandContext $ctx) 
+    public function disable(CommandContext $ctx): bool
     {
         if ("" === static::$name) {
             return false;
@@ -46,23 +47,33 @@ abstract class AbstractService implements ServiceInterface
     }
     
     // Overwritable
-    public function stop(?CommandContext $ctx) : bool
+    public function stop(CommandContext $ctx) : bool
     {
+        if (null === static::$callbackIndex) {
+            return false;
+        }
 
+        // remove listener from bot..
+        $ctx->bot->removeStateCallable(static::$event,  static::$callbackIndex);
+        static::$callbackIndex = null;
 
-        self::$running = false;
+        return null === static::$callbackIndex;
     }
 
-    public function start(?CommandContext $ctx) : bool 
+    public function start(CommandContext $ctx) : bool 
     {
-        self::$running = true;
+        if (null !== static::$callbackIndex) {
+            return false;
+        }
 
+        // add listener to bot..
+        static::$callbackIndex = $ctx->bot->state(static::$event,  [$this, "response"]);
 
-
+        return null !== static::$callbackIndex;
     }
 
     // Generic versions.
-    final public function restart(?CommandContext $ctx) : bool 
+    final public function restart(CommandContext $ctx) : bool 
     {
         $this->stop($ctx);
         $this->start($ctx);
@@ -70,7 +81,7 @@ abstract class AbstractService implements ServiceInterface
     }
 
     // In memory information. No database needed.
-    final public function status(?CommandContext $ctx) : string 
+    final public function status(CommandContext $ctx) : string 
     {
 
     }
@@ -78,7 +89,7 @@ abstract class AbstractService implements ServiceInterface
 
     public function running(): bool 
     {
-        return self::$running; // not a good way to check....
+        return null !== static::$callbackIndex; // not a good way to check....
     }
 
 
@@ -86,7 +97,7 @@ abstract class AbstractService implements ServiceInterface
     /**
      * Abstract functions
      */
-    //public function process(string $query, ?CommandContext $ctx): string;
+    abstract public function response(\Discord\Parts\Channel\Message $message, string $event);
 
 
 

@@ -8,41 +8,14 @@ use StackGuru\Core\Utils;
 
 class SpanishCommands extends AbstractService
 {
-	private const EVENT = \StackGuru\Core\BotEvent::MESSAGE_ALL_E_SELF;
-
-
     protected static $name = "spanishcommands"; // Name of the service.
     protected static $description = "Responds to messages that contains the spanish exclamation mark ¡"; // Short summary of the service purpose.
-
-	private $index;
-
+    protected static $event = \StackGuru\Core\BotEvent::MESSAGE_ALL_E_SELF;
 
 
 	final public function process(string $query, ?CommandContext $ctx): string
 	{
 		return "";
-	}
-
-	final public function start(?CommandContext $ctx): bool 
-	{
-		// add listener to bot..
-        $this->index = $ctx->bot->state(SpanishCommands::EVENT,  [$this, "response"]);
-
-		return true;
-	}
-
-	final public function stop(?CommandContext $ctx): bool 
-	{
-		// remove listener from bot..
-        $ctx->bot->removeStateCallable(SpanishCommands::EVENT,  $this->index);
-        $this->index = null;
-
-		return true;
-	}
-
-	final public function running(): bool 
-	{
-		return null !== $this->index; // no index, means no listening to messages.......
 	}
 
 	final public function qualified(string $msg): bool 
