@@ -74,6 +74,25 @@ class Registry
         return null;
     }
 
+    public function getSubCommand(string $parentname, string $name): ?CommandEntry
+    {
+        $parent = null;
+
+        if (isset($this->commands[$parentname])) {
+            $parent = $this->commands[$parentname];
+        }
+        else if (isset($this->commandAliases[$parentname])) {
+            $parent = $this->commandAliases[$parentname];
+        }
+
+        if (null !== $parent && isset($parent->getChildren()[$name])) {
+            return $parent->getChildren()[$name];
+        }
+
+
+        return null;
+    }
+
     /**
      * Returns all command classes.
      *

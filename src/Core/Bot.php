@@ -54,6 +54,13 @@ class Bot extends Database
 
             $this->saveCommand($namespace, $description, $activated);
 
+            // Since a alias would be requested at the same level as a main command
+            // We need to make an alias for each main command, that equals the normal command
+            // alias == command (type of main, main is a command that can have sub commands)
+            // 
+            // Essentially this means u cant create an alias that equals "google" if a command named "google" exists.
+            // 
+            $this->saveCommandAlias($namespace, $commandEntry->getName());
 
             foreach ($commandEntry->getChildren() as $childEntry) {
                 $namespace      = $childEntry->getFullName();

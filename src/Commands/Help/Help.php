@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace StackGuru\Commands\Help;
 
@@ -19,21 +20,22 @@ class Help extends AbstractCommand
 
     public function process(string $query, ?CommandContext $ctx): string
     {
-        // all the commands
-        $commands = $ctx->cmdRegistry->getCommands();
-
         // Encapsulate command list in code block
         $helptext = "```markdown" . PHP_EOL;
 
         // Decide if all commands should be shown, just one command or a subcommand.
         // also mention how a service is used.
         
+        //remove --help and -h
+        $query = str_replace("--help", "", $query);
+        $query = str_replace("-h", "", $query);
+
         $keys = StringParser::getFirstWords($query, 2);
 
         // a sub command
-        if (isset($keys[1]) && isset($commands[$keys[0]]) && isset($commands[$keys[0]]->getChildren()[$keys[1]])) {
-            $command = $commands[$keys[0]];
-            $subcommand = $command->getChildren()[$keys[1]];
+        if (isset($keys[1]) && $this->isCommand($ctx, $keys[0], $keys[1])) {
+            $command = $this->getCommand($ctx, $keys[0]);
+            $subcommand = $this->getCommand($ctx, $keys[0], $keys[1]);
             $alias = $subcommand->getInfoAliases();
             $aliasSize = sizeof($alias);
 
@@ -61,8 +63,8 @@ class Help extends AbstractCommand
         } 
 
         // A main command
-        else if (isset($keys[0]) && isset($commands[$keys[0]])) {
-            $command = $commands[$keys[0]];
+        else if (isset($keys[0]) && $this->isCommand($ctx, $keys[0])) {
+            $command = $this->getCommand($ctx, $keys[0]);
             $alias = $command->getInfoAliases();
             $aliasSize = sizeof($alias);
 
@@ -99,6 +101,21 @@ class Help extends AbstractCommand
         $helptext .= "```";
 
         return $helptext;
+    }
+
+    private function getCommand(CommandContext $ctx, string $n1, string $n2 = null): ?CommandEntry 
+    {
+        if (null === $n2) {
+            return $ctx->cmdRegistry->getCommand($n1);
+        }
+        else {
+            return $ctx->cmdRegistry->getSubCommand($n1, $n2);
+        }
+    }
+
+    private function isCommand(CommandContext $ctx, string $n1, string $n2 = null): bool 
+    {
+        return null !== $this->getCommand($ctx, $n1, $n2);
     }
 
     private static function showCommandUsage(string &$helptext, $arr) : void 

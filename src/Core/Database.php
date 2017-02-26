@@ -201,7 +201,7 @@ class Database
         $stmt->bindParam(":namespace", $namespace, PDO::PARAM_STR);
         $stmt->execute();
         $content = $stmt->fetch(PDO::FETCH_ASSOC);
-        $content["activated"]   = 1 == $content["activated"] ? true : false;
+        $content["activated"] = 1 == $content["activated"] ? true : false;
 
 
         $stmt = null;
@@ -209,7 +209,14 @@ class Database
         $stmt->bindParam(":namespace", $namespace, PDO::PARAM_STR);
         $stmt->execute();
 
-        $content["aliases"]     = 0 === $stmt->rowCount() ? [] : $stmt->fetch(PDO::FETCH_NUM);
+        $aliases = 0 === $stmt->rowCount() ? [] : $stmt->fetchAll(PDO::FETCH_NUM);
+
+        $content["aliases"] = [];
+        foreach ($aliases as $alias) {
+            foreach ($alias as $a) {
+            $content["aliases"][$a] = $a; // for easier checking later.
+            }
+        }
 
         return $content;
     }

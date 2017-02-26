@@ -73,7 +73,9 @@ class CommandEntry
 
     public function addAlias(string $a) 
     {
-        $this->info["aliases"][] = $a;
+        if (!isset($this->info["aliases"][$a])) {
+            $this->info["aliases"][$a] = $a;
+        }
     }
 
     public function removeAlias(string $a) 
