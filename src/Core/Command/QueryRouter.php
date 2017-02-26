@@ -24,17 +24,12 @@ trait QueryRouter
         $token = Utils\StringParser::getFirstWord($query);
 
         // Search names and aliases for first token
-        if (!empty($token))
-        {
-            if (isset($this->commands[$token])) {
-                $command = $this->commands[$token];
-            } else if (isset($this->commandAliases[$token])) {
-                $command = $this->commandAliases[$token];
-            }
+        if (!empty($token)) {
+            $command = $this->getCommand($token);
         }
 
         // Look for subcommand
-        if ($command !== null) {
+        if (null !== $command) {
             // Remove first token from query
             $query = ltrim(substr($query, strlen($token)));
 

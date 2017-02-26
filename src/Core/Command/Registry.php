@@ -57,6 +57,24 @@ class Registry
     }
 
     /**
+     * Returns a command entry given a command name or alias.
+     * 
+     * @param  string $name command name or alias
+     * @return [?CommandEntry] null if none was found
+     */
+    public function getCommand(string $name): ?CommandEntry
+    {
+        if (isset($this->commands[$name])) {
+            return $this->commands[$name];
+        }
+        else if (isset($this->commandAliases[$name])) {
+            return $this->commandAliases[$name];
+        }
+
+        return null;
+    }
+
+    /**
      * Returns all command classes.
      *
      * @return array A hashmap of name => command.
@@ -71,13 +89,16 @@ class Registry
         return $this->commandAliases;
     }
 
-    public function addCommandAlias(string $alias, CommandEntry $entry) 
+    public function addCommandAlias(string $alias, CommandEntry $entry): bool
     {
-        if (null === $entry || isset($this->commandAliases[$alias])) {
-            return;
+        if ("" === $alias || isset($this->commandAliases[$alias])) {
+            return false;
         }
 
-        return $this->commandAliases[$alias] = $entry;
+        $entry->addAlias($alias);
+        $this->commandAliases[$alias] = $entry;
+
+        return isset($this->commandAliases[$alias]);
     }
 
     public function getCommandFromAlias(string $alias): ?CommandEntry 

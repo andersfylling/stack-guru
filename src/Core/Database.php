@@ -214,4 +214,14 @@ class Database
         return $content;
     }
 
+    final public function saveCommandAlias(string $namespace, string $alias): bool 
+    {
+        $stmt = $this->db->prepare("INSERT IGNORE INTO `mydb`.`CommandAlias` (`title`, `Command_namespace`) VALUES (:title, :namespace)");
+        $stmt->bindParam(":title", $alias, PDO::PARAM_STR);
+        $stmt->bindParam(":namespace", $namespace, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return 1 === $stmt->rowCount();
+    }
+
 }
