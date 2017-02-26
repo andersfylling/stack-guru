@@ -45,6 +45,7 @@ class Bot extends Database
 
         // Store commands to database
         // 
+        echo "Storing command namespaces to database";
         foreach ($this->cmdRegistry->getCommands() as $commandEntry) {
             $namespace      = $commandEntry->getFullName();
             $description    = $commandEntry->getDescription();
@@ -59,8 +60,10 @@ class Bot extends Database
                 $activated      = true;
 
                 $this->saveCommand($namespace, $description, $activated);
+                echo ".";
             }
         }
+        echo PHP_EOL;
 
         // Debug output
         if (true === DEVELOPMENT) {
