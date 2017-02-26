@@ -66,6 +66,29 @@ class Registry
         return $this->commandClasses;
     }
 
+    public function getCommandAliases(): array 
+    {
+        return $this->commandAliases;
+    }
+
+    public function addCommandAlias(string $alias, CommandEntry $entry) 
+    {
+        if (null === $entry || isset($this->commandAliases[$alias])) {
+            return;
+        }
+
+        return $this->commandAliases[$alias] = $entry;
+    }
+
+    public function getCommandFromAlias(string $alias): ?CommandEntry 
+    {
+        if (isset($this->commandAliases[$alias])) {
+            return $this->commandAliases[$alias];
+        }
+
+        return null;
+    }
+
     /**
      * Load all the commands in given folder(s) recursively.
      *

@@ -17,6 +17,7 @@ class Bot extends Database
 
     private $cmdRegistry;
     private $services;
+    private $cmdAliases;
 
 
     /**
@@ -65,15 +66,33 @@ class Bot extends Database
         }
         echo PHP_EOL;
 
-        // Get command details from datbase
-        // 
+        // Get command details from database
+        //
+        echo "Syncing command details with  database";
         foreach ($this->cmdRegistry->getCommands() as $commandEntry) {
             $info = $this->getCommandDetails($commandEntry->getFullName());
 
             $commandEntry->updateInfo($info);
-        }
 
-        var_dump($this->cmdRegistry->getCommands());
+            // also store each alias to an array for faster access
+            foreach($info["aliases"] as $alias) {
+                $this->cmdRegistry->addCommandAlias($alias, $commandEntry);
+            }
+
+            foreach ($commandEntry->getChildren() as $childEntry) {
+                $info = $this->getCommandDetails($childEntry->getFullName());
+
+                $childEntry->updateInfo($info);
+
+                // also store each alias to an array for faster access
+                foreach($info["aliases"] as $alias) {
+                    $this->cmdRegistry->addCommandAlias($alias, $childEntry);
+                }
+
+                echo ".";
+            }
+        }
+        echo PHP_EOL;
 
 
         // Debug output
