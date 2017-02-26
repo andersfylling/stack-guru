@@ -145,6 +145,22 @@ class Database
         $stmt->execute();
     }
 
+    final public function saveCommand(string $name, string $description, bool $activated) 
+    {
+        if ("" == $namespace) { 
+            return; 
+        }
+ 
+        // Add to DB 
+        $stmt = $this->db->prepare("INSERT IGNORE INTO `mydb`.`Command`(`namespace`, `description`, `activated`) VALUES(:namespace, :description, :activated)"); 
+
+        $stmt->bindParam(":namespace",      $namespace,     \PDO::PARAM_STR);
+        $stmt->bindParam(":description",    $description,   \PDO::PARAM_STR);
+        $stmt->bindParam(":activated",      $activated,     \PDO::PARAM_BOOL);
+
+        $stmt->execute();
+    }
+
 
     final public function doesServiceExist(string $title): bool 
     {
