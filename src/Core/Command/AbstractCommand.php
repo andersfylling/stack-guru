@@ -43,9 +43,18 @@ abstract class AbstractCommand implements CommandInterface
             return true;
         }
 
+        // if its not the alpha user, compare all the roles of the user to the roles linked to the command
+        // 
+        $permitted = false;
+        $cmdNamespace = $ctx->commandEntry->getFullName();
+        foreach ($ctx->message->author->roles as $roleid => $role) {
+            $permitted = $ctx->bot->commandHasRole($cmdNamespace, strval($roleid));
+            if ($permitted) {
+                break;
+            }
+        }
 
-
-        return false;
+        return $permitted;
     }
 
 

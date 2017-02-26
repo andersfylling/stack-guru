@@ -189,9 +189,32 @@ class Database
         return 1 === $stmt->rowCount();
     }
 
-    final public function getRoles(string $command) 
+    final public function getCommandRoles(string $namespace) 
     {
+        $stmt = $this->db->prepare("SELECT Role_id FROM `Command_has_Role` WHERE `Command_namespace` = :namespace");
+        $stmt->bindParam(":namespace", $namespace, PDO::PARAM_STR);
+        $stmt->execute();
 
+        $roleColumns = 0 === $stmt->rowCount() ? [] : $stmt->fetchAll(PDO::FETCH_NUM);
+
+        $roles = [];
+        foreach ($roleColumns as $roleRow) {
+            foreach ($roleRow as $role) {
+                $roles[] = $role;
+            }
+        }
+
+        return $roles;
+    }
+
+    final public function commandHasRole(string $namespace, string $roleid): bool
+    {
+        $stmt = $this->db->prepare("SELECT COUNT(`Role_id`) FROM Command_has_Role WHERE `Command_namespace` = :namespace AND `Role_id` = :roleid LIMIT 1");
+        $stmt->bindParam(":namespace", $namespace, PDO::PARAM_STR);
+        $stmt->bindParam(":roleid", $roleid, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return 1 == $stmt->fetchColumn();
     }
 
 

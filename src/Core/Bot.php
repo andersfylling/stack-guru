@@ -324,6 +324,7 @@ class Bot extends Database
         $context->message       = $message;
         $context->discord       = $this->discord;
         $context->parentCommand = $parentCmd;
+        $context->commandEntry  = $command;
 
         // Make sure that the user/member have permissions to use the command!
         if (!$instance->permitted($context)) {
