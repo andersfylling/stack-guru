@@ -65,6 +65,17 @@ class Bot extends Database
         }
         echo PHP_EOL;
 
+        // Get command details from datbase
+        // 
+        foreach ($this->cmdRegistry->getCommands() as $commandEntry) {
+            $info = $this->getCommandDetails($commandEntry->getFullName());
+
+            $commandEntry->updateInfo($info);
+        }
+
+        var_dump($this->cmdRegistry->getCommands());
+
+
         // Debug output
         if (true === DEVELOPMENT) {
             $commands = $this->cmdRegistry->getCommands();

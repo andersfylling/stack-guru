@@ -194,4 +194,24 @@ class Database
 
     }
 
+
+    final public function getCommandDetails(string $namespace) 
+    {
+        $stmt = $this->db->prepare("SELECT description, activated FROM `Command` WHERE `namespace` = :namespace LIMIT 1");
+        $stmt->bindParam(":namespace", $namespace, PDO::PARAM_STR);
+        $stmt->execute();
+        $content = $stmt->fetch(PDO::FETCH_ASSOC);
+        $content["activated"]   = 1 == $content["activated"] ? true : false;
+
+
+        $stmt = null;
+        $stmt = $this->db->prepare("SELECT title FROM `CommandAlias` WHERE `Command_namespace` = :namespace");
+        $stmt->bindParam(":namespace", $namespace, PDO::PARAM_STR);
+        $stmt->execute();
+
+        $content["aliases"]     = 0 === $stmt->rowCount() ? [] : $stmt->fetch(PDO::FETCH_NUM);
+
+        return $content;
+    }
+
 }

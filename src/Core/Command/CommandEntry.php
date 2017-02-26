@@ -17,6 +17,8 @@ class CommandEntry
     protected $relativeClass;
     protected $fqcn;
 
+    protected $info;
+
     protected $reflection; // \ReflectionClass
     protected $parent; // ?CommandEntry
     protected $children = []; // [ "name" => CommandEntry, ... ]
@@ -37,17 +39,80 @@ class CommandEntry
         $this->fqcn = $fqcn;
 
         $this->reflection = new \ReflectionClass($fqcn);
+
+        // This info can be changed in the future based on database content.
+        $this->info = [
+            "description" => $this->getDescription(),
+            "aliases" => [],
+            "activated" => true
+        ];
     }
 
 
     /**
+     * Setters to update info arr
+     */
+    public function setDescription(string $d) 
+    {
+        if ("" === $d) {
+            return;
+        }
+
+        $this->info["description"] = $d;
+    }
+
+    public function setActivated(bool $b) 
+    {
+        $this->info["activated"] = $b;
+    }
+
+    public function setAliases(array $a) 
+    {
+        $this->info["aliases"] = $a;
+    }
+
+    public function addAlias(string $a) 
+    {
+        $this->info["aliases"][] = $a;
+    }
+
+    public function removeAlias(string $a) 
+    {
+        if (!isset($this->info["aliases"][$a])) {
+            return;
+        }
+
+        unset($this->info["aliases"][$a]);
+    }
+
+
+    public function updateInfo(array $info) 
+    {
+        if (isset($info["description"])) {
+            $this->setDescription($info["description"]);
+        }
+
+        if (isset($info["activated"])) {
+            $this->setActivated($info["activated"]);
+        }
+
+        if (isset($info["aliases"])) {
+            $this->setAliases($info["aliases"]);
+        }
+    }
+
+    /**
      * Aliases for getting static properties from command classes.
      */
-
     public function getName(): string { return $this->fqcn::getName(); }
     public function getAliases(): array { return $this->fqcn::getAliases(); }
     public function getDescription(): string { return $this->fqcn::getDescription(); }
     public function getDefault(): ?string { return $this->fqcn::getDefault(); }
+
+
+    public function getInfoAliases(): array { return $this->info["description"]; }
+    public function getInfoDescription(): string { return $this->info["aliases"]; }
+    public function getInfoActivated(): string { return $this->info["activated"]; }
 
 
     /**
