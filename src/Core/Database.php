@@ -195,6 +195,18 @@ class Database
     }
 
 
+
+    final public function addCommandRole(string $namespace, string $roleid): bool 
+    {
+        $stmt = $this->db->prepare("INSERT INTO `mydb`.`Command_has_Role` (`Command_namespace`, `Role_id`) VALUES (:namespace, :roleid)");
+        $stmt->bindParam(":roleid", $roleid, PDO::PARAM_STR);
+        $stmt->bindParam(":namespace", $namespace, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return 1 === $stmt->rowCount();
+    }
+
+
     final public function getCommandDetails(string $namespace) 
     {
         $stmt = $this->db->prepare("SELECT description, activated FROM `Command` WHERE `namespace` = :namespace LIMIT 1");
@@ -225,6 +237,16 @@ class Database
     {
         $stmt = $this->db->prepare("INSERT IGNORE INTO `mydb`.`CommandAlias` (`title`, `Command_namespace`) VALUES (:title, :namespace)");
         $stmt->bindParam(":title", $alias, PDO::PARAM_STR);
+        $stmt->bindParam(":namespace", $namespace, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return 1 === $stmt->rowCount();
+    }
+
+    final public function updateCommandDescription(string $namespace, string $description): bool 
+    {
+        $stmt = $this->db->prepare("UPDATE IGNORE `mydb`.`Command` SET `description` = :description WHERE `namespace` = :namespace");
+        $stmt->bindParam(":description", $description, PDO::PARAM_STR);
         $stmt->bindParam(":namespace", $namespace, PDO::PARAM_STR);
         $stmt->execute();
 

@@ -56,7 +56,7 @@ class Help extends AbstractCommand
 
             // Description
             $helptext .= "# Description" . PHP_EOL;
-            $helptext .= "* {$subcommand->getDescription()}" . PHP_EOL . PHP_EOL;
+            $helptext .= "* {$subcommand->getInfoDescription()}" . PHP_EOL . PHP_EOL;
 
             // Sub commands
             self::showMainCommands($helptext, $ctx, $subcommand->getChildren(), $command);
@@ -82,7 +82,7 @@ class Help extends AbstractCommand
             self::showCommandUsage($helptext, [$command->getName()]);
 
             $helptext .= "# Description" . PHP_EOL;
-            $helptext .= "* {$command->getDescription()}" . PHP_EOL . PHP_EOL;
+            $helptext .= "* {$command->getInfoDescription()}" . PHP_EOL . PHP_EOL;
 
 
             // Print all subcommands
@@ -168,7 +168,7 @@ class Help extends AbstractCommand
             $cmdline .= sprintf(self::$printf2, "true");
 
             // Add command description
-            $description = $command->getDescription();
+            $description = $command->getInfoDescription();
             if (!empty($description)) {
                 $cmdline .= "{$description}";
             }
