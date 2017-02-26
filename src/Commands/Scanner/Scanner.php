@@ -42,6 +42,6 @@ class Scanner extends AbstractCommand
 
     public function getRoles(?CommandContext $ctx)
     {
-        return $ctx->discord->roles;
+        return $ctx->guild->roles;
     }
 }
