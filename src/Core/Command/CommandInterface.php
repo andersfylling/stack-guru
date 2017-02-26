@@ -17,5 +17,5 @@ interface CommandInterface
     public static function getDefault(): ?string;
 
     // Execute the command with the given query and context.
-    public function process(string $query, ?CommandContext $ctx): string;
+    public function process(string $query, CommandContext $ctx): string;
 }

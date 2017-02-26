@@ -19,13 +19,42 @@ abstract class AbstractCommand implements CommandInterface
     {
     }
 
+    /**
+     * Check if message author / sender has permission to use this command.
+     * 
+     * @return [bool] [Premitted to use this command]
+     */
+    final public function permitted(CommandContext $ctx): bool 
+    {
+        $author = $ctx->message->author;
+        $id = null;
+
+        if (isset($author["user"])) {
+            $id = $author->user->id;
+        }
+        else {
+            $id = $author->id;
+        }
+
+
+        // check for alpha user
+        //
+        if (DISCORD_MASTER_ID == $id) {
+            return true;
+        }
+
+
+
+        return false;
+    }
+
 
     /**
      * Abstract functions
      */
 
     // TODO: Show Help for command by default.
-    abstract public function process(string $query, ?CommandContext $ctx): string;
+    abstract public function process(string $query, CommandContext $ctx): string;
 
 
     /**

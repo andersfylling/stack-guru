@@ -258,6 +258,12 @@ class Bot extends Database
         $context->discord       = $this->discord;
         $context->parentCommand = $parentCmd;
 
+        // Make sure that the user/member have permissions to use the command!
+        if (!$instance->permitted($context)) {
+            Utils\Response::sendMessage("You do not have authorization.", $message);
+            return;
+        }
+
         // Run command and send a response if the return is not null.
         $response = $instance->process($query, $context);
         if (null !== $response && "" !== $response) {
