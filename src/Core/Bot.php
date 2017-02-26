@@ -196,6 +196,14 @@ class Bot extends Database
      */
     private function incoming(\Discord\Parts\Channel\Message $message, string $event)
     {
+        // if development display request
+        // 
+        
+        if (true === DEVELOPMENT) {
+            echo PHP_EOL, "Request: {$message->content}", PHP_EOL;
+        }
+
+
         // First BOTEVENT::ALL_MESSAGES
         {
             $this->runScripts(BotEvent::MESSAGE_ALL_I_SELF, $message, $event);
