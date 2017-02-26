@@ -65,7 +65,7 @@ class Database
 
 
 
-    public function saveUser(?\Discord\Parts\User\Member $member)
+    final public function saveUser(\Discord\Parts\User\Member $member)
     {
         if (null == $member) {
             return;
@@ -95,7 +95,7 @@ class Database
         ]);
 
         // add specifics about this user
-        $stmt = $this->db->prepare("INSERT INTO `mydb`.`UserName`(`id`, `User_discord_id`, `username`, `discriminator`, `avatar`, `bot`, `timestamp`) VALUES(NULL, :discord_id, :username, :discriminator, :avatar, :isBot, NULL)");
+        $stmt = $this->db->prepare("INSERT IGNORE INTO `mydb`.`UserName`(`id`, `User_discord_id`, `username`, `discriminator`, `avatar`, `bot`, `timestamp`) VALUES(NULL, :discord_id, :username, :discriminator, :avatar, :isBot, NULL)");
         $stmt->execute([
             ":discord_id" => $id,
             ":username" => $u->username,
@@ -111,43 +111,42 @@ class Database
 
     }
 
-    public function saveRole(){}
+    final public function saveRole(\Discord\Parts\Guild\Role $role) 
+    { 
+        // Anders verify cuse I thing we have misunderstood each other.. 
+ 
+        if (null == $role) { 
+            return; 
+        } 
+ 
+        // Roles 
+        $id             = $role->id; 
+        $name           = $role->name; 
+        $color          = $role->color; 
+        $managed        = $role->managed; 
+        $hoist          = $role->hoist; 
+        $position       = $role->position; 
+        $mentionable    = $role->mentionable; 
+        $permissions    = $role->permissions->bitwise; 
+ 
+ 
+        // Add to DB 
+        $stmt = $this->db->prepare("INSERT IGNORE INTO `mydb`.`Role`(`id`, `name`, `color`, `hoist`, `position`, `managed`, `mentionable`, `permissions`) VALUES(:id, :name, :color, :hoist, :position, :managed, :mentionable, :permissions)"); 
 
-    /**
-     * Store the guild id to database.
-     * This is then extracted on bot restart or boot time, to get correct guild object.
-     * 
-     * @return [bool] [True if successfully inserted.]
-     */
-    public function saveGuildID(string $guildid) : bool
-    {
-        // Remove all other entries
-        $stmt = $this->db->prepare("TRUNCATE TABLE Guild");
+        $stmt->bindParam(":id",             $id,            \PDO::PARAM_STR);
+        $stmt->bindParam(":name",           $name,          \PDO::PARAM_STR);
+        $stmt->bindParam(":color",          $color,         \PDO::PARAM_STR);
+        $stmt->bindParam(":hoist",          $hoist,         \PDO::PARAM_BOOL);
+        $stmt->bindParam(":position",       $position,      \PDO::PARAM_INT);
+        $stmt->bindParam(":managed",        $managed,       \PDO::PARAM_BOOL);
+        $stmt->bindParam(":mentionable",    $mentionable,   \PDO::PARAM_BOOL);
+        $stmt->bindParam(":permissions",    $permissions,   \PDO::PARAM_INT);
 
-
-        $stmt = $this->db->prepare("INSERT INTO `mydb`.`Guild` (`guild_id`) VALUES(:guild_id)");
-        $stmt->bindParam(":guild_id", $guildid);
-
-        // This does not log any potential errors.. whopsy.
-        // TODO: add error support.
-        return $stmt->execute(); // true on success.
-    }
-
-    public function getGuildID() : string 
-    {
-        $stmt = $this->db->prepare("SELECT * FROM Guild LIMIT 1"); // There will only be one entry, always unless someone ruins the script.
         $stmt->execute();
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (null == $row) {
-            return null;
-        }
-        else {
-            return $row["guild_id"];
-        }
     }
 
-    public function doesServiceExist(string $title): bool 
+
+    final public function doesServiceExist(string $title): bool 
     {
         $stmt = $this->db->prepare("SELECT COUNT(`title`) FROM `Service` WHERE `title` = :title LIMIT 1");
         $stmt->bindParam(":title", $title, PDO::PARAM_STR);
@@ -156,7 +155,7 @@ class Database
         return 1 == $stmt->fetchColumn();
     }
 
-    public function enableService(string $title): bool 
+    final public function enableService(string $title): bool 
     {
         $stmt = $this->db->prepare("INSERT IGNORE INTO `mydb`.`Service` (`title`) VALUES (:title)");
         $stmt->bindParam(":title", $title, PDO::PARAM_STR);
@@ -165,13 +164,18 @@ class Database
         return 1 === $stmt->rowCount();
     }
 
-    public function disableService(string $title): bool 
+    final public function disableService(string $title): bool 
     {
         $stmt = $this->db->prepare("DELETE IGNORE FROM `mydb`.`Service` WHERE `title` = :title");
         $stmt->bindParam(":title", $title, PDO::PARAM_STR);
         $stmt->execute();
 
         return 1 === $stmt->rowCount();
+    }
+
+    final public function getRoles(string $command) 
+    {
+
     }
 
 }
