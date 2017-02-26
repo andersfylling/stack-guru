@@ -13,7 +13,7 @@ class Help extends AbstractCommand
     protected static $name = "help";
     protected static $description = "returns a list of available bot commands";
 
-    private static $printf1 = "%-27s";
+    private static $printf1 = "%-28s";
     private static $printf2 = "%-10s";
 
 
@@ -34,26 +34,48 @@ class Help extends AbstractCommand
         if (isset($keys[1]) && isset($commands[$keys[0]]) && isset($commands[$keys[0]]->getChildren()[$keys[1]])) {
             $command = $commands[$keys[0]];
             $subcommand = $command->getChildren()[$keys[1]];
+            $alias = $subcommand->getInfoAliases();
+            $aliasSize = sizeof($alias);
 
 
+            // Command name
             $helptext .= "# Command name" . PHP_EOL;
             $helptext .= "* {$command->getName()} {$subcommand->getName()}" . PHP_EOL . PHP_EOL;
 
+            // Aliases
+            $helptext .= "# Command alias [{$aliasSize}]" . PHP_EOL;
+            foreach($alias as $a) {
+                $helptext .= "* {$a}" . PHP_EOL;
+            }
+            $helptext .= PHP_EOL;
+
+            // Usage example
             self::showCommandUsage($helptext, [$command->getName() . ' ' . $subcommand->getName()]);
 
+            // Description
             $helptext .= "# Description" . PHP_EOL;
             $helptext .= "* {$subcommand->getDescription()}" . PHP_EOL . PHP_EOL;
 
+            // Sub commands
             self::showMainCommands($helptext, $ctx, $subcommand->getChildren(), $command);
         } 
 
         // A main command
         else if (isset($keys[0]) && isset($commands[$keys[0]])) {
             $command = $commands[$keys[0]];
+            $alias = $command->getInfoAliases();
+            $aliasSize = sizeof($alias);
 
 
             $helptext .= "# Command name" . PHP_EOL;
             $helptext .= "* {$command->getName()}" . PHP_EOL . PHP_EOL;
+
+            // Aliases
+            $helptext .= "# Command alias [{$aliasSize}]" . PHP_EOL;
+            foreach($alias as $a) {
+                $helptext .= "* {$a}" . PHP_EOL;
+            }
+            $helptext .= PHP_EOL;
 
             self::showCommandUsage($helptext, [$command->getName()]);
 

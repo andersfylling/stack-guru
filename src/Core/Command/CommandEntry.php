@@ -110,9 +110,9 @@ class CommandEntry
     public function getDefault(): ?string { return $this->fqcn::getDefault(); }
 
 
-    public function getInfoAliases(): array { return $this->info["description"]; }
-    public function getInfoDescription(): string { return $this->info["aliases"]; }
-    public function getInfoActivated(): string { return $this->info["activated"]; }
+    public function getInfoAliases(): array { return $this->info["aliases"]; }
+    public function getInfoDescription(): string { return $this->info["description"]; }
+    public function getInfoActivated(): bool { return $this->info["activated"]; }
 
 
     /**
