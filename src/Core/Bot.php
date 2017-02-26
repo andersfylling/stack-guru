@@ -43,6 +43,25 @@ class Bot extends Database
         $this->cmdRegistry = new \StackGuru\Core\Command\Registry();
         $this->cmdRegistry->loadCommandFolder($options["commands"]["namespace"], $options["commands"]["folder"]);
 
+        // Store commands to database
+        // 
+        foreach ($this->cmdRegistry->getCommands() as $commandEntry) {
+            $namespace      = $commandEntry->getFullName();
+            $description    = $commandEntry->getDescription();
+            $activated      = true;
+
+            $this->saveCommand($namespace, $description, $activated);
+
+
+            foreach ($commandEntry->getChildren() as $childEntry) {
+                $namespace      = $childEntry->getFullName();
+                $description    = $childEntry->getDescription();
+                $activated      = true;
+
+                $this->saveCommand($namespace, $description, $activated);
+            }
+        }
+
         // Debug output
         if (true === DEVELOPMENT) {
             $commands = $this->cmdRegistry->getCommands();

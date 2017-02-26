@@ -55,7 +55,8 @@ class CommandEntry
      */
 
     public function getNamespace(): string { return $this->namespace; }
-    public function getRelativeClass(): string { $this->relativeClass; }
+    public function getRelativeClass(): string { return $this->relativeClass; }
+    public function getFullName(): string { return $this->namespace . "\\" . $this->relativeClass; }
     public function getClass(): string { return $this->fqcn; }
     public function getCommandDepth(): int
     {

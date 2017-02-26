@@ -145,9 +145,9 @@ class Database
         $stmt->execute();
     }
 
-    final public function saveCommand(string $name, string $description, bool $activated) 
+    final public function saveCommand(string $namespace, string $description, bool $activated) 
     {
-        if ("" == $namespace) { 
+        if ("" == $namespace || "" == $description || null == $activated) { 
             return; 
         }
  
