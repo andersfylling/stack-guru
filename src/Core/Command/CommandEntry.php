@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace StackGuru\Core\Command;
 
 use StackGuru\Core\Utils;
+use StackGuru\Core\Command\CommandContext;
 
 
 /**
@@ -110,6 +111,7 @@ class CommandEntry
     public function getAliases(): array { return $this->fqcn::getAliases(); }
     public function getDescription(): string { return $this->fqcn::getDescription(); }
     public function getDefault(): ?string { return $this->fqcn::getDefault(); }
+    public function hasPermission(CommandContext $ctx): bool { return $this->fqcn::permitted($ctx); }
 
 
     public function getInfoAliases(): array { return $this->info["aliases"]; }

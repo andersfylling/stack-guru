@@ -137,7 +137,7 @@ class Help extends AbstractCommand
         $helptext .= PHP_EOL;
     }
 
-    private static function showMainCommands(string &$helptext, ?CommandContext $ctx, $commands, $parentCommand = null) : void 
+    private static function showMainCommands(string &$helptext, CommandContext $ctx, $commands, $parentCommand = null) : void 
     {
         $nr = sizeof($commands);
 
@@ -153,7 +153,10 @@ class Help extends AbstractCommand
 
         // Print all commands
         foreach ($commands as $name => $command) {
-            $commandTree = self::getCommandTreeString($command);
+            $ctx->commandEntry = $command;
+            if (!$command->hasPermission($ctx)) {
+                continue;
+            }
 
             // Print command with subcommand tree
             if (null === $parentCommand) {
