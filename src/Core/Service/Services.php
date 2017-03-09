@@ -62,6 +62,11 @@ class Services
 		return $entry;
 	}
 
+	public function getAll(): array
+	{
+		return $this->services;
+	}
+
 	public function get(string $name): ?ServiceEntry 
 	{
 		if (null === $name) {
