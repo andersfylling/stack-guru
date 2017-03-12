@@ -20,7 +20,7 @@ use StackGuru\Core\Utils;
 class Role extends AbstractCommand
 {
     protected static $name = "role";
-    protected static $description = "something about the shutdown command";
+    protected static $description = "Handle what commands can be run by what roles.";
 
 
     public function process(string $query, ?CommandContext $ctx): string
@@ -67,8 +67,12 @@ class Role extends AbstractCommand
         $command = $cmdArr["command"];
 
         $roles = explode(' ', $cmdArr["query"]); // get all words after the command
-        $counter = 0;
+        $counterRoles = 0;
+        $counterCommands = 0;
         foreach ($roles as $role) {
+            //incase of multiple roles, reset the command counter..
+            $counterCommands = 0;
+
             //check if role is valid
             $output = [];
             preg_match('~<@&(.*?)>~', $role, $output);
@@ -90,11 +94,50 @@ class Role extends AbstractCommand
             }
 
             // ok, add role for command to database.
-            if ($add && $ctx->bot->addCommandRole($command->getFullName(), $roleid)) {
-                $counter++;
+            if ($add) {
+                if ($family) {
+
+                    $children = []; // BUGGY.... if subcommands can have sub commands.. which they kinda should.
+                    if (0 == sizeof($command->getChildren())) {
+                        $children = $command->getParent()->getChildren();
+
+
+                        // also add access to the parent command..
+                        if ($ctx->bot->addCommandRole($command->getParent()->getFullName(), $roleid)) {
+                            $counterCommands++;
+                        }
+
+                        foreach ($children as $childName => $child) {
+                            if ("*RECURSION*" == $child) {
+                                $children[$childName] = $command; // remove *RECURSION* value..
+                                break; // there will only be one.
+                            }
+                        }
+                    }
+                    else {
+                        $children = $command->getChildren();
+                    }
+
+                    foreach ($children as $cmdName => $cmd) {
+                        if ("*RECURSION*" == $cmd || null == $cmd) {
+                            continue;
+                        }
+
+                        if ($ctx->bot->addCommandRole($cmd->getFullName(), $roleid)) {
+                            $counterCommands++;
+                        }
+                    }
+                    $counterRoles++;
+                }
+
+                // also add access to the default command..
+                else if ($ctx->bot->addCommandRole($command->getFullName(), $roleid)) {
+                    $counterRoles++;
+                }
+
             }
         }
 
-    	return "Gave {$counter} access to the command.";
+    	return "Gave {$counterRoles} roles access to {$counterCommands} commands.";
     }
 }

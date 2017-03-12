@@ -221,7 +221,7 @@ class Database
 
     final public function addCommandRole(string $namespace, string $roleid): bool 
     {
-        $stmt = $this->db->prepare("INSERT INTO `mydb`.`Command_has_Role` (`Command_namespace`, `Role_id`) VALUES (:namespace, :roleid)");
+        $stmt = $this->db->prepare("INSERT IGNORE INTO `mydb`.`Command_has_Role` (`Command_namespace`, `Role_id`) VALUES (:namespace, :roleid)");
         $stmt->bindParam(":roleid", $roleid, PDO::PARAM_STR);
         $stmt->bindParam(":namespace", $namespace, PDO::PARAM_STR);
         $stmt->execute();
