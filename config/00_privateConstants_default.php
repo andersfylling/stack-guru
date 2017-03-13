@@ -4,7 +4,8 @@
 //
 
 // const ST_DISCORD_SETTINGS 	= [
-// 	"token" 	=> ""
+// 	"token" 	=> "",
+//  "logging"	=> false
 // ];
 
 // const ST_DATABASE_SETTINGS 	= [
