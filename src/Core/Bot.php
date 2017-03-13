@@ -6,6 +6,7 @@ namespace StackGuru\Core;
 use \Discord\Discord;
 use \Discord\WebSockets\Event as DiscordEvent;
 use StackGuru\Core\Utils;
+use \Discord\Parts\Channel\Message as Message;
 
 class Bot extends Database
 {
@@ -138,9 +139,9 @@ class Bot extends Database
         $messageEvents = [
             DiscordEvent::MESSAGE_CREATE,
             DiscordEvent::MESSAGE_UPDATE, // disabled due to errors in Discord
-            DiscordEvent::MESSAGE_DELETE,
-            DiscordEvent::MESSAGE_DELETE_BULK
         ];
+
+        // DiscordEvent::MESSAGE_DELETE, only returns a string $id for the message.
 
         // When the app is ready, listen for messages.
         $this->discord->on("ready", function (Discord $self) use ($messageEvents) {
@@ -156,17 +157,39 @@ class Bot extends Database
 
             // Handle message events
             // 
-            foreach ($messageEvents as $event) {
-                $self->on($event, function (\Discord\Parts\Channel\Message $message) use ($event) {
-                    // Discord has it's own exception handler, so we have to catch exceptions from
-                    // our message handler ourselves.
-                    try {
-                        $this->incoming($message, $event);
-                    } catch (\Throwable $e) {
-                        echo $e, PHP_EOL;
-                    }
-                });
-            }
+
+            // New message
+            $self->on(DiscordEvent::MESSAGE_CREATE, function (Message $msg) {
+                // Discord has it's own exception handler, so we have to catch exceptions from
+                // our message handler ourselves.
+                try {
+                    $this->incoming(DiscordEvent::MESSAGE_CREATE, $msg->id, $msg);
+                } catch (\Throwable $e) {
+                    echo $e, PHP_EOL;
+                }
+            });
+
+            // Updated message
+            $self->on(DiscordEvent::MESSAGE_UPDATE, function (Message $newMsg, Message $oldMsg) {
+                // Discord has it's own exception handler, so we have to catch exceptions from
+                // our message handler ourselves.
+                try {
+                    $this->incoming(DiscordEvent::MESSAGE_UPDATE, $newMsg->id, $newMsg, $oldMsg);
+                } catch (\Throwable $e) {
+                    echo $e, PHP_EOL;
+                }
+            });
+
+            // Deleted message
+            $self->on(DiscordEvent::MESSAGE_DELETE, function (String $msgId) {
+                // Discord has it's own exception handler, so we have to catch exceptions from
+                // our message handler ourselves.
+                try {
+                    $this->incoming(DiscordEvent::MESSAGE_DELETE, $msgId);
+                } catch (\Throwable $e) {
+                    echo $e, PHP_EOL;
+                }
+            });
         });
 
 
@@ -201,19 +224,19 @@ class Bot extends Database
      *
      * @param \Discord\Parts\Channel\Message $message
      */
-    private function incoming(\Discord\Parts\Channel\Message $message, string $event)
+    private function incoming(string $event, string $msgId, ?Message $message = null, ?Message $oldMessage = null)
     {
         // if development display request
         // 
         
-        if (true === DEVELOPMENT) {
+        if (true === DEVELOPMENT && null !== $message) {
             echo PHP_EOL, "Request: {$message->content}", PHP_EOL;
         }
 
 
         // First BOTEVENT::ALL_MESSAGES
         {
-            $this->runScripts(BotEvent::MESSAGE_ALL_I_SELF, $message, $event);
+            $this->runScripts(BotEvent::MESSAGE_ALL_I_SELF, $event, $msgId, $message, $oldMessage);
         }
 
         // This checks if the message written is by this bot itself: AKA self.
@@ -223,11 +246,11 @@ class Bot extends Database
         // Initiate the BOTEVENT::ALL_MESSAGES_E_SELF
         {
             if ($message->author->id == $this->discord->id) {
-                $this->runScripts(BotEvent::MESSAGE_FROM_SELF, $message, $event);
+                $this->runScripts(BotEvent::MESSAGE_FROM_SELF, $event, $msgId, $message, $oldMessage);
                 return;
             }
 
-            $this->runScripts(BotEvent::MESSAGE_ALL_E_SELF, $message, $event);
+            $this->runScripts(BotEvent::MESSAGE_ALL_E_SELF, $event, $msgId, $message, $oldMessage);
         }
 
         // Check if anyone is contacting the bot / SELF
@@ -267,7 +290,7 @@ class Bot extends Database
                 //
                 // If so, exit this function.
                 if (!$referenced) {
-                    $this->runScripts(BotEvent::MESSAGE_ALL_E_COMMAND, $message, $event);
+                    $this->runScripts(BotEvent::MESSAGE_ALL_E_COMMAND, $event, $msgId, $message, $oldMessage);
                     return;
                 }
 
@@ -280,7 +303,7 @@ class Bot extends Database
             $message->channel->broadcastTyping();
 
             // The incoming message is for the bot.
-            $this->runScripts(BotEvent::MESSAGE_OTHERS_TO_SELF, $message, $event);
+            $this->runScripts(BotEvent::MESSAGE_OTHERS_TO_SELF, $event, $msgId, $message, $oldMessage);
         }
 
 
@@ -392,14 +415,14 @@ class Bot extends Database
      *
      * @param string $state
      */
-    private function runScripts(string $state, \Discord\Parts\Channel\Message $message, string $event)
+    private function runScripts(string $state, string $event, string $msgId, ?Message $message = null, ?Message $oldMessage = null)
     {
         if (!isset($this->callbacks[$state])) {
             return;
         }
 
         foreach ($this->callbacks[$state] as &$e) {// ($i = sizeof($arr) - 1; $i >= 0; $i -= 1) {
-            call_user_func_array($e, [$message, $event]);
+            call_user_func_array($e, [$event, $msgId, $message, $oldMessage]);
             //call_user_func_array($this->callbacks[$state][$i], [$message, $event]);
         }
     }

@@ -5,6 +5,8 @@ namespace StackGuru\Services;
 use \StackGuru\Core\Service\AbstractService;
 use \StackGuru\Core\Command\CommandContext;
 use StackGuru\Core\Utils;
+use \Discord\WebSockets\Event as DiscordEvent;
+use \Discord\Parts\Channel\Message as Message;
 
 class NZT extends AbstractService
 {
@@ -18,7 +20,7 @@ class NZT extends AbstractService
 		return "";
 	}
 
-	final public function response(\Discord\Parts\Channel\Message $message, string $event)
+	final public function response(string $event, string $msgId, ?Message $message = null, ?Message $oldMessage = null)
 	{
 		if (null !== $message->content && strpos(strtolower($message->content), "nzt") !== false) {
 	        $rudeNZTResponses = [
