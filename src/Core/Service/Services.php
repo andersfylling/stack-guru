@@ -14,8 +14,6 @@ class Services
 	public function __construct() 
 	{
 		$this->services = [];
-
-		echo "loaded services";
 	}
 
 	public function loadServicesFolder(string $namespace, string $path, CommandContext $ctx) : void 

@@ -107,9 +107,12 @@ class Bot extends Database
         if (true === DEVELOPMENT) {
             $commands = $this->cmdRegistry->getCommands();
             echo "Loaded ", sizeof($commands), " commands:", PHP_EOL;
+
+            $mask = "%-20s %s \n";
+            printf($mask, "Name", "Subcommands");
             foreach ($commands as $name => $command) {
                 $subcommands = array_keys($command->getChildren());
-                echo " * ", $name, " [", implode(", ", $subcommands), "]", PHP_EOL;
+                printf($mask, " * " . $name, "[" . implode(", " , $subcommands) . "]");
             }
             echo PHP_EOL;
         }
@@ -125,6 +128,21 @@ class Bot extends Database
         $serviceCtx->parentCommand = null;
         $this->services = new \StackGuru\Core\Service\Services();
         $this->services->loadServicesFolder($options["services"]["namespace"], $options["services"]["folder"], $serviceCtx);
+
+
+        // Debug output
+        if (true === DEVELOPMENT) {
+            $services = $this->services->getAll();
+            echo "Loaded ", sizeof($services), " services:", PHP_EOL;
+
+            $mask = "%-20s %s \n";
+            printf($mask, "Name", "Status");
+            foreach ($services as $name => $srv) {
+                $status = "{\"enabled\":".($srv->isEnabled($serviceCtx)?"true":"false").", \"running\":".($srv->running()?"true":"false")."}";
+                printf($mask, " * " . $name, $status);
+            }
+            echo PHP_EOL;
+        }
 
         // Set up a discord instance
         $this->discord = new Discord($options["discord"]);
@@ -146,10 +164,24 @@ class Bot extends Database
         // When the app is ready, listen for messages.
         $this->discord->on("ready", function (Discord $self) use ($messageEvents) {
 
+            if (true === DEVELOPMENT) {
+                echo "... OK!", PHP_EOL;
+            }
+
             // Add bot status
             // 
+            if (true === DEVELOPMENT) {
+                echo "Setting bot status to `!help`.";
+            }
             $game = $this->discord->factory(\Discord\Parts\User\Game::class, ["name" => "!help"]);
-            $this->discord->updatePresence($game, false);
+            if (true === DEVELOPMENT) {
+                echo '.';
+            }
+            $this->discord->updatePresence($game, false);            
+            if (true === DEVELOPMENT) {
+                echo ". OK!", PHP_EOL;
+            }
+
 
             // Start services
             //
@@ -157,6 +189,9 @@ class Bot extends Database
 
             // Handle message events
             // 
+            if (true === DEVELOPMENT) {
+                echo "Adding bot listeners";
+            }
 
             // New message
             $self->on(DiscordEvent::MESSAGE_CREATE, function (Message $msg) {
@@ -164,6 +199,10 @@ class Bot extends Database
                 // our message handler ourselves.
                 try {
                     $this->incoming(DiscordEvent::MESSAGE_CREATE, $msg->id, $msg);
+
+                    if (true === DEVELOPMENT) {
+                        echo '.';
+                    }
                 } catch (\Throwable $e) {
                     echo $e, PHP_EOL;
                 }
@@ -175,6 +214,9 @@ class Bot extends Database
                 // our message handler ourselves.
                 try {
                     $this->incoming(DiscordEvent::MESSAGE_UPDATE, $newMsg->id, $newMsg, $oldMsg);
+                    if (true === DEVELOPMENT) {
+                        echo '.';
+                    }
                 } catch (\Throwable $e) {
                     echo $e, PHP_EOL;
                 }
@@ -186,19 +228,32 @@ class Bot extends Database
                 // our message handler ourselves.
                 try {
                     $this->incoming(DiscordEvent::MESSAGE_DELETE, $msgId);
+                    if (true === DEVELOPMENT) {
+                        echo '.';
+                    }
                 } catch (\Throwable $e) {
                     echo $e, PHP_EOL;
                 }
             });
+
+
+
+            if (true === DEVELOPMENT) {
+                echo "... OK!", PHP_EOL;
+            }
+
+
+            if (true === DEVELOPMENT) {
+                echo "Bot is now running!", PHP_EOL, "---", PHP_EOL, PHP_EOL;
+            }
         });
 
 
         // Run!
-        try {
-            $this->discord->run();
-        } catch (\Throwable $e) {
-            echo $e, PHP_EOL;
+        if (true === DEVELOPMENT) {
+            echo "Starting DiscordPHP service";
         }
+        $this->discord->run();
     }
 
     /**
