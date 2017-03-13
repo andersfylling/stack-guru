@@ -12,7 +12,7 @@ use StackGuru\Core\Utils;
 class Description extends AbstractCommand
 {
     protected static $name = "description";
-    protected static $description = "Stops a service";
+    protected static $description = "Update the database description for a command.";
 
 
     public function process(string $query, ?CommandContext $ctx): string

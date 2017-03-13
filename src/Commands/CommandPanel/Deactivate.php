@@ -12,7 +12,7 @@ use StackGuru\Core\Utils;
 class Deactivate extends AbstractCommand
 {
     protected static $name = "deactivate";
-    protected static $description = "Disable a service so it won't run at boot";
+    protected static $description = "Deactivates a command so it can't be run";
 
 
     public function process(string $query, ?CommandContext $ctx): string

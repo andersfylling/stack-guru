@@ -18,7 +18,7 @@ use StackGuru\Core\Utils;
 class Alias extends AbstractCommand
 {
     protected static $name = "alias";
-    protected static $description = "Starts a service";
+    protected static $description = "Add an alias for a command. `!cp alias add <command> <alias>`";
 
 
     public function process(string $query, ?CommandContext $ctx): string

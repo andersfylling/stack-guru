@@ -20,7 +20,7 @@ use StackGuru\Core\Utils;
 class Role extends AbstractCommand
 {
     protected static $name = "role";
-    protected static $description = "Handle what commands can be run by what roles.";
+    protected static $description = "Determine what roles can use which commands";
 
 
     public function process(string $query, ?CommandContext $ctx): string
