@@ -5,6 +5,8 @@ namespace StackGuru\Core\Service;
 
 use StackGuru\Core\Utils\Reflection;
 use StackGuru\Core\Command\CommandContext;
+use \Discord\WebSockets\Event as DiscordEvent;
+use \Discord\Parts\Channel\Message as Message;
 
 /**
  * To start, stop, restart or get status about a service; Use the known linux command syntax from systemctl:
@@ -97,7 +99,7 @@ abstract class AbstractService implements ServiceInterface
     /**
      * Abstract functions
      */
-    abstract public function response(\Discord\Parts\Channel\Message $message, string $event);
+    abstract public function response(string $event, string $msgId, ?Message $message = null, ?Message $oldMessage = null);
 
 
 
