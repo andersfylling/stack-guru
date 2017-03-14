@@ -291,19 +291,26 @@ class Bot extends Database
         // create service context
         $serviceCtx = new CommandContext();
         $serviceCtx->bot           = $this;
-        $serviceCtx->guild         = $message->channel->guild;
+        $serviceCtx->guild         = null === $message ? null : $message->channel->guild;
         $serviceCtx->cmdRegistry   = $this->cmdRegistry;       
         $serviceCtx->services      = $this->services;
         $serviceCtx->message       = $message;
         $serviceCtx->discord       = $this->discord;
         $serviceCtx->parentCommand = null;
 
-        //var_dump($message->channel);
-
 
         // First BOTEVENT::ALL_MESSAGES
-        {
-            $this->runScripts(BotEvent::MESSAGE_ALL_I_SELF, $event, $msgId, $message, $serviceCtx);
+        $this->runScripts(BotEvent::MESSAGE_ALL_I_SELF, $event, $msgId, $message, $serviceCtx);
+
+        // If the event is MESSAGE_DELETE, don't continue as we only get a msg id.
+        if (DiscordEvent::MESSAGE_DELETE === $event) {
+            $this->runScripts(BotEvent::MESSAGE_DELETED, $event, $msgId, $message, $serviceCtx);
+            return;
+        }
+
+        // If the message is null, don't continue..
+        if (null === $message) {
+            return;
         }
 
         // This checks if the message written is by this bot itself: AKA self.

@@ -312,7 +312,7 @@ class Database
         return 1 === $stmt->rowCount();
     }
 
-    final public function chatlog_saveMessage(string $id, string $channel_id, string $user_id, bool $deleted = false) 
+    final public function chatlog_saveMessage(string $id, string $channel_id, string $user_id, bool $deleted = false): bool
     {
         // INSERT INTO `mydb`.`Message`
         // (`id`,
@@ -337,7 +337,7 @@ class Database
         return 1 === $stmt->rowCount();
     }
 
-    final public function chatlog_saveMessageContent(string $content, string $message_id) 
+    final public function chatlog_saveMessageContent(string $content, string $message_id): bool
     {
         // INSERT INTO `mydb`.`MessageContent`
         // (`content`,
@@ -356,7 +356,15 @@ class Database
         return 1 === $stmt->rowCount();
     }
 
-    final public function chatlog_updateMessage() {}
+    final public function chatlog_updateMessage(string $id, bool $deleted = false): bool
+    {
+        $stmt = $this->db->prepare("UPDATE `mydb`.`Message` SET `deleted` = :del WHERE `id` = :id");
+        $stmt->bindParam(":id",     $id,      PDO::PARAM_STR);
+        $stmt->bindParam(":del",    $deleted, PDO::PARAM_BOOL);
+        $stmt->execute();
+
+        return 1 === $stmt->rowCount();
+    }
     final public function chatlog_updateMessageContent() {}
 
     final public function chatlog_deleteMessage() {}

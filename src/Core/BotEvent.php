@@ -17,4 +17,6 @@ abstract class BotEvent
     const MESSAGE_FROM_SELF         	= "message_self";               	// SELF         	-> *
     const MESSAGE_SELF_TO_SELF      	= "message_self_to_self";       	// SELF         	-> SELF
     const MESSAGE_OTHERS_TO_SELF    	= "message_others_to_self";     	// *            	-> SELF
+
+    const MESSAGE_DELETED				= "message_was_deleted";			// when someone deletes their message.
 }

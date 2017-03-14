@@ -22,32 +22,34 @@ class Chatlog extends AbstractService
 
 	final public function response(string $event, string $msgId, ?Message $message = null, CommandContext $serviceCtx)
 	{
+
 		// ignore private messaging
-		if ($message->channel->is_private) {
+		if ($message !== null && $message->channel->is_private) {
 			return;
 		}
 
 		// If this channel can't be logged, ignore it.
-		if (!$serviceCtx->bot->chatlog_loggableChannel($message->channel_id)) {
+		if ($message !== null && !$serviceCtx->bot->chatlog_loggableChannel($message->channel_id)) {
 			return;
 		}
 
 
 		// new message
-		if (DiscordEvent::MESSAGE_CREATE == $event) {
+		if ($message !== null && DiscordEvent::MESSAGE_CREATE == $event) {
 			if ($serviceCtx->bot->chatlog_saveMessage($msgId, $message->channel_id, $message->author->id)) {
 				$serviceCtx->bot->chatlog_saveMessageContent($message->content, $message->id);
 			}
 		}
 
 		// updated message
-		else if (DiscordEvent::MESSAGE_UPDATE == $event) {
-			// chatlog_updateMessageContent(...)
+		else if ($message !== null && DiscordEvent::MESSAGE_UPDATE == $event) {
+			$serviceCtx->bot->chatlog_saveMessageContent($message->content, $message->id);
 		}
 
 		// deleted message
-		else if (DiscordEvent::MESSAGE_DELETE == $event) {
-			// chatlog_updateMessageContent(...)
+		else if ($message === null && DiscordEvent::MESSAGE_DELETE == $event) {
+			$deleted = true;
+			$serviceCtx->bot->chatlog_updateMessage($msgId, $deleted);
 		}
 	}
 }
