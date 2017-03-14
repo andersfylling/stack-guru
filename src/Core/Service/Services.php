@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace StackGuru\Core\Service;
 
 use StackGuru\Core\Utils;
-use StackGuru\Core\Command\CommandContext;
+use StackGuru\Core\Command\CommandContext as CommandContext;
 
 // Object to hold all services
 class Services

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace StackGuru\Services;
 use \StackGuru\Core\Service\AbstractService;
-use \StackGuru\Core\Command\CommandContext;
+use StackGuru\Core\Command\CommandContext as CommandContext;
 use StackGuru\Core\Utils;
 use \Discord\WebSockets\Event as DiscordEvent;
 use \Discord\Parts\Channel\Message as Message;
@@ -20,7 +20,7 @@ class Chatlog extends AbstractService
 		return "";
 	}
 
-	final public function response(string $event, string $msgId, ?Message $message = null, ?Message $oldMessage = null)
+	final public function response(string $event, string $msgId, ?Message $message = null, CommandContext $serviceCtx)
 	{
 		// new message
 		if (DiscordEvent::MESSAGE_CREATE == $event) {

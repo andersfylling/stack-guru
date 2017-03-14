@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace StackGuru\Services;
 use \StackGuru\Core\Service\AbstractService;
-use \StackGuru\Core\Command\CommandContext;
+use StackGuru\Core\Command\CommandContext as CommandContext;
 use StackGuru\Core\Utils;
 use \Discord\WebSockets\Event as DiscordEvent;
 use \Discord\Parts\Channel\Message as Message;
@@ -25,7 +25,7 @@ class SpanishCommands extends AbstractService
 		return null !== $msg && '¡' == \StackGuru\Core\Utils\StringParser::getCharAt(0, $msg);
 	}
 
-	final public function response(string $event, string $msgId, ?Message $message = null, ?Message $oldMessage = null)
+	final public function response(string $event, string $msgId, ?Message $message = null, CommandContext $serviceCtx)
 	{
 		if (!$this->qualified($message->content)) {
 			return;

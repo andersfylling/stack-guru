@@ -7,6 +7,7 @@ use \Discord\Discord;
 use \Discord\WebSockets\Event as DiscordEvent;
 use StackGuru\Core\Utils;
 use \Discord\Parts\Channel\Message as Message;
+use StackGuru\Core\Command\CommandContext as CommandContext;
 
 class Bot extends Database
 {
@@ -118,14 +119,13 @@ class Bot extends Database
         }
 
         // load services
-        $serviceCtx = new \StackGuru\Core\Command\CommandContext();
+        $serviceCtx = new CommandContext();
         $serviceCtx->bot           = $this;
         $serviceCtx->guild         = null;
         $serviceCtx->cmdRegistry   = null;        
         $serviceCtx->services      = null;
         $serviceCtx->message       = null;
         $serviceCtx->discord       = null;
-        $serviceCtx->parentCommand = null;
         $this->services = new \StackGuru\Core\Service\Services();
         $this->services->loadServicesFolder($options["services"]["namespace"], $options["services"]["folder"], $serviceCtx);
 
@@ -194,7 +194,7 @@ class Bot extends Database
             }
 
             // New message
-            $self->on(DiscordEvent::MESSAGE_CREATE, function (Message $msg) {
+            $self->on(DiscordEvent::MESSAGE_CREATE, function (Message $msg, $discordObj = null) {
                 // Discord has it's own exception handler, so we have to catch exceptions from
                 // our message handler ourselves.
                 try {
@@ -209,11 +209,11 @@ class Bot extends Database
             });
 
             // Updated message
-            $self->on(DiscordEvent::MESSAGE_UPDATE, function (Message $newMsg, Message $oldMsg) {
+            $self->on(DiscordEvent::MESSAGE_UPDATE, function (Message $msg, $discordObj = null) {
                 // Discord has it's own exception handler, so we have to catch exceptions from
                 // our message handler ourselves.
                 try {
-                    $this->incoming(DiscordEvent::MESSAGE_UPDATE, $newMsg->id, $newMsg, $oldMsg);
+                    $this->incoming(DiscordEvent::MESSAGE_UPDATE, $msg->id, $msg);
                     if (true === DEVELOPMENT) {
                         echo '.';
                     }
@@ -279,7 +279,7 @@ class Bot extends Database
      *
      * @param \Discord\Parts\Channel\Message $message
      */
-    private function incoming(string $event, string $msgId, ?Message $message = null, ?Message $oldMessage = null)
+    private function incoming(string $event, string $msgId, ?Message $message = null)
     {
         // if development display request
         // 
@@ -288,10 +288,20 @@ class Bot extends Database
             echo PHP_EOL, "Request: {$message->content}", PHP_EOL;
         }
 
+        // create service context
+        $serviceCtx = new CommandContext();
+        $serviceCtx->bot           = $this;
+        $serviceCtx->guild         = $message->channel->guild;
+        $serviceCtx->cmdRegistry   = $this->cmdRegistry;       
+        $serviceCtx->services      = $this->services;
+        $serviceCtx->message       = $message;
+        $serviceCtx->discord       = $this->discord;
+        $serviceCtx->parentCommand = null;
+
 
         // First BOTEVENT::ALL_MESSAGES
         {
-            $this->runScripts(BotEvent::MESSAGE_ALL_I_SELF, $event, $msgId, $message, $oldMessage);
+            $this->runScripts(BotEvent::MESSAGE_ALL_I_SELF, $event, $msgId, $message, $serviceCtx);
         }
 
         // This checks if the message written is by this bot itself: AKA self.
@@ -301,11 +311,11 @@ class Bot extends Database
         // Initiate the BOTEVENT::ALL_MESSAGES_E_SELF
         {
             if ($message->author->id == $this->discord->id) {
-                $this->runScripts(BotEvent::MESSAGE_FROM_SELF, $event, $msgId, $message, $oldMessage);
+                $this->runScripts(BotEvent::MESSAGE_FROM_SELF, $event, $msgId, $message, $serviceCtx);
                 return;
             }
 
-            $this->runScripts(BotEvent::MESSAGE_ALL_E_SELF, $event, $msgId, $message, $oldMessage);
+            $this->runScripts(BotEvent::MESSAGE_ALL_E_SELF, $event, $msgId, $message, $serviceCtx);
         }
 
         // Check if anyone is contacting the bot / SELF
@@ -345,7 +355,7 @@ class Bot extends Database
                 //
                 // If so, exit this function.
                 if (!$referenced) {
-                    $this->runScripts(BotEvent::MESSAGE_ALL_E_COMMAND, $event, $msgId, $message, $oldMessage);
+                    $this->runScripts(BotEvent::MESSAGE_ALL_E_COMMAND, $event, $msgId, $message, $serviceCtx);
                     return;
                 }
 
@@ -358,7 +368,7 @@ class Bot extends Database
             $message->channel->broadcastTyping();
 
             // The incoming message is for the bot.
-            $this->runScripts(BotEvent::MESSAGE_OTHERS_TO_SELF, $event, $msgId, $message, $oldMessage);
+            $this->runScripts(BotEvent::MESSAGE_OTHERS_TO_SELF, $event, $msgId, $message, $serviceCtx);
         }
 
 
@@ -394,7 +404,7 @@ class Bot extends Database
 
         // Build command context so the command has references back to the bot
         // and other commands.
-        $context                = new \StackGuru\Core\Command\CommandContext();
+        $context                = new CommandContext();
         $context->bot           = $this;
         $context->guild         = $message->channel->guild;
         $context->cmdRegistry   = $this->cmdRegistry;        
@@ -470,14 +480,14 @@ class Bot extends Database
      *
      * @param string $state
      */
-    private function runScripts(string $state, string $event, string $msgId, ?Message $message = null, ?Message $oldMessage = null)
+    private function runScripts(string $state, string $event, string $msgId, ?Message $message = null, CommandContext $serviceCtx)
     {
         if (!isset($this->callbacks[$state])) {
             return;
         }
 
         foreach ($this->callbacks[$state] as &$e) {// ($i = sizeof($arr) - 1; $i >= 0; $i -= 1) {
-            call_user_func_array($e, [$event, $msgId, $message, $oldMessage]);
+            call_user_func_array($e, [$event, $msgId, $message, $serviceCtx]);
             //call_user_func_array($this->callbacks[$state][$i], [$message, $event]);
         }
     }

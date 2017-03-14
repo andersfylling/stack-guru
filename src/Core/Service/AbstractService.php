@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace StackGuru\Core\Service;
 
+use StackGuru\Core\Command\CommandContext as CommandContext;
 use StackGuru\Core\Utils\Reflection;
-use StackGuru\Core\Command\CommandContext;
 use \Discord\WebSockets\Event as DiscordEvent;
 use \Discord\Parts\Channel\Message as Message;
 
@@ -99,7 +99,7 @@ abstract class AbstractService implements ServiceInterface
     /**
      * Abstract functions
      */
-    abstract public function response(string $event, string $msgId, ?Message $message = null, ?Message $oldMessage = null);
+    abstract public function response(string $event, string $msgId, ?Message $message = null, CommandContext $serviceCtx);
 
 
 
