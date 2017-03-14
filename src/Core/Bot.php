@@ -298,6 +298,8 @@ class Bot extends Database
         $serviceCtx->discord       = $this->discord;
         $serviceCtx->parentCommand = null;
 
+        //var_dump($message->channel);
+
 
         // First BOTEVENT::ALL_MESSAGES
         {
@@ -310,7 +312,7 @@ class Bot extends Database
         // Don't continue if the message is by the bot.
         // Initiate the BOTEVENT::ALL_MESSAGES_E_SELF
         {
-            if ($message->author->id == $this->discord->id) {
+            if (null !== $message->author && $message->author->id == $this->discord->id) {
                 $this->runScripts(BotEvent::MESSAGE_FROM_SELF, $event, $msgId, $message, $serviceCtx);
                 return;
             }

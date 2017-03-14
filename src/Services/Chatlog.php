@@ -22,10 +22,22 @@ class Chatlog extends AbstractService
 
 	final public function response(string $event, string $msgId, ?Message $message = null, CommandContext $serviceCtx)
 	{
+		// ignore private messaging
+		if ($message->channel->is_private) {
+			return;
+		}
+
+		// If this channel can't be logged, ignore it.
+		if (!$serviceCtx->bot->chatlog_loggableChannel($message->channel_id)) {
+			return;
+		}
+
+
 		// new message
 		if (DiscordEvent::MESSAGE_CREATE == $event) {
-			// chatlog_saveMessage(...)
-			// chatlog_saveMessageContent(...)
+			if ($serviceCtx->bot->chatlog_saveMessage($msgId, $message->channel_id, $message->author->id)) {
+				$serviceCtx->bot->chatlog_saveMessageContent($message->content, $message->id);
+			}
 		}
 
 		// updated message
