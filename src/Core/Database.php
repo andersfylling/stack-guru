@@ -276,4 +276,54 @@ class Database
         return 1 === $stmt->rowCount();
     }
 
+    final public function chatlog_saveMessage(string $id, bool $deleted, string $channel_id, string $user_id) 
+    {
+        // INSERT INTO `mydb`.`Message`
+        // (`id`,
+        // `deleted`,
+        // `Channel_id`,
+        // `User_discord_id`)
+        // VALUES
+        // (<{id: }>,
+        // <{deleted: }>,
+        // <{Channel_id: }>,
+        // <{User_discord_id: }>);
+        // 
+
+
+        $stmt = $this->db->prepare("INSERT IGNORE INTO `mydb`.`Message` (`id`, `deleted`, `Channel_id`, `User_discord_id`) VALUES(:id, :del, :channel_id, :user)");
+        $stmt->bindParam(":id",                 $id,                PDO::PARAM_STR);
+        $stmt->bindParam(":del",                $deleted,           PDO::PARAM_BOOL);
+        $stmt->bindParam(":channel_id",         $channel_id,        PDO::PARAM_STR);
+        $stmt->bindParam(":user_id",            $user_id,           PDO::PARAM_STR);
+        $stmt->execute();
+
+        return 1 === $stmt->rowCount();
+    }
+
+    final public function chatlog_saveMessageContent(string $content, string $message_id) 
+    {
+        // INSERT INTO `mydb`.`MessageContent`
+        // (`content`,
+        // `timestamp`,
+        // `Message_id`)
+        // VALUES
+        // (<{content: }>,
+        // <{timestamp: CURRENT_TIMESTAMP}>,
+        // <{Message_id: }>);
+
+        $stmt = $this->db->prepare("INSERT IGNORE INTO `mydb`.`MessageContent` (`content`, `timestamp`, `Message_id`) VALUES(:c, NULL, :m)");
+        $stmt->bindParam(":c",  $content,       PDO::PARAM_STR);
+        $stmt->bindParam(":m",  $message_id,    PDO::PARAM_STR);
+        $stmt->execute();
+
+        return 1 === $stmt->rowCount();
+    }
+
+    final public function chatlog_updateMessage() {}
+    final public function chatlog_updateMessageContent() {}
+
+    final public function chatlog_deleteMessage() {}
+    final public function chatlog_deleteMessageContent() {}
+
 }
