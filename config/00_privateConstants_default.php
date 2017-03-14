@@ -5,7 +5,8 @@
 
 // const ST_DISCORD_SETTINGS 	= [
 // 	"token" 	=> "",
-//  "logging"	=> false
+//  "logging"	=> false,
+//	"loadAllMembers" => true
 // ];
 
 // const ST_DATABASE_SETTINGS 	= [
