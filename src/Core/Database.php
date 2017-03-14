@@ -327,7 +327,7 @@ class Database
         // 
 
 
-        $stmt = $this->db->prepare("INSERT INTO `mydb`.`Message` (`id`, `deleted`, `Channel_id`, `User_discord_id`) VALUES(:id, :del, :channel_id, :user_id)");
+        $stmt = $this->db->prepare("INSERT IGNORE INTO `mydb`.`Message` (`id`, `deleted`, `Channel_id`, `User_discord_id`) VALUES(:id, :del, :channel_id, :user_id)");
         $stmt->bindParam(":id",                 $id,                PDO::PARAM_STR);
         $stmt->bindParam(":del",                $deleted,           PDO::PARAM_BOOL);
         $stmt->bindParam(":channel_id",         $channel_id,        PDO::PARAM_STR);
@@ -348,7 +348,7 @@ class Database
         // <{timestamp: CURRENT_TIMESTAMP}>,
         // <{Message_id: }>);
 
-        $stmt = $this->db->prepare("INSERT INTO `mydb`.`MessageContent` (`content`, `timestamp`, `Message_id`) VALUES(:c, NULL, :m)");
+        $stmt = $this->db->prepare("INSERT IGNORE INTO `mydb`.`MessageContent` (`content`, `timestamp`, `Message_id`) VALUES(:c, NULL, :m)");
         $stmt->bindParam(":c",  $content,       PDO::PARAM_STR);
         $stmt->bindParam(":m",  $message_id,    PDO::PARAM_STR);
         $stmt->execute();
@@ -358,7 +358,7 @@ class Database
 
     final public function chatlog_updateMessage(string $id, bool $deleted = false): bool
     {
-        $stmt = $this->db->prepare("UPDATE `mydb`.`Message` SET `deleted` = :del WHERE `id` = :id");
+        $stmt = $this->db->prepare("UPDATE IGNORE `mydb`.`Message` SET `deleted` = :del WHERE `id` = :id");
         $stmt->bindParam(":id",     $id,      PDO::PARAM_STR);
         $stmt->bindParam(":del",    $deleted, PDO::PARAM_BOOL);
         $stmt->execute();
@@ -398,7 +398,7 @@ class Database
 
     final public function chatlog_setChannelAsLoggable(string $id): bool 
     {
-        $stmt = $this->db->prepare("UPDATE `mydb`.`Command_chatlog_loggable_channels` SET `loggable` = TRUE WHERE `Channel_id` = :id");
+        $stmt = $this->db->prepare("UPDATE IGNORE `mydb`.`Command_chatlog_loggable_channels` SET `loggable` = TRUE WHERE `Channel_id` = :id");
         $stmt->bindParam(":id", $id, \PDO::PARAM_STR);
         $stmt->execute();
 
