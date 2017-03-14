@@ -48,7 +48,7 @@ abstract class AbstractCommand implements CommandInterface
         $permitted = false;
         $cmdNamespace = $ctx->commandEntry->getFullName(); // WRONG, NEED TO GET CLASS FROM THIS PLACE HERE!!
         foreach ($ctx->message->author->roles as $roleid => $role) {
-            $permitted = $ctx->bot->commandHasRole($cmdNamespace, strval($roleid));
+            $permitted = $ctx->database->commandHasRole($cmdNamespace, strval($roleid));
             if ($permitted) {
                 break;
             }

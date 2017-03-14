@@ -68,7 +68,7 @@ class Alias extends AbstractCommand
     public function addAlias(CommandEntry $cmd, string $alias, CommandContext $ctx): bool
     {
         $success = false;
-        if ($ctx->bot->saveCommandAlias($cmd->getFullName(), $alias)) {
+        if ($ctx->database->saveCommandAlias($cmd->getFullName(), $alias)) {
             $success = $ctx->cmdRegistry->addCommandAlias($alias, $cmd);
             echo "Alias error: able to add alias to database but not to command entry...", PHP_EOL;
         }

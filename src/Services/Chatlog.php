@@ -29,27 +29,27 @@ class Chatlog extends AbstractService
 		}
 
 		// If this channel can't be logged, ignore it.
-		if ($message !== null && !$serviceCtx->bot->chatlog_loggableChannel($message->channel_id)) {
+		if ($message !== null && !$serviceCtx->database->chatlog_loggableChannel($message->channel_id)) {
 			return;
 		}
 
 
 		// new message
 		if ($message !== null && DiscordEvent::MESSAGE_CREATE == $event) {
-			if ($serviceCtx->bot->chatlog_saveMessage($msgId, $message->channel_id, $message->author->id)) {
-				$serviceCtx->bot->chatlog_saveMessageContent($message->content, $message->id);
+			if ($serviceCtx->database->chatlog_saveMessage($msgId, $message->channel_id, $message->author->id)) {
+				$serviceCtx->database->chatlog_saveMessageContent($message->content, $message->id);
 			}
 		}
 
 		// updated message
 		else if ($message !== null && DiscordEvent::MESSAGE_UPDATE == $event) {
-			$serviceCtx->bot->chatlog_saveMessageContent($message->content, $message->id);
+			$serviceCtx->database->chatlog_saveMessageContent($message->content, $message->id);
 		}
 
 		// deleted message
 		else if ($message === null && DiscordEvent::MESSAGE_DELETE == $event) {
 			$deleted = true;
-			$serviceCtx->bot->chatlog_updateMessage($msgId, $deleted);
+			$serviceCtx->database->chatlog_updateMessage($msgId, $deleted);
 		}
 	}
 }

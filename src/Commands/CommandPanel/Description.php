@@ -33,7 +33,7 @@ class Description extends AbstractCommand
         $description    = $cmdArr["query"];
 
         // Store to database first, if that works, then update cmdRegistry
-        $success = $ctx->bot->updateCommandDescription($command->getFullName(), $description);
+        $success = $ctx->database->updateCommandDescription($command->getFullName(), $description);
         if (!$success) {
             return "ERROR: Unable to update database description. Nothing else updated.";
         }

@@ -23,16 +23,16 @@ class Save extends AbstractCommand
 
         // the db command should return true when stored, so bot can respond with legit numbers.
         foreach($users as $user) {
-            $ctx->bot->saveUser($user);
+            $ctx->database->saveUser($user);
         }
 
         foreach ($roles as $role) {
-            $ctx->bot->saveRole($role);
+            $ctx->database->saveRole($role);
         }
 
         foreach ($channels as $channel) {
-            $ctx->bot->saveChannel($channel);
-            $ctx->bot->saveLoggableChannel($channel); // loggable => false
+            $ctx->database->saveChannel($channel);
+            $ctx->database->saveLoggableChannel($channel); // loggable => false
         }
 
 

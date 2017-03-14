@@ -28,7 +28,7 @@ class Enable extends AbstractCommand
         $counter = [];
         for ($i = 0; $i < sizeof($output[1]); $i++) {
             $id = $output[1][$i];
-            $counter[$id] = $ctx->bot->chatlog_setChannelAsLoggable($id);
+            $counter[$id] = $ctx->database->chatlog_setChannelAsLoggable($id);
         }
 
 

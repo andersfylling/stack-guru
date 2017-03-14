@@ -15,4 +15,5 @@ class CommandContext
     public $discord;	 	// Discord
     public $parentCommand; 	// parent command of current command, assuming a command can only have one subcommand. might be null.
     public $commandEntry;
+    public $database;		//database
 }

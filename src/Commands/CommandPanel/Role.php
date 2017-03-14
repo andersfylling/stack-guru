@@ -103,7 +103,7 @@ class Role extends AbstractCommand
 
 
                         // also add access to the parent command..
-                        if ($ctx->bot->addCommandRole($command->getParent()->getFullName(), $roleid)) {
+                        if ($ctx->database->addCommandRole($command->getParent()->getFullName(), $roleid)) {
                             $counterCommands++;
                         }
 
@@ -123,7 +123,7 @@ class Role extends AbstractCommand
                             continue;
                         }
 
-                        if ($ctx->bot->addCommandRole($cmd->getFullName(), $roleid)) {
+                        if ($ctx->database->addCommandRole($cmd->getFullName(), $roleid)) {
                             $counterCommands++;
                         }
                     }
@@ -131,7 +131,7 @@ class Role extends AbstractCommand
                 }
 
                 // also add access to the default command..
-                else if ($ctx->bot->addCommandRole($command->getFullName(), $roleid)) {
+                else if ($ctx->database->addCommandRole($command->getFullName(), $roleid)) {
                     $counterRoles++;
                 }
 

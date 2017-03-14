@@ -36,7 +36,7 @@ abstract class AbstractService implements ServiceInterface
             return false;
         }
 
-        return $ctx->bot->enableService(static::$name);
+        return $ctx->database->enableService(static::$name);
     }
 
     public function disable(CommandContext $ctx): bool
@@ -45,7 +45,7 @@ abstract class AbstractService implements ServiceInterface
             return false;
         }
 
-        return $ctx->bot->disableService(static::$name);
+        return $ctx->database->disableService(static::$name);
     }
     
     // Overwritable

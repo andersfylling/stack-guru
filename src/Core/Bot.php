@@ -9,7 +9,7 @@ use StackGuru\Core\Utils;
 use \Discord\Parts\Channel\Message as Message;
 use StackGuru\Core\Command\CommandContext as CommandContext;
 
-class Bot extends Database
+class Bot
 {
     private $discord; // \Discord\Discord
 
@@ -20,6 +20,7 @@ class Bot extends Database
     private $cmdRegistry;
     private $services;
     private $cmdAliases;
+    private $database;
 
 
     /**
@@ -40,7 +41,7 @@ class Bot extends Database
         $options = Utils\ResolveOptions::verify($options, ["discord", "database", "commands", "services"]);
 
         // Setup database connection
-        Database::__construct($options["database"]);
+        $this->database = new Database($options["database"]);
 
         // Setup command registry.
         $this->cmdRegistry = new \StackGuru\Core\Command\Registry();
@@ -54,7 +55,7 @@ class Bot extends Database
             $description    = $commandEntry->getDescription();
             $activated      = true;
 
-            $this->saveCommand($namespace, $description, $activated);
+            $this->database->saveCommand($namespace, $description, $activated);
 
             // Since a alias would be requested at the same level as a main command
             // We need to make an alias for each main command, that equals the normal command
@@ -62,14 +63,14 @@ class Bot extends Database
             // 
             // Essentially this means u cant create an alias that equals "google" if a command named "google" exists.
             // 
-            $this->saveCommandAlias($namespace, $commandEntry->getName());
+            $this->database->saveCommandAlias($namespace, $commandEntry->getName());
 
             foreach ($commandEntry->getChildren() as $childEntry) {
                 $namespace      = $childEntry->getFullName();
                 $description    = $childEntry->getDescription();
                 $activated      = true;
 
-                $this->saveCommand($namespace, $description, $activated);
+                $this->database->saveCommand($namespace, $description, $activated);
                 echo ".";
             }
         }
@@ -79,7 +80,7 @@ class Bot extends Database
         //
         echo "Syncing command details with  database";
         foreach ($this->cmdRegistry->getCommands() as $commandEntry) {
-            $info = $this->getCommandDetails($commandEntry->getFullName());
+            $info = $this->database->getCommandDetails($commandEntry->getFullName());
 
             $commandEntry->updateInfo($info);
 
@@ -89,7 +90,7 @@ class Bot extends Database
             }
 
             foreach ($commandEntry->getChildren() as $childEntry) {
-                $info = $this->getCommandDetails($childEntry->getFullName());
+                $info = $this->database->getCommandDetails($childEntry->getFullName());
 
                 $childEntry->updateInfo($info);
 
@@ -120,12 +121,13 @@ class Bot extends Database
 
         // load services
         $serviceCtx = new CommandContext();
-        $serviceCtx->bot           = $this;
-        $serviceCtx->guild         = null;
-        $serviceCtx->cmdRegistry   = null;        
-        $serviceCtx->services      = null;
-        $serviceCtx->message       = null;
-        $serviceCtx->discord       = null;
+        $serviceCtx->bot            = $this;
+        $serviceCtx->guild          = null;
+        $serviceCtx->cmdRegistry    = null;        
+        $serviceCtx->services       = null;
+        $serviceCtx->message        = null;
+        $serviceCtx->discord        = null;
+        $serviceCtx->database       = $this->database;
         $this->services = new \StackGuru\Core\Service\Services();
         $this->services->loadServicesFolder($options["services"]["namespace"], $options["services"]["folder"], $serviceCtx);
 
@@ -290,13 +292,14 @@ class Bot extends Database
 
         // create service context
         $serviceCtx = new CommandContext();
-        $serviceCtx->bot           = $this;
-        $serviceCtx->guild         = null === $message ? null : $message->channel->guild;
-        $serviceCtx->cmdRegistry   = $this->cmdRegistry;       
-        $serviceCtx->services      = $this->services;
-        $serviceCtx->message       = $message;
-        $serviceCtx->discord       = $this->discord;
-        $serviceCtx->parentCommand = null;
+        $serviceCtx->bot            = $this;
+        $serviceCtx->guild          = null === $message ? null : $message->channel->guild;
+        $serviceCtx->cmdRegistry    = $this->cmdRegistry;       
+        $serviceCtx->services       = $this->services;
+        $serviceCtx->message        = $message;
+        $serviceCtx->discord        = $this->discord;
+        $serviceCtx->database       = $this->database;
+        $serviceCtx->parentCommand  = null;
 
 
         // First BOTEVENT::ALL_MESSAGES
@@ -421,6 +424,7 @@ class Bot extends Database
         $context->message       = $message;
         $context->discord       = $this->discord;
         $context->parentCommand = $parentCmd;
+        $context->database      = $this->database;
         $context->commandEntry  = $command;
 
         // Make sure that the user/member have permissions to use the command!

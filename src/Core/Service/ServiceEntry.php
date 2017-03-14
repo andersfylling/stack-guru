@@ -38,7 +38,7 @@ class ServiceEntry
     {
         // Check if this service exist in the database, AKA is enabled.
         // 
-        return $ctx->bot->doesServiceExist($this->getName());
+        return $ctx->database->doesServiceExist($this->getName());
     }
 
 

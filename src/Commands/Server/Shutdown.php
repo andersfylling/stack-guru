@@ -14,7 +14,7 @@ class Shutdown extends AbstractCommand
 
     public function process(string $query, ?CommandContext $ctx): string
     {
-        $args = explode(' ', trim($query) . ' ');
+    	exit(1); //stops the bot with exit code 1
         return "gkdfjhlg";
     }
 }
