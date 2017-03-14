@@ -17,15 +17,17 @@ class Enable extends AbstractCommand
     {
         
         $output = [];
-        preg_match('~<#(.*?)>~', $query, $output);
+        preg_match_all('~<#(.*?)>~', $query, $output);
 
-        if (2 > sizeof($output)) {
+        var_dump($output);
+
+        if (2 > sizeof($output) || 1 > sizeof($output[1])) {
             return "Did you mention a channel using `#channelname`? Tip: you can specify multiple channels after each other.";
         }
 
         $counter = [];
-        for ($i = 1; $i < sizeof($output); $i++) {
-            $id = $output[$i];
+        for ($i = 0; $i < sizeof($output[1]); $i++) {
+            $id = $output[1][$i];
             $counter[$id] = $ctx->bot->chatlog_setChannelAsLoggable($id);
         }
 
