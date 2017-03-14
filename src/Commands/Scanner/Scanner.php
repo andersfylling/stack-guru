@@ -20,10 +20,6 @@ class Scanner extends AbstractCommand
         $roles = $this->getRoles($ctx);
         
     	$list = "";
-    	foreach($this->getUsers($ctx) as $key => $value) {
-		    $list .= $value->username . PHP_EOL;
-		    //var_dump($value);
-		}
 
         return $list;
     }
@@ -43,5 +39,11 @@ class Scanner extends AbstractCommand
     public function getRoles(?CommandContext $ctx)
     {
         return $ctx->guild->roles;
+    }
+
+    public function getChannels(?CommandContext $ctx)
+    {
+        //var_dump($ctx->guild);
+        return $ctx->guild->channels;
     }
 }

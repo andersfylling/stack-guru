@@ -112,9 +112,7 @@ class Database
     }
 
     final public function saveRole(\Discord\Parts\Guild\Role $role) 
-    { 
-        // Anders verify cuse I thing we have misunderstood each other.. 
- 
+    {
         if (null == $role) { 
             return; 
         } 
@@ -144,6 +142,44 @@ class Database
 
         $stmt->execute();
     }
+
+    final public function saveChannel(\Discord\Parts\Channel\Channel $channel) 
+    {
+        if (null == $channel) { 
+            return; 
+        } 
+ 
+        // Roles 
+        $id             = $channel->id; 
+        $guild_id       = $channel->guild_id; 
+        $name           = $channel->name; 
+        $type           = $channel->type; 
+        $position       = $channel->position; 
+        $is_private     = $channel->is_private; 
+        $topic          = $channel->topic; 
+        $bitrate        = $channel->bitrate; 
+        $user_limit     = $channel->user_limit; 
+ 
+ 
+        // Add to DB 
+        $stmt = $this->db->prepare("INSERT IGNORE INTO `mydb`.`Channel` (`id`, `guild_id`, `name`, `type`, `position`, `is_private`, `permission_overwrites`, `topic`, `bitrate`, `user_limit`) VALUES (:id, :guild_id, :name, :type, :position, :is_private, NULL, :topic, :bitrate, :user_limit)"); 
+
+        
+
+        $stmt->bindParam(":id",                     $id,                    \PDO::PARAM_STR);
+        $stmt->bindParam(":guild_id",               $guild_id,              \PDO::PARAM_STR);
+        $stmt->bindParam(":name",                   $name,                  \PDO::PARAM_STR);
+        $stmt->bindParam(":type",                   $type,                  \PDO::PARAM_STR);
+        $stmt->bindParam(":position",               $position,              \PDO::PARAM_INT);
+        $stmt->bindParam(":is_private",             $is_private,            \PDO::PARAM_BOOL);
+        //$stmt->bindParam(":permission_overwrites",  $permission_overwrites, \PDO::PARAM_STR);
+        $stmt->bindParam(":topic",                  $topic,                 \PDO::PARAM_STR);
+        $stmt->bindParam(":bitrate",                $bitrate,               \PDO::PARAM_STR);
+        $stmt->bindParam(":user_limit",             $user_limit,            \PDO::PARAM_STR);
+
+        $stmt->execute();
+    }
+
 
     final public function saveCommand(string $namespace, string $description, bool $activated) 
     {
@@ -276,7 +312,7 @@ class Database
         return 1 === $stmt->rowCount();
     }
 
-    final public function chatlog_saveMessage(string $id, bool $deleted, string $channel_id, string $user_id) 
+    final public function chatlog_saveMessage(string $id, string $channel_id, string $user_id, bool $deleted = false) 
     {
         // INSERT INTO `mydb`.`Message`
         // (`id`,
@@ -291,7 +327,7 @@ class Database
         // 
 
 
-        $stmt = $this->db->prepare("INSERT IGNORE INTO `mydb`.`Message` (`id`, `deleted`, `Channel_id`, `User_discord_id`) VALUES(:id, :del, :channel_id, :user)");
+        $stmt = $this->db->prepare("INSERT INTO `mydb`.`Message` (`id`, `deleted`, `Channel_id`, `User_discord_id`) VALUES(:id, :del, :channel_id, :user_id)");
         $stmt->bindParam(":id",                 $id,                PDO::PARAM_STR);
         $stmt->bindParam(":del",                $deleted,           PDO::PARAM_BOOL);
         $stmt->bindParam(":channel_id",         $channel_id,        PDO::PARAM_STR);
@@ -312,7 +348,7 @@ class Database
         // <{timestamp: CURRENT_TIMESTAMP}>,
         // <{Message_id: }>);
 
-        $stmt = $this->db->prepare("INSERT IGNORE INTO `mydb`.`MessageContent` (`content`, `timestamp`, `Message_id`) VALUES(:c, NULL, :m)");
+        $stmt = $this->db->prepare("INSERT INTO `mydb`.`MessageContent` (`content`, `timestamp`, `Message_id`) VALUES(:c, NULL, :m)");
         $stmt->bindParam(":c",  $content,       PDO::PARAM_STR);
         $stmt->bindParam(":m",  $message_id,    PDO::PARAM_STR);
         $stmt->execute();
@@ -325,5 +361,40 @@ class Database
 
     final public function chatlog_deleteMessage() {}
     final public function chatlog_deleteMessageContent() {}
+
+    final public function chatlog_loggableChannel(string $id): bool
+    {
+
+        $stmt = $this->db->prepare("SELECT COUNT(`Channel_id`) FROM `mydb`.`Command_chatlog_loggable_channels` WHERE `loggable` = TRUE AND `Channel_id` = :id LIMIT 1");
+        $stmt->bindParam(":id", $id, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return 1 == $stmt->fetchColumn();
+    }
+
+
+    final public function saveLoggableChannel(\Discord\Parts\Channel\Channel $channel) 
+    {
+        if (null == $channel) { 
+            return; 
+        }
+
+        $id = $channel->id;
+ 
+        // Add to DB 
+        $stmt = $this->db->prepare("INSERT IGNORE INTO `mydb`.`Command_chatlog_loggable_channels`(`Channel_id`,`loggable`) VALUES(:id,FALSE)");
+        $stmt->bindParam(":id", $id, \PDO::PARAM_STR);
+        $stmt->execute();
+    }
+
+
+    final public function chatlog_setChannelAsLoggable(string $id): bool 
+    {
+        $stmt = $this->db->prepare("UPDATE `mydb`.`Command_chatlog_loggable_channels` SET `loggable` = TRUE WHERE `Channel_id` = :id");
+        $stmt->bindParam(":id", $id, \PDO::PARAM_STR);
+        $stmt->execute();
+
+        return 1 === $stmt->rowCount();
+    }
 
 }

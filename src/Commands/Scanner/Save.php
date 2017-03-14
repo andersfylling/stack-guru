@@ -18,6 +18,7 @@ class Save extends AbstractCommand
     {
         $users = $ctx->parentCommand->getUsers($ctx);
         $roles = $ctx->parentCommand->getRoles($ctx);
+        $channels = $ctx->parentCommand->getChannels($ctx);
 
 
         // the db command should return true when stored, so bot can respond with legit numbers.
@@ -29,12 +30,18 @@ class Save extends AbstractCommand
             $ctx->bot->saveRole($role);
         }
 
+        foreach ($channels as $channel) {
+            $ctx->bot->saveChannel($channel);
+            $ctx->bot->saveLoggableChannel($channel); // loggable => false
+        }
+
 
         $res = "";
         $res .= "```Markdown" . PHP_EOL;
         $res .= "# Log" . PHP_EOL;
         $res .= "* Members: " . sizeof($users) . PHP_EOL;
         $res .= "* Roles:   " . sizeof($roles) . PHP_EOL;
+        $res .= "* Channel:   " . sizeof($channels) . PHP_EOL;
         $res .= "```";
 
 
