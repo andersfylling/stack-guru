@@ -1,3 +1,8 @@
-get.classes.php
 .idea/
+config/database.php
 config/discord.php
+config/00_privateConstants.php
+config/01_privateConstants.php
+vendor/
+
+.sonar/

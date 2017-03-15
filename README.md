@@ -5,8 +5,12 @@ stack-guru is a Discord bot for the [/r/nootropics](https://www.reddit.com/r/noo
 Written and maintained by (OUTDATED):
 
   - [/u/anders_463](https://www.reddit.com/u/anders_463)
-  - [/u/theartmaker](https://www.reddit.com/u/theartmaker)
+  
+  
+## Setup and common issues on new clones
 
+   https://stackoverflow.com/questions/2424343/undefined-class-constant-mysql-attr-init-command-with-pdo
+ * #### Undefined class constant 'MYSQL_ATTR_INIT_COMMAND' with pdo
 
 ## How to install
 Requirements:
