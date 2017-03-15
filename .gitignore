@@ -2,7 +2,8 @@
 config/database.php
 config/discord.php
 config/00_privateConstants.php
-config/01_privateConstants.php
+config/01_privateConstants.php	
+config/01_privateConstants_default.php	
 vendor/
 
 .sonar/
