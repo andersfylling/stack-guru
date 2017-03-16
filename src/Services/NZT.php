@@ -22,7 +22,7 @@ class NZT extends AbstractService
 
 	final public function response(string $event, string $msgId, ?Message $message = null, CommandContext $serviceCtx)
 	{
-		if (null !== $message->content && strpos(strtolower($message->content), "nzt") !== false) {
+		if (null !== $message && strpos(strtolower($message->content), "nzt") !== false) {
 	        $rudeNZTResponses = [
 	            "Really.. NZT!?",
 	            "NZT? Who do you think you are!?",

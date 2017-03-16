@@ -43,7 +43,6 @@ class Enable extends AbstractCommand
 	    	}
 
 	    	$success = $serviceEntry->getInstance()->enable($ctx);
-		$serviceEntry->removeInstance();
 
     		$response = "";
     		if (true === $success) {

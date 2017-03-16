@@ -50,7 +50,7 @@ class View extends AbstractCommand
         foreach ($services as $name => $service) {
             $title = "* {$name}";
             $enabled = $service->isEnabled($ctx) ? "True" : "False";
-            $running = $service->running() ? "True" : "False";
+            $running = $service->running($ctx) ? "True" : "False";
             $desc    = $service->getDescription();
 
             // Pad command names to align command descriptions

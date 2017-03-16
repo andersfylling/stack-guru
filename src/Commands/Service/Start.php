@@ -27,7 +27,7 @@ class Start extends AbstractCommand
     	// Check if service is already running.
     	// 
 		$title = $serviceEntry->getName();
-    	if ($serviceEntry->running()) {
+    	if ($serviceEntry->running($ctx)) {
     		return "The service `{$title}` is already running. Run `!service status {$title}` for more.";
     	}
 

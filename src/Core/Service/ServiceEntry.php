@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace StackGuru\Core\Service;
 
 use StackGuru\Core\Utils;
+use \StackGuru\Core\Command\CommandContext;
 
 
 /**
@@ -48,7 +49,7 @@ class ServiceEntry
 
     public function getName(): string { return $this->fullname::getName(); }
     public function getDescription(): string { return $this->fullname::getDescription(); }
-    public function running(): bool { return null !== $this->instance && $this->instance->running(); }
+    public function running(CommandContext $ctx): bool { return null !== $this->instance && $this->instance->running($ctx); }
     public function getInstance(): ?ServiceInterface { return $this->instance; }
     public function removeInstance(): bool { $this->instance = null; return null === $this->instance; }
 

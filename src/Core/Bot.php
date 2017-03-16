@@ -140,7 +140,7 @@ class Bot
             $mask = "%-20s %s \n";
             printf($mask, "Name", "Status");
             foreach ($services as $name => $srv) {
-                $status = "{\"enabled\":".($srv->isEnabled($serviceCtx)?"true":"false").", \"running\":".($srv->running()?"true":"false")."}";
+                $status = "{\"enabled\":".($srv->isEnabled($serviceCtx)?"true":"false").", \"running\":".($srv->running($serviceCtx)?"true":"false")."}";
                 printf($mask, " * " . $name, $status);
             }
             echo PHP_EOL;
@@ -414,6 +414,8 @@ class Bot
         $instance = $command->createInstance();
         $parentCmd = null == $result["parent"] ? null : $result["parent"]->createInstance();
 
+        var_dump($this->callbacks);
+
         // Build command context so the command has references back to the bot
         // and other commands.
         $context                = new CommandContext();
@@ -462,8 +464,11 @@ class Bot
             $this->callbacks[$state] = [];
         }
 
-        $index = sizeof($this->callbacks[$state]);
-        $this->callbacks[$state][$index] = $callback;
+        $sizeBefore = sizeof($this->callbacks[$state]);
+        $this->callbacks[$state][] = $callback;
+        $sizeAfter = sizeof($this->callbacks[$state]);
+
+        $index = $sizeBefore === $sizeAfter ? null : $sizeAfter - 1; // this is not async so no issue i think...
 
         return $index;
     }
@@ -482,8 +487,17 @@ class Bot
         }
 
         if (isset($this->callbacks[$state]) && isset($this->callbacks[$state][$index])) {
-            $this->callbacks[$state][$index] = function () {}; // empty array, doesn't scale well. Should use unset and then shift the array.
+            $this->callbacks[$state][$index] = null;
         }
+    }
+
+    public function containsStateCallable(string $state, int $index): bool
+    {
+        if (null === $index || 0 > $index) {
+            return false;
+        }
+
+        return isset($this->callbacks[$state]) && isset($this->callbacks[$state][$index]);
     }
 
     /**
@@ -493,14 +507,19 @@ class Bot
      *
      * @param string $state
      */
-    private function runScripts(string $state, string $event, string $msgId, ?Message $message = null, CommandContext $serviceCtx)
+    private function runScripts(string $state, string $event, string $msgId, ?Message $message = null, CommandContext $ctx)
     {
         if (!isset($this->callbacks[$state])) {
             return;
         }
 
         foreach ($this->callbacks[$state] as &$e) {// ($i = sizeof($arr) - 1; $i >= 0; $i -= 1) {
-            call_user_func_array($e, [$event, $msgId, $message, $serviceCtx]);
+            if (null === $e) {
+                continue;
+            }
+
+            
+            call_user_func_array($e, [$event, $msgId, $message, $ctx]);
             //call_user_func_array($this->callbacks[$state][$i], [$message, $event]);
         }
     }

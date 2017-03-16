@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace StackGuru\Core\Service;
 
-use StackGuru\Core\Command\CommandContext as CommandContext;
-use StackGuru\Core\Utils\Reflection;
+use \StackGuru\Core\Command\CommandContext as CommandContext;
+use \StackGuru\Core\Utils\Reflection;
 use \Discord\WebSockets\Event as DiscordEvent;
 use \Discord\Parts\Channel\Message as Message;
 
@@ -57,9 +57,14 @@ abstract class AbstractService implements ServiceInterface
 
         // remove listener from bot..
         $ctx->bot->removeStateCallable(static::$event,  static::$callbackIndex);
-        static::$callbackIndex = null;
 
-        return null === static::$callbackIndex;
+        $running = $this->running($ctx);
+
+        if (!$running) {
+            static::$callbackIndex = null;
+        }
+
+        return !$running;
     }
 
     public function start(CommandContext $ctx) : bool 
@@ -71,7 +76,7 @@ abstract class AbstractService implements ServiceInterface
         // add listener to bot..
         static::$callbackIndex = $ctx->bot->state(static::$event,  [$this, "response"]);
 
-        return null !== static::$callbackIndex;
+        return $this->running($ctx);
     }
 
     // Generic versions.
@@ -85,13 +90,13 @@ abstract class AbstractService implements ServiceInterface
     // In memory information. No database needed.
     final public function status(CommandContext $ctx) : string 
     {
-
+        return "";
     }
 
 
-    public function running(): bool 
+    public function running(CommandContext $ctx): bool 
     {
-        return null !== static::$callbackIndex; // not a good way to check....
+        return null !== static::$callbackIndex && $ctx->bot->containsStateCallable(static::$event, static::$callbackIndex);
     }
 
 

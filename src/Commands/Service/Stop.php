@@ -27,13 +27,19 @@ class Stop extends AbstractCommand
     	// Check if service is already running.
     	// 
 		$title = $serviceEntry->getName();
-    	if (!$serviceEntry->running()) {
+    	if (!$serviceEntry->running($ctx)) {
     		return "The service `{$title}` is not running. Run `!service status {$title}` for more.";
     	}
 
     	// Tell the user that the service is being enabled.
     	Utils\Response::sendMessage("Stopping...", $ctx->message, function () use ($ctx, $serviceEntry, $title) {
-	    	$success = $serviceEntry->removeInstance();
+	    	// set service instance, in case it has been stopped or some error happened.
+            if (null === $serviceEntry->getInstance()) {
+                $serviceEntry->createInstance();
+            }
+
+            $service = $serviceEntry->getInstance();
+            $success = $service->stop($ctx);
 
     		$response = "";
     		if (true === $success) {

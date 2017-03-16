@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 namespace StackGuru\Core\Service;
-use StackGuru\Core\Command\CommandContext;
+use \StackGuru\Core\Command\CommandContext;
 
 
 /**
@@ -21,7 +21,7 @@ interface ServiceInterface
     public function restart(CommandContext $ctx) 	: bool;
     public function status(CommandContext $ctx) 	: string;
 
-    public function running(): bool;
+    public function running(CommandContext $ctx): bool;
 
     // Execute the command with the given query and context.
     public function process(string $query, ?CommandContext $ctx): string;
