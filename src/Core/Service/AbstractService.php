@@ -51,7 +51,7 @@ abstract class AbstractService implements ServiceInterface
     // Overwritable
     public function stop(CommandContext $ctx) : bool
     {
-        if (null === static::$callbackIndex) {
+        if (!$this->running($ctx)) {
             return false;
         }
 
@@ -69,7 +69,7 @@ abstract class AbstractService implements ServiceInterface
 
     public function start(CommandContext $ctx) : bool 
     {
-        if (null !== static::$callbackIndex) {
+        if ($this->running($ctx)) {
             return false;
         }
 
