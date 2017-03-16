@@ -38,7 +38,7 @@ class AddRole extends AbstractCommand
         $role = $ctx->guild->roles[$roleid];
         foreach($ctx->guild->members as $member) {
             $member->addRole($role);
-            $ctx->guild->members->save($member);
+            $ctx->guild->members->save($member)->then(function ($response) {}, function ($e) {echo $e->getMessage(), PHP_EOL;});
         } 
 
 
