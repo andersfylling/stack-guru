@@ -43,6 +43,7 @@ class AddRole extends AbstractCommand
             $ctx->guild->members->save($member)->then(function ($response) {}, function ($e) {
                 if ("" === $error) {
                     $error = $e->getMessage();
+                    break;
                 }
             });
         }
