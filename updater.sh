@@ -15,7 +15,7 @@ fi
 
 echo "lock" > $lock_file
 
-php_pid=$(ps aux | grep '[p]hp bot.bootstrap.php' | awk '{print $2}')
+php_pid=$(ps aux | grep '[p]hp stack-guru.php' | awk '{print $2}')
 
 kill -9 $php_pid
 
@@ -32,4 +32,4 @@ echo "`date` | updated!" >> $log_file # log every update
 
 sleep 1
 cd /home/devs/stack-guru
-php bot.bootstrap.php &>> $php_log_file
+php stack-guru.php &>> $php_log_file
