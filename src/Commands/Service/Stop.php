@@ -33,8 +33,7 @@ class Stop extends AbstractCommand
 
     	// Tell the user that the service is being enabled.
     	Utils\Response::sendMessage("Stopping...", $ctx->message, function () use ($ctx, $serviceEntry, $title) {
-	    	$service = $serviceEntry->getInstance();
-	    	$success = $service->stop($ctx);
+	    	$success = $serviceEntry->removeInstance();
 
     		$response = "";
     		if (true === $success) {

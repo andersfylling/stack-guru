@@ -27,16 +27,16 @@ class SpanishCommands extends AbstractService
 
 	final public function response(string $event, string $msgId, ?Message $message = null, CommandContext $serviceCtx)
 	{
-		if (!$this->qualified($message->content)) {
+		if (null === $message || !$this->qualified($message->content)) {
 			return;
 		}
 
 		// different responses. should be stored into database later..
 		$spanishResponse = [
-            "No hablo español, lo siento"
-        ];
+            		"No hablo español, lo siento"
+        	];
 
-        $response = $spanishResponse[array_rand($spanishResponse, 1)];
-        Utils\Response::sendResponse($response, $message);
+        	$response = $spanishResponse[array_rand($spanishResponse, 1)];
+        	Utils\Response::sendResponse($response, $message);
 	}
 }

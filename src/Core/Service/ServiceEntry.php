@@ -50,6 +50,7 @@ class ServiceEntry
     public function getDescription(): string { return $this->fullname::getDescription(); }
     public function running(): bool { return null !== $this->instance && $this->instance->running(); }
     public function getInstance(): ?ServiceInterface { return $this->instance; }
+    public function removeInstance(): bool { $this->instance = null; return null === $this->instance; }
 
 
     /**
