@@ -32,4 +32,4 @@ echo "`date` | updated!" >> $log_file # log every update
 
 sleep 1
 cd /home/devs/stack-guru
-php stack-guru.php &>> $php_log_file
+php stack-guru.php --dev &>> $php_log_file
