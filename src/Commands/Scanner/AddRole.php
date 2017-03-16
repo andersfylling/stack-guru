@@ -39,7 +39,7 @@ class AddRole extends AbstractCommand
         foreach($ctx->guild->members as $member) {
             $member->addRole($role);
             $ctx->guild->members->save($member)->then(function ($response) {}, function ($e) {echo $e->getMessage(), PHP_EOL;});
-        } 
+        }
 
 
         return "Successfully added role `{$role->name}` to every user.";
