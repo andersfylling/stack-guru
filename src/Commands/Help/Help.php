@@ -138,25 +138,19 @@ class Help extends AbstractCommand
     }
 
     private static function showMainCommands(string &$helptext, CommandContext $ctx, $commands, $parentCommand = null) : void 
-    {
-        $nr = sizeof($commands);
-
-        $title = "";
-        $title .= sprintf(self::$printf1, "# Available commands [{$nr}]");
-
-        if (0 !== $nr) {
-            $title .= sprintf(self::$printf2, "Enabled");
-            $title .= "Description";
-        }
-        
+    {        
         $helptext .= $title . PHP_EOL;
 
+        $commandsHelpText = "";
+        $nrOfCommands = 0;
         // Print all commands
         foreach ($commands as $name => $command) {
             $ctx->commandEntry = $command;
             if (!$command->hasPermission($ctx)) {
                 continue;
             }
+
+            $nrOfCommands += 1;
 
             // Print command with subcommand tree
             if (null === $parentCommand) {
@@ -176,8 +170,19 @@ class Help extends AbstractCommand
                 $cmdline .= "{$description}";
             }
 
-            $helptext .= $cmdline . PHP_EOL;
+            $commandsHelpText .= $cmdline . PHP_EOL;
         }
+
+        $title = "";
+        $title .= sprintf(self::$printf1, "# Available commands [{$nrOfCommands}]");
+
+        if (0 !== $nrOfCommands) {
+            $title .= sprintf(self::$printf2, "Enabled");
+            $title .= "Description";
+        }
+
+        $helptext .= $title . PHP_EOL;
+        $helptext .= $commandsHelpText;
     }
 
     private static function getCommandTreeString(CommandEntry $command): string
