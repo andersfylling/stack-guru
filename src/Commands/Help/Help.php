@@ -139,8 +139,6 @@ class Help extends AbstractCommand
 
     private static function showMainCommands(string &$helptext, CommandContext $ctx, $commands, $parentCommand = null) : void 
     {        
-        $helptext .= $title . PHP_EOL;
-
         $commandsHelpText = "";
         $nrOfCommands = 0;
         // Print all commands
