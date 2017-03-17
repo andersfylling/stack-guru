@@ -7,6 +7,7 @@ use \Discord\Discord;
 use \Discord\WebSockets\Event as DiscordEvent;
 use StackGuru\Core\Utils;
 use \Discord\Parts\Channel\Message as Message;
+use \Discord\Parts\User\Member as Member;
 use StackGuru\Core\Command\CommandContext as CommandContext;
 
 class Bot
@@ -166,23 +167,14 @@ class Bot
         // When the app is ready, listen for messages.
         $this->discord->on("ready", function (Discord $self) use ($messageEvents) {
 
+            //show that the bot is starting up
+
             if (true === DEVELOPMENT) {
                 echo "... OK!", PHP_EOL;
             }
 
-            // Add bot status
-            // 
-            if (true === DEVELOPMENT) {
-                echo "Setting bot status to `!help`.";
-            }
-            $game = $this->discord->factory(\Discord\Parts\User\Game::class, ["name" => "!help"]);
-            if (true === DEVELOPMENT) {
-                echo '.';
-            }
-            $this->discord->updatePresence($game, false);            
-            if (true === DEVELOPMENT) {
-                echo ". OK!", PHP_EOL;
-            }
+            // set presence
+            $this->updatePresence("!help");
 
 
             // Start services
@@ -201,10 +193,6 @@ class Bot
                 // our message handler ourselves.
                 try {
                     $this->incoming(DiscordEvent::MESSAGE_CREATE, $msg->id, $msg);
-
-                    if (true === DEVELOPMENT) {
-                        echo '.';
-                    }
                 } catch (\Throwable $e) {
                     echo $e, PHP_EOL;
                 }
@@ -216,9 +204,6 @@ class Bot
                 // our message handler ourselves.
                 try {
                     $this->incoming(DiscordEvent::MESSAGE_UPDATE, $msg->id, $msg);
-                    if (true === DEVELOPMENT) {
-                        echo '.';
-                    }
                 } catch (\Throwable $e) {
                     echo $e, PHP_EOL;
                 }
@@ -230,9 +215,23 @@ class Bot
                 // our message handler ourselves.
                 try {
                     $this->incoming(DiscordEvent::MESSAGE_DELETE, $msgId);
-                    if (true === DEVELOPMENT) {
-                        echo '.';
+                } catch (\Throwable $e) {
+                    echo $e, PHP_EOL;
+                }
+            });
+
+            // when someone joins the guild give them the member role.. todo: fix hack
+            $self->on(DiscordEvent::GUILD_MEMBER_ADD, function (Member $member) {
+                // Discord has it's own exception handler, so we have to catch exceptions from
+                // our message handler ourselves.
+                try {
+                    if (!isset($member->guild->roles["280835202299985932"])) {
+                        return;
                     }
+
+                    $role = $member->guild->roles["280835202299985932"];
+                    $member->addRole($role);
+                    $member->guild->members->save($member);
                 } catch (\Throwable $e) {
                     echo $e, PHP_EOL;
                 }
@@ -243,6 +242,9 @@ class Bot
             if (true === DEVELOPMENT) {
                 echo "... OK!", PHP_EOL;
             }
+
+
+            //$this->discord->loop->addTimer(1, function ($timer) { $this->updatePresence("!help"); });
 
 
             if (true === DEVELOPMENT) {
@@ -256,6 +258,7 @@ class Bot
             echo "Starting DiscordPHP service";
         }
         $this->discord->run();
+
     }
 
     /**
@@ -522,5 +525,12 @@ class Bot
             //call_user_func_array($this->callbacks[$state][$i], [$message, $event]);
         }
     }
+
+    public function updatePresence(string $title, ?bool $idle = false) 
+    {
+        $this->discord->updatePresence($this->discord->factory(\Discord\Parts\User\Game::class, ["name" => $title]), $idle);
+    }
+
+
 
 }
