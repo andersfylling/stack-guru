@@ -29,6 +29,7 @@ abstract class AbstractCommand implements CommandInterface
         $author = $ctx->message->author;
         $id = null;
 
+        //private chat or not
         if (isset($author["user"])) {
             $id = $author->user->id;
         }
