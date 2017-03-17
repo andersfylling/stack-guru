@@ -14,6 +14,10 @@ class AddRole extends AbstractCommand
     protected static $description = "gives all users a mentionable role";
     protected static $default = ""; // default sub-command
 
+    protected $progress = 0;
+    protected $totalNumberOfMembers = 0;
+    protected $currentChannel = null;
+
 
     public function process(string $query, ?CommandContext $ctx): string
     {
@@ -44,6 +48,8 @@ class AddRole extends AbstractCommand
         //     });
         // }
 
+        $this->totalNumberOfMembers = sizeof($ctx->message->channel->guild->members->all());
+        $this->currentChannel = $ctx->message->channel;
 
         $this->addRoleToMembersDeferred($ctx->message->channel->guild, $role)->then(function($r) use($ctx, $role) {
             $ctx->message->channel->sendMessage("Successfully added role `{$role->name}` to every user.");
@@ -69,8 +75,15 @@ class AddRole extends AbstractCommand
             return $deferred->resolve();
         }
 
+        if (in_array($role, (end($members))->getRawAttributes()['roles'])) {
+            array_pop($members);
+            $this->updateProgress($role); 
+            return $this->addRoleToMembers($guild, $members, $role, $deferred);
+        }
+
+
         $this->addRoleToMember($guild, end($members), $role)->then(
-            function($res) use($guild, $members, $role, $deferred) { array_pop($members); return $this->addRoleToMembers($guild, $members, $role, $deferred); }, 
+            function($res) use($guild, $members, $role, $deferred) { array_pop($members); $this->updateProgress($role); return $this->addRoleToMembers($guild, $members, $role, $deferred); }, 
             function($e) use($guild, $members, $role, $deferred) { return $this->addRoleToMembers($guild, $members, $role, $deferred); }
         );
     }
@@ -79,5 +92,11 @@ class AddRole extends AbstractCommand
     {
         $member->addRole($role);
         return $guild->members->save($member);
+    }
+
+    private function updateProgress($role) 
+    {
+        $this->progress += 1;
+        $this->currentChannel->sendMessage("Adding role {$role} to {$this->progress}/{$this->totalNumberOfMembers}");
     }
 }
