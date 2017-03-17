@@ -414,7 +414,6 @@ class Bot
         $instance = $command->createInstance();
         $parentCmd = null == $result["parent"] ? null : $result["parent"]->createInstance();
 
-        var_dump($this->callbacks);
 
         // Build command context so the command has references back to the bot
         // and other commands.
