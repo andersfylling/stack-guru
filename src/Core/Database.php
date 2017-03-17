@@ -405,4 +405,15 @@ class Database
         return 1 === $stmt->rowCount();
     }
 
+    final public function chatlog_getChannels(?bool $logged = true) 
+    {
+        $stmt = $this->db->prepare("SELECT `Channel`.`name` FROM `mydb`.`Channel` INNER JOIN `mydb`.`Command_chatlog_loggable_channels` ON `Command_chatlog_loggable_channels`.`Channel_id` = `Channel`.`id` WHERE `Command_chatlog_loggable_channels`.`loggable` = :loggable");
+        $stmt->bindParam(":loggable", $logged, PDO::PARAM_BOOL);
+        $stmt->execute();
+
+        $channels = 0 === $stmt->rowCount() ? [] : $stmt->fetchAll(PDO::FETCH_NUM);
+
+        return $channels;
+    }
+
 }
