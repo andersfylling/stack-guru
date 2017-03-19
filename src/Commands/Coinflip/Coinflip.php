@@ -28,7 +28,7 @@ class Coinflip extends AbstractCommand
             $words = ["tails", "heads"];
         }
         else if (1 == sizeof($words)) {
-            $words[] = ["Other option."];
+            $words[] = "Other option.";
         }
 
         $winner = $words[mt_rand(0, 1)];
