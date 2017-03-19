@@ -17,7 +17,13 @@ class Coinflip extends AbstractCommand
 
     public function process(string $query, ?CommandContext $ctx): string
     {
-        $words = explode(' ', $query, 3);
+        if ("" == trim($query)) {
+            $words = [];
+        }
+        else {
+            $words = explode(' ', $query, 3);
+        }    
+        
         if (empty($words)) {
             $words = ["tails", "heads"];
         }
