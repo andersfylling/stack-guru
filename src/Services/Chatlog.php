@@ -48,7 +48,6 @@ class Chatlog extends AbstractService
 
 		// new message
 		if (DiscordEvent::MESSAGE_CREATE == $event) {
-            var_dump($message);
             $author_id = isset($message->author->user) ? $message->author->user->id : $message->author->id; // on bot message from github: Trying to get property of non-object
 
             // built in discord bots causes an error..
