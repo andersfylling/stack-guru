@@ -29,8 +29,8 @@ class DebugLevel
 			case INFO: 		$title = "INFO"; 	break;
 			case WARNING: 	$title = "WARNING"; break;
 			case SEVERE: 	$title = "SEVERE"; 	break;
-			
-			default:		$title = "ALL";
+
+			default:		$title = "UNDEFINED LEVEL";
 		}
 
 		return $title;
