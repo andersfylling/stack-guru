@@ -48,12 +48,7 @@ class Chatlog extends AbstractService
 
 		// new message
 		if (DiscordEvent::MESSAGE_CREATE == $event) {
-            $author_id = $private ? $message->author->id : $message->author->user->id; // on bot message from github: Trying to get property of non-object
-
-            // built in discord bots causes an error..
-            if (null === $author_id) {
-                return;
-            }
+            $author_id = isset($message->author->id) ? $message->author->id : $message->author->user->id;
 
 			if ($serviceCtx->database->chatlog_saveMessage($msgId, $channel_id, $author_id)) {
 				$serviceCtx->database->chatlog_saveMessageContent($messageContent, $message->id);
