@@ -42,12 +42,17 @@ class Logger
 	}
 
 
-	public static function log(int $level, string $message, $object = null) 
+	public static function log(int $level, string $message, \Exception $e = null) 
 	{
 		// haven't implemented storing to database
+		// haven't implemented handling exception objects yet
 
 		// check if it should be logged to terminal
-		if () {}
+		if (self::$development) {
+			$levelTitle = DebugLevel::getTitle($level);
+
+			echo "DEBUG [{$levelTitle}]: {$message}", PHP_EOL;
+		}
 	}
 
 }
