@@ -2,6 +2,8 @@
 declare(strict_types=1);
 
 namespace StackGuru\Core\Command;
+use React\Promise\Promise as Promise;
+use React\Promise\Deferred as Deferred; // used in commands, pleased here so its easy to find.
 
 
 /**
@@ -14,8 +16,7 @@ interface CommandInterface
     public static function getName(): string;
     public static function getAliases(): array;
     public static function getDescription(): string;
-    public static function getDefault(): ?string;
 
     // Execute the command with the given query and context.
-    public function process(string $query, CommandContext $ctx): string;
+    public function process(string $query, CommandContext $ctx): Promise;
 }
