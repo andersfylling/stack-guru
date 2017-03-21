@@ -5,7 +5,9 @@ namespace StackGuru\Commands\Service;
 
 use StackGuru\Core\Command\AbstractCommand;
 use StackGuru\Core\Command\CommandContext;
-use StackGuru\Core\Utils;
+use StackGuru\Core\Utils\Response as Response;
+use React\Promise\Promise as Promise;
+use React\Promise\Deferred as Deferred;
 
 /**
  * Adds a service to the database entry so that it can be started, stopped, restarted and whatever.
@@ -16,23 +18,27 @@ class Enable extends AbstractCommand
     protected static $description = "Enable a service to automatically run at boot";
 
 
-    public function process(string $query, ?CommandContext $ctx): string
+    public function process(string $query, CommandContext $ctx): Promise
     {
+        $deferred = new Deferred();
     	// Check if service exists in folder.
     	//
     	$serviceEntry = $ctx->services->get($query);
 
     	if (null === $serviceEntry) {
-    		return "The service `{$query}` was not found.";
+            $deferred->reject("The service `{$query}` was not found.");
+    		return $deferred->promise();
     	}
     	$title = $serviceEntry->getName();
 
     	// Tell the user that the service is being enabled.
-    	Utils\Response::sendMessage("Enabling...", $ctx->message, function () use ($ctx, $serviceEntry, $title) {
+    	$this->reply("Enabling...", $ctx, false, false, function () use ($ctx, $serviceEntry, $title, $deferred) {
 
     		if ($serviceEntry->isEnabled($ctx)) {
     			$response = "The service {$title} is already enabled. You can start it by typing `!service start {$title}`";
-    			Utils\Response::sendMessage($response, $ctx->message);
+                $this->reply($response, $ctx, false, false, function() use($deferred) {
+                    $deferred->resolve();
+                });
     			return;
     		}
 
@@ -53,13 +59,12 @@ class Enable extends AbstractCommand
     			// TODO, store error reason in database or something..
     		}
 
-    		Utils\Response::sendMessage($response, $ctx->message);
-
-    		//return "";
+            $this->reply($response, $ctx, false, false, function() use($deferred) {
+                $deferred->resolve();
+            });
     	});
         
 
-
-        return "";
+        return $deferred->promise();
     }
 }

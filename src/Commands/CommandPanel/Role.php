@@ -4,7 +4,9 @@ namespace StackGuru\Commands\CommandPanel;
 
 use StackGuru\Core\Command\AbstractCommand;
 use StackGuru\Core\Command\CommandContext;
-use StackGuru\Core\Utils;
+use StackGuru\Core\Utils\Response as Response;
+use React\Promise\Promise as Promise;
+use React\Promise\Deferred as Deferred;
 
 // # Add a role that can use the command
 // !commandpanel role add <command> @role
@@ -23,7 +25,7 @@ class Role extends AbstractCommand
     protected static $description = "Determine what roles can use which commands";
 
 
-    public function process(string $query, ?CommandContext $ctx): string
+    public function process(string $query, CommandContext $ctx): Promise
     {
         $add = false;
         $remove = false;
@@ -138,6 +140,7 @@ class Role extends AbstractCommand
             }
         }
 
-    	return "Gave {$counterRoles} roles access to {$counterCommands} commands.";
+        $response = "Gave {$counterRoles} roles access to {$counterCommands} commands.";
+        return Response::sendMessage($response, $ctx->message);
     }
 }

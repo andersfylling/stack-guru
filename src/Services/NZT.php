@@ -33,7 +33,7 @@ class NZT extends AbstractService
 	        ];
 
 	        $response = $rudeNZTResponses[array_rand($rudeNZTResponses, 1)];
-	        Utils\Response::sendResponse($response, $message);
+	        Utils\Response::sendMessage($response, $message, true);
 	    }
 	}
 }

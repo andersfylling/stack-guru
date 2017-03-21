@@ -438,10 +438,7 @@ class Bot
         }
 
         // Run command and send a response if the return is not null.
-        $response = $instance->process($query, $context);
-        if (null !== $response && "" !== $response) {
-            Utils\Response::sendResponse($response, $message);
-        }
+        $instance->process($query, $context); // returns a promise
     }
 
 

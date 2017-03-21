@@ -4,6 +4,9 @@ namespace StackGuru\Commands\Chatlog;
 
 use StackGuru\Core\Command\AbstractCommand;
 use StackGuru\Core\Command\CommandContext;
+use StackGuru\Core\Utils\Response as Response;
+use React\Promise\Promise as Promise;
+use React\Promise\Deferred as Deferred;
 
 
 class View extends AbstractCommand
@@ -13,7 +16,7 @@ class View extends AbstractCommand
 
 
 
-    public function process(string $query, ?CommandContext $ctx): string
+    public function process(string $query, CommandContext $ctx): Promise
     {
         $channels = $ctx->database->chatlog_getChannels();
 
@@ -21,7 +24,7 @@ class View extends AbstractCommand
         $this->listBuggedChannels($helptext, $ctx, $channels);
         $helptext .= "```";
 
-        return $helptext;
+        return Response::sendMessage($helptext, $ctx->message);
     }
 
     private static function listBuggedChannels(string &$helptext, CommandContext $ctx, array $services) : string

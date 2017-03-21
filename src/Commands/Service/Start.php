@@ -5,7 +5,9 @@ namespace StackGuru\Commands\Service;
 
 use StackGuru\Core\Command\AbstractCommand;
 use StackGuru\Core\Command\CommandContext;
-use StackGuru\Core\Utils;
+use StackGuru\Core\Utils\Response as Response;
+use React\Promise\Promise as Promise;
+use React\Promise\Deferred as Deferred;
 
 
 class Start extends AbstractCommand
@@ -14,27 +16,28 @@ class Start extends AbstractCommand
     protected static $description = "Starts a service";
 
 
-    public function process(string $query, ?CommandContext $ctx): string
+    public function process(string $query, CommandContext $ctx): Promise
     {
+        $deferred = new Deferred();
     	// Check if service exists in folder.
     	//
     	$serviceEntry = $ctx->services->get($query);
 
     	if (null === $serviceEntry) {
-    		return "The service `{$query}` was not found.";
+            $deferred->reject("The service `{$query}` was not found.");
+            return $deferred->promise();
     	}
 
     	// Check if service is already running.
     	// 
 		$title = $serviceEntry->getName();
     	if ($serviceEntry->running($ctx)) {
-    		return "The service `{$title}` is already running. Run `!service status {$title}` for more.";
+            $deferred->reject("The service `{$title}` is already running. Run `!service status {$title}` for more.");
+            return $deferred->promise();
     	}
 
     	// Tell the user that the service is being enabled.
-    	Utils\Response::sendMessage("Starting...", $ctx->message, function () use ($ctx, $serviceEntry, $title) {
-
-
+    	$this->reply("Starting...", $ctx, false, false, function () use ($ctx, $serviceEntry, $title, $deferred) {
             // set service instance, in case it has been stopped or some error happened.
             if (null === $serviceEntry->getInstance()) {
                 $serviceEntry->createInstance();
@@ -52,13 +55,12 @@ class Start extends AbstractCommand
     			// TODO, store error reason in database or something..
     		}
 
-    		Utils\Response::sendMessage($response, $ctx->message);
-
-    		//return "";
+            $this->reply($response, $ctx, false, false, function() use($deferred) {
+                $deferred->resolve();
+            });
     	});
         
 
-
-        return "";
+        return $deferred->promise();
     }
 }

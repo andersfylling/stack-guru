@@ -21,16 +21,17 @@ class DebugLevel
 		$title = "";
 
 		switch($level) {
-			case ALL: 		$title = "ALL"; 	break;
-			case CONFIG: 	$title = "CONFIG"; 	break;
-			case FINEST: 	$title = "FINEST"; 	break;
-			case FINER: 	$title = "FINER"; 	break;
-			case FINE: 		$title = "FINE"; 	break;
-			case INFO: 		$title = "INFO"; 	break;
-			case WARNING: 	$title = "WARNING"; break;
-			case SEVERE: 	$title = "SEVERE"; 	break;
+			case self::ALL: 	$title = "ALL"; 	break;
+			case self::CONFIG: 	$title = "CONFIG"; 	break;
+			case self::FINEST: 	$title = "FINEST"; 	break;
+			case self::FINER: 	$title = "FINER"; 	break;
+			case self::FINE: 	$title = "FINE"; 	break;
+			case self::INFO: 	$title = "INFO"; 	break;
+			case self::WARNING:	$title = "WARNING"; break;
+			case self::SEVERE: 	$title = "SEVERE"; 	break;
 
-			default:		$title = "UNDEFINED LEVEL";
+			default:			$title = "UNDEFINED LEVEL";
+			
 		}
 
 		return $title;

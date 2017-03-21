@@ -5,7 +5,9 @@ namespace StackGuru\Commands\CommandPanel;
 
 use StackGuru\Core\Command\AbstractCommand;
 use StackGuru\Core\Command\CommandContext;
-use StackGuru\Core\Utils;
+use StackGuru\Core\Utils\Response as Response;
+use React\Promise\Promise as Promise;
+use React\Promise\Deferred as Deferred;
 
 /**
  * Adds a service to the database entry so that it can be started, stopped, restarted and whatever.
@@ -16,8 +18,9 @@ class Activate extends AbstractCommand
     protected static $description = "Enable a service to automatically run at boot";
 
 
-    public function process(string $query, ?CommandContext $ctx): string
+    public function process(string $query, CommandContext $ctx): Promise
     {
-        return "";
+        $response = "Not implemented yet";
+        return Response::sendMessage($response, $ctx->message);
     }
 }

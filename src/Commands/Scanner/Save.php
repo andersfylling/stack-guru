@@ -4,7 +4,9 @@ namespace StackGuru\Commands\Scanner;
 
 use StackGuru\Core\Command\AbstractCommand;
 use StackGuru\Core\Command\CommandContext;
-use StackGuru\Core\Utils;
+use React\Promise\Promise as Promise;
+use React\Promise\Deferred as Deferred;
+use StackGuru\Core\Utils\Response as Response;
 
 
 class Save extends AbstractCommand
@@ -14,7 +16,7 @@ class Save extends AbstractCommand
     protected static $default = ""; // default sub-command
 
 
-    public function process(string $query, ?CommandContext $ctx): string
+    public function process(string $query, CommandContext $ctx): Promise
     {
         $users = $ctx->parentCommand->getUsers($ctx);
         $roles = $ctx->parentCommand->getRoles($ctx);
@@ -45,6 +47,6 @@ class Save extends AbstractCommand
         $res .= "```";
 
 
-        return $res;
+        return Response::sendMessage($res, $ctx->message);
     }
 }

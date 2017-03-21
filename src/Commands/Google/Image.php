@@ -4,7 +4,9 @@ namespace StackGuru\Commands\Google;
 
 use StackGuru\Core\Command\AbstractCommand;
 use StackGuru\Core\Command\CommandContext;
-use StackGuru\Core\Utils;
+use StackGuru\Core\Utils\Response as Response;
+use React\Promise\Promise as Promise;
+use React\Promise\Deferred as Deferred;
 
 
 class Image extends AbstractCommand
@@ -15,7 +17,7 @@ class Image extends AbstractCommand
     protected static $description = "search images";
 
 
-    public function process (string $query, ?CommandContext $ctx) : string
+    public function process(string $query, CommandContext $ctx): Promise
     {
         $args = explode(' ', $query);
 
@@ -30,6 +32,6 @@ class Image extends AbstractCommand
             "tbm" => "isch"
         ]);
 
-        return $link;
+        return Response::sendMessage($link, $ctx->message);
     }
 }

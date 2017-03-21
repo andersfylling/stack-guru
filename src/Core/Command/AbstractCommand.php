@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace StackGuru\Core\Command;
 
 use StackGuru\Core\Utils;
-use StackGuru\Core\Utils\Response;
+use StackGuru\Core\Utils\Response as Response;
+use React\Promise\Promise as Promise;
+use React\Promise\Deferred as Deferred;
 
 
 abstract class AbstractCommand implements CommandInterface
@@ -71,7 +73,7 @@ abstract class AbstractCommand implements CommandInterface
      */
 
     // TODO: Show Help for command by default.
-    abstract public function process(string $query, CommandContext $ctx): string;
+    abstract public function process(string $query, CommandContext $ctx): Promise;
 
 
     /**

@@ -44,17 +44,7 @@ trait QueryRouter
                 // Check if next word is a subcommand
                 $child = $command->getChild($token);
                 if ($child === null) {
-                    // Try to use default subcommand
-                    $child = $command->getDefaultChild();
-                    if ($child !== null) {
-                        // Skip trimming the query when using default subcommand
-                        $parent = $command;
-                        $command = $child;
-                        break;
-                    } else {
-                        // Use last found command and break out of loop
-                        break;
-                    }
+                    break;
                 }
                 else {
                     $parent = $command; 

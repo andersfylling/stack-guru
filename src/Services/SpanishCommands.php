@@ -37,6 +37,6 @@ class SpanishCommands extends AbstractService
         	];
 
         	$response = $spanishResponse[array_rand($spanishResponse, 1)];
-        	Utils\Response::sendResponse($response, $message);
+        	Utils\Response::sendMessage($response, $message, true);
 	}
 }

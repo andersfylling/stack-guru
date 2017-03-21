@@ -9,6 +9,4 @@ $argc = sizeof($argv);
 $terminal_args = [];
 require __DIR__."/terminalArgumentsHandler.php";
 
-var_dump($terminal_args);
-
 require __DIR__."/autoload.php";

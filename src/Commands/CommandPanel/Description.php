@@ -4,7 +4,9 @@ namespace StackGuru\Commands\CommandPanel;
 
 use StackGuru\Core\Command\AbstractCommand;
 use StackGuru\Core\Command\CommandContext;
-use StackGuru\Core\Utils;
+use StackGuru\Core\Utils\Response as Response;
+use React\Promise\Promise as Promise;
+use React\Promise\Deferred as Deferred;
 
 
 // # Edit description for command
@@ -15,7 +17,7 @@ class Description extends AbstractCommand
     protected static $description = "Update the database description for a command.";
 
 
-    public function process(string $query, ?CommandContext $ctx): string
+    public function process(string $query, CommandContext $ctx): Promise
     {
         $words = explode(' ', $query);
         if (1 >= sizeof($words)) {
@@ -41,6 +43,8 @@ class Description extends AbstractCommand
         $command->setDescription($description);
 
 
-        return "Description for `{$command->getName()}` was set to `{$description}`.";
+        $response = "Description for `{$command->getName()}` was set to `{$description}`.";
+        
+        return Response::sendMessage($response, $ctx->message);
     }
 }

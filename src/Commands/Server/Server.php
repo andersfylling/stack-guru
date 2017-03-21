@@ -4,17 +4,20 @@ namespace StackGuru\Commands\Server;
 
 use StackGuru\Core\Command\AbstractCommand;
 use StackGuru\Core\Command\CommandContext;
+use StackGuru\Core\Utils\Response as Response;
+use React\Promise\Promise as Promise;
+use React\Promise\Deferred as Deferred;
 
 
 class Server extends AbstractCommand
 {
     protected static $name = "server";
-    protected static $description = "bot service commands";
-    protected static $default = "status";
+    protected static $description = "Make the bot do stuff";
 
 
-    public function process(string $query, ?CommandContext $ctx): string
+    public function process(string $query, CommandContext $ctx): Promise
     {
-        return "Not implemented yet";
+        $response = "Not implemented yet";
+        return Response::sendMessage($response, $ctx->message);
     }
 }
