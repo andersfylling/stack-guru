@@ -48,10 +48,10 @@ function log_formatted {
 function log_echo {
   # Log to stderr if DEBUG is set, otherwise log to UPDATER_LOG
   message="$@"
-  if [ -z $DEV_MODE ]; then
+  if [ "$DEV_MODE" -eq "0" ]; then
     log_formatted "$message" >> $UPDATER_LOG
   else
-    log_formatted "$message" >&1
+    log_formatted "$message"
   fi
 }
 
@@ -59,7 +59,7 @@ function log_echo {
 function log_error {
   # Log to stderr if DEBUG is set, otherwise log to UPDATER_LOG
   message="ERROR: $@"
-  if [ -z $DEV_MODE ]; then
+  if [ "$DEV_MODE" -eq "0" ]; then
     log_formatted "$message" >> $UPDATER_LOG
   else
     log_formatted "$message" >&2
@@ -155,7 +155,7 @@ git pull "$GIT_REMOTE" "$GIT_BRANCH" >/dev/null
 
 # Update composer dependencies
 log_echo "Updating dependencies..."
-if [ "$DEV_MODE" = "1" ]; then
+if [ "$DEV_MODE" -eq "1" ]; then
   composer install
 else
   composer install --no-dev --optimize-autoloader
