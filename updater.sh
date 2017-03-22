@@ -14,11 +14,11 @@ SYSTEMD_SERVICE=${SYSTEMD_SERVICE:-"stackguru.service"}
 GIT_REMOTE=${GIT_REMOTE:-"origin"}
 GIT_BRANCH=${GIT_BRANCH:-""}
 
-if [ "${STACKGURU_ENV,,}" = "development" ]; then
-  DEV_MODE=1
-else
+if [ -z "$STACKGURU_ENV" ] || [ "${STACKGURU_ENV,,}" = "production" ]; then
   DEV_MODE=0
   GIT_BRANCH=${GIT_BRANCH:-"master"}
+else
+  DEV_MODE=1
 fi
 
 #
