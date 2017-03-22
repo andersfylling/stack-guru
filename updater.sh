@@ -4,7 +4,7 @@
 # Variables (may be overriden by environment)
 #
 
-STACKGURU_ENV=${STACKGURU_ENV:-"DEVELOPMENT"}
+STACKGURU_ENV=${STACKGURU_ENV:-"production"}
 WORKSPACE_DIR=${WORKSPACE_DIR:-"$(dirname "$0")"}
 UPDATER_LOG=${UPDATER_LOG:-"$HOME/discord_autoupdate.log"}
 LOCK_FILE=${LOCK_FILE:-"/tmp/discord_updater.lock"}
@@ -14,12 +14,14 @@ SYSTEMD_SERVICE=${SYSTEMD_SERVICE:-"stackguru.service"}
 GIT_REMOTE=${GIT_REMOTE:-"origin"}
 GIT_BRANCH=${GIT_BRANCH:-""}
 
-if [ -z "$STACKGURU_ENV" ] || [ "${STACKGURU_ENV,,}" = "production" ]; then
+shopt -s nocasematch
+if [ "${STACKGURU_ENV,,}" == "production" ]; then
   DEV_MODE=0
   GIT_BRANCH=${GIT_BRANCH:-"master"}
 else
   DEV_MODE=1
 fi
+
 
 #
 # Constants
