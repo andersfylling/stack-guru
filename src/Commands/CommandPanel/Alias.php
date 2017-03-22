@@ -5,7 +5,9 @@ namespace StackGuru\Commands\CommandPanel;
 use StackGuru\Core\Command\AbstractCommand;
 use StackGuru\Core\Command\CommandContext;
 use StackGuru\Core\Command\CommandEntry;
-use StackGuru\Core\Utils;
+use StackGuru\Core\Utils\Response as Response;
+use React\Promise\Promise as Promise;
+use React\Promise\Deferred as Deferred;
 
 
 // # Add an alias for a command
@@ -21,7 +23,7 @@ class Alias extends AbstractCommand
     protected static $description = "Add an alias for a command. `!cp alias add <command> <alias>`";
 
 
-    public function process(string $query, ?CommandContext $ctx): string
+    public function process(string $query, CommandContext $ctx): Promise
     {
         $words = explode(' ', $query);
         $success = false;
@@ -57,7 +59,7 @@ class Alias extends AbstractCommand
         }
 
 
-        return $response;
+        return Response::sendMessage($response, $ctx->message);
     }
 
     public function getCommandEntry(string $cmd, CommandContext $ctx): ?CommandEntry

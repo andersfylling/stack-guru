@@ -4,8 +4,9 @@ namespace StackGuru\Commands\Scanner;
 
 use StackGuru\Core\Command\AbstractCommand;
 use StackGuru\Core\Command\CommandContext;
-use StackGuru\Core\Utils;
-use React\Promise\Deferred;
+use React\Promise\Promise as Promise;
+use React\Promise\Deferred as Deferred;
+use StackGuru\Core\Utils\Response as Response;
 
 
 class AddRole extends AbstractCommand
@@ -19,25 +20,28 @@ class AddRole extends AbstractCommand
     protected $currentChannel = null;
 
 
-    public function process(string $query, ?CommandContext $ctx): string
+    public function process(string $query, CommandContext $ctx): Promise
     {
+        $deferred = new Deferred();
+
         if (!(strpos($query, "<@&") !== false)) {
-            return "Did you mention a role?";
+            return Response::sendMessage("Did you mention a role?", $ctx->message);
         }
-        var_dump($query);
 
         $output = null;
         preg_match('~<@&(.*?)>~', $query, $output);
 
         if (2 != sizeof($output)) {
-            return "Did you mention more than one role? Try to `!scanner giveusersrole @random` where random is a legit role.";
+            $res = "Did you mention more than one role? Try to `!scanner giveusersrole @random` where random is a legit role.";
+            return Response::sendMessage($res, $ctx->message);
         }
 
 
         $roleid = $output[1];
 
         if (!isset($ctx->guild->roles[$roleid])) {
-            return "Role given does not exist in this guild. Talk to bot engineers..";
+            $res = "Role given does not exist in this guild. Talk to bot engineers..";
+            return Response::sendMessage($res, $ctx->message);
         }
 
         $role = $ctx->guild->roles[$roleid];
@@ -51,13 +55,14 @@ class AddRole extends AbstractCommand
         $this->totalNumberOfMembers = sizeof($ctx->message->channel->guild->members->all());
         $this->currentChannel = $ctx->message->channel;
 
-        $this->addRoleToMembersDeferred($ctx->message->channel->guild, $role)->then(function($r) use($ctx, $role) {
-            $ctx->message->channel->sendMessage("Successfully added role `{$role->name}` to every user.");
+        $this->addRoleToMembersDeferred($ctx->message->channel->guild, $role)->then(function($r) use($ctx, $role, $deferred) {
+            $res = "Successfully added role `{$role->name}` to every user.";
+            $this->reply($res, $ctx, false, false, function() use($deferred) {
+                $deferred->resolve();
+            });
         });
 
-
-
-        return "";
+        return $deferred;
     }
 
     private function addRoleToMembersDeferred($guild, $role) 

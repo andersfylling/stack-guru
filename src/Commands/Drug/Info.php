@@ -4,6 +4,9 @@ namespace StackGuru\Commands\Drug;
 
 use StackGuru\Core\Command\AbstractCommand;
 use StackGuru\Core\Command\CommandContext;
+use StackGuru\Core\Utils\Response as Response;
+use React\Promise\Promise as Promise;
+use React\Promise\Deferred as Deferred;
 
 
 class Info extends AbstractCommand
@@ -45,7 +48,7 @@ class Info extends AbstractCommand
      *
      * @return string Response to be sent.
      */
-    public function process(string $query, ?CommandContext $ctx): string
+    public function process(string $query, CommandContext $ctx): Promise
     {
         $args = explode(' ', $query);
 
@@ -79,7 +82,7 @@ class Info extends AbstractCommand
             $result = PHP_EOL . strtoupper($args[0]) . PHP_EOL . $result;
         }
 
-        return $result;
+        return Response::sendMessage($result, $ctx->message);
     }
 
 

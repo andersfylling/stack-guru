@@ -27,6 +27,23 @@ abstract class AbstractService implements ServiceInterface
     {
     }
 
+    /**
+     *  Makes sure that the event member is always an array.
+     *  Also adds support for using a callback with an event as parameter per event in $event[]
+     */
+    private function eventHandler(Callable $callback = null): array
+    {
+        $events = isset(static::$event[0]) ? static::$event : [static::$event];
+
+        if (null !== $callback) {
+            for ($i = 0, $end = count($events); $i < $end; $i++) {
+                call_user_func_array($callback, [$events[$i]]);
+            }
+        }
+
+        return $events;
+    }
+
     // Default methods.
     // Interacts with the database to start, stop or whatever.
     // 

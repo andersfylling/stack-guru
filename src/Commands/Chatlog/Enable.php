@@ -4,22 +4,22 @@ namespace StackGuru\Commands\Chatlog;
 
 use StackGuru\Core\Command\AbstractCommand;
 use StackGuru\Core\Command\CommandContext;
+use StackGuru\Core\Utils\Response as Response;
+use React\Promise\Promise as Promise;
+use React\Promise\Deferred as Deferred;
 
 
 class Enable extends AbstractCommand
 {
     protected static $name = "enable";
     protected static $description = "Enable logging on a channel";
-    protected static $default = ""; // default sub-command
 
 
-    public function process(string $query, ?CommandContext $ctx): string
+    public function process(string $query, CommandContext $ctx): Promise
     {
         
         $output = [];
         preg_match_all('~<#(.*?)>~', $query, $output);
-
-        var_dump($output);
 
         if (2 > sizeof($output) || 1 > sizeof($output[1])) {
             return "Did you mention a channel using `#channelname`? Tip: you can specify multiple channels after each other.";
@@ -43,9 +43,7 @@ class Enable extends AbstractCommand
             }
         }
 
-
-
-
-        return $channelsUpdated . PHP_EOL . PHP_EOL . $channelsNotUpdated;
+        $response = $channelsUpdated . PHP_EOL . PHP_EOL . $channelsNotUpdated . PHP_EOL;
+        return Response::sendMessage($response, $ctx->message);
     }
 }

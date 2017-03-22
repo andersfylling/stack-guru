@@ -2,84 +2,63 @@
 declare(strict_types=1);
 
 namespace StackGuru\Core\Utils;
+use React\Promise\Promise as Promise;
+use React\Promise\Deferred as Deferred;
+use \Discord\Parts\Channel\Message as Message;
+use \StackGuru\Core\Utils\Logger as Logger;
+use \StackGuru\Core\Utils\DebugLevel as Level;
 
 
 abstract class Response
 {
     /**
-     * @param string $str
+     * @param string $str The message content
      * @param \Discord\Parts\Channel\Message|null $message
-     * @param \Closure|null $callback
-     * @param bool|null $private
+     * @param bool|null $mention Should the user be mentioned or not
+     * @param bool|null $private if this is to be sent as a pm
      */
-    public static function sendResponse(
-        string                          $str,
-        \Discord\Parts\Channel\Message  $message    = null,
-        boolean                         $private    = null,
-        ?\Closure                       $callback   = null
-    ) {
-        if (null === $message && true === DEVELOPMENT) {
-            echo "Message was not sent: {$str}" . PHP_EOL;
-            return;
+    public static function sendMessage(string $str, Message $message = null, bool $mention = false, bool $private = false): Promise
+    {
+        $deferred = new Deferred();
+        $promise = $deferred->promise();
+        $testing = defined("TESTING") && TESTING;
+
+
+        if (null === $message && !$testing) {
+            Logger::log(Level::INFO, "Message was not sent: {$str}");
+
+            $deferred->reject('$message was null'); // should this be an \Exception ?
+            return $deferred->promise();
         }
 
-        /*
-         * Check if the channel is private or not
-         */
-        if (null !== $private) {
-            /*
-             * For some reason, the author object differs when its a private chat compared to public.
-             */
 
-            if (true === DEVELOPMENT) {
-                echo "Response: {$str}", PHP_EOL;
+        // if this is used in an testing environment,
+        if (!$testing) {
+            // not testing so lets send the message,
+            if ($private) {
+                // send the message to the user only,
+                $promise = $message->getAuthorAttribute(0)->sendMessage($str);
+            }
+            else {
+                // send it public, to a server/guild channel,
+                if ($mention) {
+                    // mention the user first,
+                    $promise = $message->reply($str);
+                }
+                else {
+                    // don't mention the user.
+                    $promise = $message->channel->sendMessage($str);
+                }
             }
 
-            if (false === TESTING) {
-                $message->getAuthorAttribute(0)->sendMessage($str)->then($callback);
-            }
+            // Log that the message was "sent" from the bot
+            Logger::log(Level::INFO, "Added message to DiscordPHP que: {$str}");
         }
-
-        /*
-         * If this is to be sent in public, utilize the already existing reply method.
-         * $in->author->((user->)*)sendMessage("{$in->author}, {$message}");
-         */
         else {
-            if (true === DEVELOPMENT) {
-                echo "Response: {$str}", PHP_EOL;
-            }
-
-            if (false === TESTING) {
-                $message->reply($str)->then($callback);
-            }
-        }
-    }
-
-
-    /**
-     * Send a message to the same channel the message came from. maybe rename this to sendUpdate(...)
-     * 
-     * @param string $str
-     * @param \Discord\Parts\Channel\Message|null $message
-     * @param \Closure|null $callback
-     * @param bool|null $private
-     */
-    public static function sendMessage(
-        string                          $str,
-        \Discord\Parts\Channel\Message  $message,
-        ?\Closure                       $callback = null
-    ) {
-        if (null === $message && true === DEVELOPMENT) {
-            echo "Message was not sent: {$str}" . PHP_EOL;
-            return;
+            $deferred->resolve($str); // in testing, didn't send message (to avoid spam).
         }
 
-        if (true === DEVELOPMENT) {
-            echo "Response: {$str}", PHP_EOL;
-        }
 
-        if (false === TESTING) {
-            $message->channel->sendMessage($str)->then($callback);
-        }
+        return $promise;
     }
 }

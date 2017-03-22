@@ -4,7 +4,9 @@ namespace StackGuru\Commands\Service;
 
 use StackGuru\Core\Command\AbstractCommand;
 use StackGuru\Core\Command\CommandContext;
-use StackGuru\Core\Utils;
+use StackGuru\Core\Utils\Response as Response;
+use React\Promise\Promise as Promise;
+use React\Promise\Deferred as Deferred;
 
 
 class View extends AbstractCommand
@@ -17,7 +19,7 @@ class View extends AbstractCommand
     private static $printf3 = "%-8s";
 
 
-    public function process(string $query, ?CommandContext $ctx): string
+    public function process(string $query, CommandContext $ctx): Promise
     {
     	// Check if service exists in folder.
     	//
@@ -27,7 +29,7 @@ class View extends AbstractCommand
         $this->listServices($helptext, $ctx, $services);
         $helptext .= "```";
 
-        return $helptext;
+        return Response::sendMessage($helptext, $ctx->message);
     }
 
 

@@ -7,6 +7,9 @@ use StackGuru\Core\Command\AbstractCommand;
 use StackGuru\Core\Command\CommandContext;
 use StackGuru\Core\Command\CommandEntry;
 use StackGuru\Core\Utils\StringParser;
+use StackGuru\Core\Utils\Response as Response;
+use React\Promise\Promise as Promise;
+use React\Promise\Deferred as Deferred;
 
 
 class Help extends AbstractCommand
@@ -18,7 +21,7 @@ class Help extends AbstractCommand
     private static $printf2 = "%-10s";
 
 
-    public function process(string $query, ?CommandContext $ctx): string
+    public function process(string $query, CommandContext $ctx): Promise
     {
         // Encapsulate command list in code block
         $helptext = "```markdown" . PHP_EOL;
@@ -100,7 +103,7 @@ class Help extends AbstractCommand
 
         $helptext .= "```";
 
-        return $helptext;
+        return Response::sendMessage($helptext, $ctx->message);
     }
 
     private function getCommand(CommandContext $ctx, string $n1, string $n2 = null): ?CommandEntry 

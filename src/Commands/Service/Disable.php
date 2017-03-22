@@ -1,10 +1,13 @@
 <?php
+declare(strict_types=1);
 
 namespace StackGuru\Commands\Service;
 
 use StackGuru\Core\Command\AbstractCommand;
 use StackGuru\Core\Command\CommandContext;
-use StackGuru\Core\Utils;
+use StackGuru\Core\Utils\Response as Response;
+use React\Promise\Promise as Promise;
+use React\Promise\Deferred as Deferred;
 
 /**
  * Remove a service from the database entry.
@@ -15,23 +18,27 @@ class Disable extends AbstractCommand
     protected static $description = "Disable a service so it won't run at boot";
 
 
-    public function process(string $query, ?CommandContext $ctx): string
+    public function process(string $query, CommandContext $ctx): Promise
     {
+        $deferred = new Deferred();
     	// Check if service exists in folder.
     	//
     	$serviceEntry = $ctx->services->get($query);
 
-    	if (null === $serviceEntry) {
-    		return "The service `{$query}` was not found.";
-    	}
+        if (null === $serviceEntry) {
+            $deferred->reject("The service `{$query}` was not found.");
+            return $deferred->promise();
+        }
     	$title = $serviceEntry->getName();
 
     	// Tell the user that the service is being enabled.
-    	Utils\Response::sendMessage("Disabling...", $ctx->message, function () use ($ctx, $serviceEntry, $title) {
+    	$this->reply("Disabling...", $ctx, false, false, function () use ($ctx, $serviceEntry, $title, $deferred) {
 
     		if (!$serviceEntry->isEnabled($ctx)) {
     			$response = "The service {$title} is has not been enabled yet.";
-    			Utils\Response::sendMessage($response, $ctx->message);
+                $this->reply($response, $ctx, false, false, function() use($deferred) {
+                    $deferred->resolve();
+                });
     			return;
     		}
 
@@ -53,11 +60,12 @@ class Disable extends AbstractCommand
     			// TODO, store error reason in database or something..
     		}
 
-    		Utils\Response::sendMessage($response, $ctx->message);
+            $this->reply($response, $ctx, false, false, function() use($deferred) {
+                $deferred->resolve();
+            });
     	});
         
 
-
-        return "";
+        return $deferred->promise();
     }
 }

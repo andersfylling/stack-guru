@@ -5,6 +5,9 @@ namespace StackGuru\Commands\Service;
 
 use StackGuru\Core\Command\AbstractCommand;
 use StackGuru\Core\Command\CommandContext;
+use StackGuru\Core\Utils\Response as Response;
+use React\Promise\Promise as Promise;
+use React\Promise\Deferred as Deferred;
 
 
 class Status extends AbstractCommand
@@ -13,7 +16,7 @@ class Status extends AbstractCommand
     protected static $description = "Shows information about the bot running, memory usage.";
 
 
-    public function process(string $query, ?CommandContext $ctx): string
+    public function process(string $query, CommandContext $ctx): Promise
     {
        $memoryLimitKiB	= round(memory_get_peak_usage(true) / 1024);
        $memoryLimitMiB	= number_format($memoryLimitKiB / 1024, 1, ',', ' ');
@@ -32,7 +35,7 @@ class Status extends AbstractCommand
                    "\n" .
                    "```";
 
-        return $response;
+        return Response::sendMessage($response, $ctx->message);
     }
 
     private function timeElapsed(): string

@@ -4,6 +4,9 @@ declare(strict_types=1);
 namespace StackGuru\Core\Command;
 
 use StackGuru\Core\Utils;
+use StackGuru\Core\Utils\Response as Response;
+use React\Promise\Promise as Promise;
+use React\Promise\Deferred as Deferred;
 
 
 abstract class AbstractCommand implements CommandInterface
@@ -11,9 +14,6 @@ abstract class AbstractCommand implements CommandInterface
     protected static $name = ""; // Name of the command.
     protected static $aliases = []; // List of top-level aliases for the command.
     protected static $description = ""; // Short summary of the commands purpose.
-
-    protected static $default = null; // Default subcommand name, takes precedence over process().
-
 
     public function __construct()
     {
@@ -58,13 +58,22 @@ abstract class AbstractCommand implements CommandInterface
         return $permitted;
     }
 
+    /**
+     *  Send a message to someone privately or the channel the message came from.
+     *  A callback can be given but will use a parameter as `mixed $value = null`
+     */
+    final public function reply(string $message, CommandContext $ctx, bool $mention = false, bool $private = false, callable $callback = null): void 
+    {
+        Response::sendMessage($message, $ctx->message, $mention, $private)->then(/* resolve */$callback, /*rejected*/$callback);
+    }
+
 
     /**
      * Abstract functions
      */
 
     // TODO: Show Help for command by default.
-    abstract public function process(string $query, CommandContext $ctx): string;
+    abstract public function process(string $query, CommandContext $ctx): Promise;
 
 
     /**
@@ -84,5 +93,5 @@ abstract class AbstractCommand implements CommandInterface
 
     final public static function getAliases(): array { return static::$aliases; }
     final public static function getDescription(): string { return static::$description; }
-    final public static function getDefault(): ?string { return static::$default; }
+
 }

@@ -4,34 +4,24 @@ namespace StackGuru\Commands\Chatlog;
 
 use StackGuru\Core\Command\AbstractCommand;
 use StackGuru\Core\Command\CommandContext;
-use StackGuru\Core\BotEvent;
+use StackGuru\Core\Utils\Response as Response;
+use React\Promise\Promise as Promise;
+use React\Promise\Deferred as Deferred;
 
 
 class Chatlog extends AbstractCommand
 {
     protected static $name = "chatlog";
     protected static $description = "Logs all chat messages for selected channels";
-    protected static $default = "info"; // default sub-command
 
 
-    public function process(string $query, ?CommandContext $ctx): string
+    public function process(string $query, CommandContext $ctx): Promise
     {
-        //var_dump($ctx->bot->guild->channels);
-        //
-        //
-        
-        $ctx->bot->state(BotEvent::MESSAGE_ALL_I_SELF,  [$this, "log"]);
-
-
-    	return "hellu";
+        $response = "Not implemented yet";
+        return Response::sendMessage($response, $ctx->message);
     }
 
-    public function log(\Discord\Parts\Channel\Message $message, string $event) 
-    {
-        echo "---LOGGER", PHP_EOL, "$event: $message->content", PHP_EOL;
-    }
-
-    public function getUsers(?CommandContext $ctx)
+    public function getUsers(CommandContext $ctx)
     {
         $users = $ctx->guild->members;
         $ret = [];
@@ -43,7 +33,7 @@ class Chatlog extends AbstractCommand
         return $users;
     }
 
-    public function getRoles(?CommandContext $ctx)
+    public function getRoles(CommandContext $ctx)
     {
         return $ctx->discord->roles;
     }

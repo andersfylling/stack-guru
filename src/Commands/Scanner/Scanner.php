@@ -4,24 +4,21 @@ namespace StackGuru\Commands\Scanner;
 
 use StackGuru\Core\Command\AbstractCommand;
 use StackGuru\Core\Command\CommandContext;
+use React\Promise\Promise as Promise;
+use React\Promise\Deferred as Deferred;
+use StackGuru\Core\Utils\Response as Response;
 
 
 class Scanner extends AbstractCommand
 {
     protected static $name = "scanner";
     protected static $description = "Scan guild for all users";
-    protected static $default = ""; // default sub-command
 
 
-    public function process(string $query, ?CommandContext $ctx): string
+    public function process(string $query, CommandContext $ctx): Promise
     {
-
-    	$users = $this->getUsers($ctx);
-        $roles = $this->getRoles($ctx);
-        
-    	$list = "";
-
-        return $list;
+        $response = "Not implemented yet";
+        return Response::sendMessage($response, $ctx->message);
     }
 
     public function getUsers(?CommandContext $ctx)

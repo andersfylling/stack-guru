@@ -4,7 +4,9 @@ namespace StackGuru\Commands\Scanner;
 
 use StackGuru\Core\Command\AbstractCommand;
 use StackGuru\Core\Command\CommandContext;
-use StackGuru\Core\Utils;
+use React\Promise\Promise as Promise;
+use React\Promise\Deferred as Deferred;
+use StackGuru\Core\Utils\Response as Response;
 
 
 class RemoveRole extends AbstractCommand
@@ -14,7 +16,7 @@ class RemoveRole extends AbstractCommand
     protected static $default = ""; // default sub-command
 
 
-    public function process(string $query, ?CommandContext $ctx): string
+    public function process(string $query, CommandContext $ctx): Promise
     {
         if (!(strpos($query, "<@&") !== false)) {
             return "Did you mention a role?";
@@ -41,7 +43,7 @@ class RemoveRole extends AbstractCommand
             $ctx->guild->members->save($member);
         } 
 
-
-        return "Successfully removed role `{$role->name}` from every user.";
+        $res = "Successfully removed role `{$role->name}` from every user.";
+        return Response::sendMessage($res, $ctx->message);
     }
 }

@@ -110,7 +110,6 @@ class CommandEntry
     public function getName(): string { return $this->fqcn::getName(); }
     public function getAliases(): array { return $this->fqcn::getAliases(); }
     public function getDescription(): string { return $this->fqcn::getDescription(); }
-    public function getDefault(): ?string { return $this->fqcn::getDefault(); }
     public function hasPermission(CommandContext $ctx): bool { return $this->fqcn::permitted($ctx); }
 
 
@@ -148,13 +147,6 @@ class CommandEntry
     {
         if (isset($this->children[$name]))
             return $this->children[$name];
-        return null;
-    }
-    public function getDefaultChild(): ?CommandEntry
-    {
-        $name = $this->getDefault();
-        if (!empty($name))
-            return $this->getChild($name);
         return null;
     }
     public function addChild(CommandEntry $command): void

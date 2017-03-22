@@ -20,44 +20,53 @@ class Chatlog extends AbstractService
 		return "";
 	}
 
-	final public function response(string $event, string $msgId, ?Message $message = null, CommandContext $serviceCtx)
+	final public function response(string $event, string $msgId, Message $message = null, CommandContext $serviceCtx)
 	{
 
+        // ignore empty messages
+        if (null === $message) {
+            return;
+        }
+
 		$channel_id = "private messaging";
-		$author_id = null;
+        $private = $message->channel->is_private;
+
+
 
 		// ignore private messaging
-		if ($message !== null && !$message->channel->is_private) {
+		if (!$private) {
 			$channel_id = $message->channel_id;
 		}
 
-        if ($message !== null && !$message->channel->is_private) {
-            $author_id = $message->author->user->id;
-        }
-        else if ($message !== null) {
-            $author_id = $message->author->id;
-        }
-
 		// If this channel can't be logged, ignore it.
-		if ($message !== null && !$serviceCtx->database->chatlog_loggableChannel($channel_id)) {
+		if (!$serviceCtx->database->chatlog_loggableChannel($channel_id)) {
 			return;
 		}
 
+        $messageContent = null === $message->content ? "" : $message->content;
+
 
 		// new message
-		if ($message !== null && DiscordEvent::MESSAGE_CREATE == $event) {
+		if (DiscordEvent::MESSAGE_CREATE == $event) {
+            $author_id = isset($message->author->user) ? $message->author->user->id : $message->author->id; // on bot message from github: Trying to get property of non-object
+
+            // built in discord bots causes an error..
+            if (null === $author_id) {
+                return;
+            }
+
 			if ($serviceCtx->database->chatlog_saveMessage($msgId, $channel_id, $author_id)) {
-				$serviceCtx->database->chatlog_saveMessageContent($message->content, $message->id);
+				$serviceCtx->database->chatlog_saveMessageContent($messageContent, $message->id);
 			}
 		}
 
 		// updated message
-		else if ($message !== null && DiscordEvent::MESSAGE_UPDATE == $event) {
-			$serviceCtx->database->chatlog_saveMessageContent($message->content, $message->id);
+		else if (DiscordEvent::MESSAGE_UPDATE == $event) {
+			$serviceCtx->database->chatlog_saveMessageContent($messageContent, $message->id);
 		}
 
 		// deleted message
-		else if ($message === null && DiscordEvent::MESSAGE_DELETE == $event) {
+		else if (DiscordEvent::MESSAGE_DELETE == $event) {
 			$deleted = true;
 			$serviceCtx->database->chatlog_updateMessage($msgId, $deleted);
 		}

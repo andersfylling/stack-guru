@@ -4,7 +4,9 @@ namespace StackGuru\Commands\Service;
 
 use StackGuru\Core\Command\AbstractCommand;
 use StackGuru\Core\Command\CommandContext;
-use StackGuru\Core\Utils;
+use StackGuru\Core\Utils\Response as Response;
+use React\Promise\Promise as Promise;
+use React\Promise\Deferred as Deferred;
 
 
 class Restart extends AbstractCommand
@@ -13,9 +15,12 @@ class Restart extends AbstractCommand
     protected static $description = "something about the shutdown command";
 
 
-    public function process(string $query, ?CommandContext $ctx): string
+    public function process(string $query, CommandContext $ctx): Promise
     {
-        return "Hardcoded to not run due to issues. Commands needs to use promise before this can be implemented.";
+        $deferred = new Deferred();
+        $deferred->reject("Hardcoded to not run due to issues. Commands needs to use promise before this can be implemented.");
+
+        return $deferred->promise();
 
 
         if ("" === trim($query)) {
@@ -44,7 +49,7 @@ class Restart extends AbstractCommand
             }
 
             if ($counter > $limit) {
-                Utils\Response::sendMessage("Something went wrong, please check status.", $ctx->message);
+                Response::sendMessage("Something went wrong, please check status.", $ctx->message);
                 return;
             }
 
@@ -58,14 +63,14 @@ class Restart extends AbstractCommand
     	return "";
     }
 
-    public function runCommand(string $command, string $query, ?CommandContext $ctx, Callable $callback = null) : void 
+    public function runCommand(string $command, string $query, CommandContext $ctx, Callable $callback = null) : void 
     {
     	// get command
     	$cmd = $ctx->cmdRegistry->parseCommandQuery($command)["command"]; // TODO: use interal API, not this...
 
     	// Should never fire.
     	if (null === $cmd) {
-    		Utils\Response::sendResponse("Command does not exist `{$command}`", $ctx->message);
+    		Response::sendResponse("Command does not exist `{$command}`", $ctx->message);
     		return;
     	}
 
@@ -75,7 +80,7 @@ class Restart extends AbstractCommand
 
     	// Send update to user.
         if ("" !== $response) {
-            Utils\Response::sendMessage($response, $ctx->message, $callback);
+            Response::sendMessage($response, $ctx->message, $callback);
         }
         else if (null !== $callback) {
             call_user_func_array($callback, []);
