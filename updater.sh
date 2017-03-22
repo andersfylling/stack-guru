@@ -1,35 +1,37 @@
 #!/bin/bash
-# coded by /u/theartmaker <theartmaker@openmailbox.org>
-# part of stack-guru, a bot for /r/nootropics Discord server
 
 ## CONSTANTS ##################################################################
 lock_file="/tmp/discord_updater.lock"
-log_file="/home/devs/discord_autoupdate.log"
+log_file="~/discord_autoupdate.log"
 php_log_file="/var/log/php_errors.log"
+
 
 ## CODE #######################################################################
 
-if [ -f $lock_file ]; then
-    exit
-fi
+# Lock
+[ -f $lock_file ] && exit
+touch $lock_file
 
-echo "lock" > $lock_file
+# Stop bot
+sudo systemctl stop stackguru.service
 
-php_pid=$(ps aux | grep '[p]hp stack-guru.php' | awk '{print $2}')
+# Change working directory
+cd ~/stack-guru
 
-kill -9 $php_pid
+# Update source code
+git reset --hard
+git pull
 
-if [ "$?" == "1" ]; then
-    exit
-fi
+# Update dependencies
+composer install --no-dev --optimize-autoloader
 
-git -C /home/devs/stack-guru reset --hard
-git -C /home/devs/stack-guru pull
-
+# Unlock
 rm $lock_file
 
-echo "`date` | updated!" >> $log_file # log every update
+# Log update
+echo "`date` | updated!" >> $log_file
 
 sleep 1
-cd /home/devs/stack-guru
-php stack-guru.php &>> $php_log_file
+
+# Start bot
+sudo systemctl start stackguru.service
