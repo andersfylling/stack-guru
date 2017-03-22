@@ -79,7 +79,6 @@ function check_binary_dependency {
 
 # Check for file existence
 function check_file_dependency {
-  echo "Checking file: $1"
   [ -e "$1" ] || log_fatal "File or folder '$1' does not exist."
 }
 
@@ -150,20 +149,30 @@ lock_workspace
 [ ! -z "$WORKSPACE_DIR" ] && cd "$WORKSPACE_DIR"
 
 # Update source code
-git reset --hard
-git pull "$GIT_REMOTE" "$GIT_BRANCH"
+log_echo "Updating source code..."
+git reset --hard >/dev/null
+git pull "$GIT_REMOTE" "$GIT_BRANCH" >/dev/null
 
 # Update composer dependencies
+log_echo "Updating dependencies..."
 if [ "$DEV_MODE" = "1" ]; then
-  composer install --dev
+  composer install
 else
   composer install --no-dev --optimize-autoloader
 fi
+log_echo "Updated dependencies"
 
 # Log update
-log_echo "Updated source code!"
+COMMIT=$(git log -1 --oneline)
+VERSION=$(git describe 2>/dev/null)
+if [ -z $VERSION ]; then
+  VERSION="${COMMIT}"
+else
+  VERSION="${VERSION} (${COMMIT})"
+fi
+log_echo "Updated source code! HEAD is now at: ${VERSION}"
 
-# Unlock workspace
+# Unlock workspace, restart bot
 unlock_workspace
 
 exit 0
