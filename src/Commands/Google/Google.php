@@ -17,7 +17,9 @@ class Google extends AbstractCommand
 
     public function process(string $query, CommandContext $ctx): Promise
     {
-        $response = "Not implemented yet";
-        return Response::sendMessage($response, $ctx->message);
+    	$search = $ctx->cmdRegistry->loadCommand("\\StackGuru\\Commands\\Google", "Search");
+    	$searchCommand = $search->createInstance();
+
+        return $searchCommand->process($query, $ctx);
     }
 }
