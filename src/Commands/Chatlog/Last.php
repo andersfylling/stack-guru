@@ -80,7 +80,7 @@ class Last extends AbstractCommand
         $user = $message["username"] . '#' . $message["discriminator"];
 
         // if the message content contains ` it needs to be correctly parsed
-        $content = $message["content"]; //str_replace('`', "\`", $message["content"]);
+        $content = str_replace('`', "\`", $message["content"]);
 
         /*
 
@@ -91,7 +91,7 @@ class Last extends AbstractCommand
         */
 
 
-        $str = "";
+        $str = "---";
         //$str  = "```Markdown";
         $str .= PHP_EOL;
         $str .= "Channel: {$channel}, MessageID: {$message_id}";
