@@ -416,4 +416,39 @@ class Database
         return $channels;
     }
 
+    final public function chatlog_getLastMessages(int $limit = 10, string $channel_id = null): array 
+    {
+        if (0 > $limit) {
+            // error...
+            return [];
+        }
+
+        $query  = "SELECT distinct `Message`.`id`, `Channel`.`name`, `MessageContent`.`timestamp`, `UserName`.`username`, `UserName`.`discriminator`, `MessageContent`.`content` ";
+        $query .= "FROM mydb.MessageContent ";
+        $query .= "INNER JOIN mydb.Message ON MessageContent.Message_id = Message.id ";
+        $query .= "INNER JOIN mydb.UserName ON Message.User_discord_id = UserName.User_discord_id ";
+        $query .= "INNER JOIN mydb.Channel ON Message.Channel_id = Channel.id ";
+
+        // if a specific channel was specified
+        if (null !== $channel_id) {
+            $query .= "WHERE `Channel`.`id` = :channel_id ";
+        }
+
+        $query .= "ORDER BY `MessageContent`.`timestamp` DESC LIMIT :limit";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(":limit", $limit, PDO::PARAM_INT);
+
+        if (null !== $channel_id) {
+            $stmt->bindParam(":channel_id", $channel_id, PDO::PARAM_STR);
+        }
+
+        $stmt->execute();
+
+        $messages = 0 === $stmt->rowCount() ? [] : $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+        return $messages;
+    }
+
 }
