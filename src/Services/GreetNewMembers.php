@@ -20,7 +20,7 @@ class GreetNewMembers extends AbstractService
 		return "";
 	}
 
-	final public function response(string $event, string $msgId, CommandContext $serviceCtx, $member = null)
+	final public function response(string $e, string $msgId, CommandContext $serviceCtx, $member = null)
 	{
 		if (null === $member) {
 			return;
@@ -29,7 +29,7 @@ class GreetNewMembers extends AbstractService
 		// if a general chat exist we greet the user in there.. for now.
 		$chan = null;
 		foreach ($member->guild->channels as $channel) {
-			if ("general" == $channel->name) {
+			if ("general" == strtolower($channel->name)) {
 				$chan = $channel;
 				break;
 			}
