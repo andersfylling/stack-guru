@@ -121,7 +121,7 @@ abstract class AbstractService implements ServiceInterface
     /**
      * Abstract functions
      */
-    abstract public function response(string $event, string $msgId, ?Message $message = null, CommandContext $serviceCtx);
+    abstract public function response(string $event, string $msgId, CommandContext $serviceCtx, $data = null);
 
 
 

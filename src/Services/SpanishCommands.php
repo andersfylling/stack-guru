@@ -25,7 +25,7 @@ class SpanishCommands extends AbstractService
 		return null !== $msg && '¡' == \StackGuru\Core\Utils\StringParser::getCharAt(0, $msg);
 	}
 
-	final public function response(string $event, string $msgId, ?Message $message = null, CommandContext $serviceCtx)
+	final public function response(string $event, string $msgId,  CommandContext $serviceCtx, $message = null)
 	{
 		if (null === $message || !$this->qualified($message->content)) {
 			return;

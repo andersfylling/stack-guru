@@ -20,7 +20,7 @@ class Chatlog extends AbstractService
 		return "";
 	}
 
-	final public function response(string $event, string $msgId, Message $message = null, CommandContext $serviceCtx)
+	final public function response(string $event, string $msgId, CommandContext $serviceCtx, $message = null)
 	{
 
         // ignore empty messages

@@ -19,4 +19,6 @@ abstract class BotEvent
     const MESSAGE_OTHERS_TO_SELF    	= "message_others_to_self";     	// *            	-> SELF
 
     const MESSAGE_DELETED				= "message_was_deleted";			// when someone deletes their message.
+
+    const MEMBER_JOINED_GUILD			= "member_joined_guild";			// when someone joins the guild
 }

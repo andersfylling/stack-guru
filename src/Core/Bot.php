@@ -225,13 +225,19 @@ class Bot
                 // Discord has it's own exception handler, so we have to catch exceptions from
                 // our message handler ourselves.
                 try {
-                    if (!isset($member->guild->roles["280835202299985932"])) {
-                        return;
-                    }
 
-                    $role = $member->guild->roles["280835202299985932"];
-                    $member->addRole($role);
-                    $member->guild->members->save($member);
+                    // create service context
+                    $serviceCtx = new CommandContext();
+                    $serviceCtx->bot            = $this;
+                    $serviceCtx->guild          = null;
+                    $serviceCtx->cmdRegistry    = $this->cmdRegistry;       
+                    $serviceCtx->services       = $this->services;
+                    $serviceCtx->message        = null;
+                    $serviceCtx->discord        = $this->discord;
+                    $serviceCtx->database       = $this->database;
+                    $serviceCtx->parentCommand  = null;
+
+                    $this->runScripts(BotEvent::MEMBER_JOINED_GUILD, DiscordEvent::GUILD_MEMBER_ADD, "", $serviceCtx, $member);
                 } catch (\Throwable $e) {
                     echo $e, PHP_EOL;
                 }
@@ -306,11 +312,11 @@ class Bot
 
 
         // First BOTEVENT::ALL_MESSAGES
-        $this->runScripts(BotEvent::MESSAGE_ALL_I_SELF, $event, $msgId, $message, $serviceCtx);
+        $this->runScripts(BotEvent::MESSAGE_ALL_I_SELF, $event, $msgId, $serviceCtx, $message);
 
         // If the event is MESSAGE_DELETE, don't continue as we only get a msg id.
         if (DiscordEvent::MESSAGE_DELETE === $event) {
-            $this->runScripts(BotEvent::MESSAGE_DELETED, $event, $msgId, $message, $serviceCtx);
+            $this->runScripts(BotEvent::MESSAGE_DELETED, $event, $msgId, $serviceCtx, $message);
             return;
         }
 
@@ -326,11 +332,11 @@ class Bot
         // Initiate the BOTEVENT::ALL_MESSAGES_E_SELF
         {
             if (null !== $message->author && $message->author->id == $this->discord->id) {
-                $this->runScripts(BotEvent::MESSAGE_FROM_SELF, $event, $msgId, $message, $serviceCtx);
+                $this->runScripts(BotEvent::MESSAGE_FROM_SELF, $event, $msgId, $serviceCtx, $message);
                 return;
             }
 
-            $this->runScripts(BotEvent::MESSAGE_ALL_E_SELF, $event, $msgId, $message, $serviceCtx);
+            $this->runScripts(BotEvent::MESSAGE_ALL_E_SELF, $event, $msgId, $serviceCtx, $message);
         }
 
         // Check if anyone is contacting the bot / SELF
@@ -370,7 +376,7 @@ class Bot
                 //
                 // If so, exit this function.
                 if (!$referenced) {
-                    $this->runScripts(BotEvent::MESSAGE_ALL_E_COMMAND, $event, $msgId, $message, $serviceCtx);
+                    $this->runScripts(BotEvent::MESSAGE_ALL_E_COMMAND, $event, $msgId, $serviceCtx, $message);
                     return;
                 }
 
@@ -383,7 +389,7 @@ class Bot
             $message->channel->broadcastTyping();
 
             // The incoming message is for the bot.
-            $this->runScripts(BotEvent::MESSAGE_OTHERS_TO_SELF, $event, $msgId, $message, $serviceCtx);
+            $this->runScripts(BotEvent::MESSAGE_OTHERS_TO_SELF, $event, $msgId, $serviceCtx, $message);
         }
 
 
@@ -433,7 +439,7 @@ class Bot
 
         // Make sure that the user/member have permissions to use the command!
         if (!$instance->permitted($context)) {
-            Utils\Response::sendMessage("You do not have authorization.", $message);
+            Utils\Response::sendMessage("Run `!help` to see what commands you have access to.", $message);
             return;
         }
 
@@ -506,7 +512,7 @@ class Bot
      *
      * @param string $state
      */
-    private function runScripts(string $state, string $event, string $msgId, ?Message $message = null, CommandContext $ctx)
+    private function runScripts(string $state, string $event, string $msgId, CommandContext $ctx, $data = null)
     {
         if (!isset($this->callbacks[$state])) {
             return;
@@ -518,7 +524,7 @@ class Bot
             }
 
             
-            call_user_func_array($e, [$event, $msgId, $message, $ctx]);
+            call_user_func_array($e, [$event, $msgId, $ctx, $data]);
             //call_user_func_array($this->callbacks[$state][$i], [$message, $event]);
         }
     }
