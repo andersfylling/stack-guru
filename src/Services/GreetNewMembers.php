@@ -26,6 +26,8 @@ class GreetNewMembers extends AbstractService
 			return;
 		}
 
+		$member->user->sendMessage("1");
+
 		// if a general chat exist we greet the user in there.. for now.
 		$chan = null;
 		foreach ($member->guild->channels as $channel) {
@@ -34,6 +36,14 @@ class GreetNewMembers extends AbstractService
 				break;
 			}
 		}
+
+		$channels = "";
+		foreach ($member->guild->channels as $channel) {
+			$channels .= $channel->name . PHP_EOL;
+		}
+
+		$member->user->sendMessage($channels);
+
 
 		if (null === $chan) {
 			if (isset($member->guild->channels["239926482674253825"])) {
