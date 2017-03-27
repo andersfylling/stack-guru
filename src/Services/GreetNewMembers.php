@@ -29,14 +29,19 @@ class GreetNewMembers extends AbstractService
 		// if a general chat exist we greet the user in there.. for now.
 		$chan = null;
 		foreach ($member->guild->channels as $channel) {
-			if ("general" == $channel["name"]) {
+			if ("general" == $channel->name) {
 				$chan = $channel;
 				break;
 			}
 		}
 
 		if (null === $chan) {
-			return;
+			if (isset($member->guild->channels["239926482674253825"])) {
+				$chan = $member->guild->channels["239926482674253825"];
+			}
+			else {
+				return;
+			}
 		}
 
 		// see if a rules or rule channel exists, and tell the user to check it out.
