@@ -81,6 +81,7 @@ class Last extends AbstractCommand
 
         // if the message content contains ` it needs to be correctly parsed
         $content = str_replace('`', "\`", $message["content"]);
+        $content = str_replace('@', "@ ", $content]);
 
         /*
 
