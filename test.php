@@ -1,5 +1,5 @@
 <pre>
-
+//
 Notice: Trying to get property of non-object in C:\xampp\htdocs\stack-guru\vendor\team-reflex\discord-php\src\Discord\Parts\Channel\Message.php on line 114
 
 Warning: Invalid argument supplied for foreach() in C:\xampp\htdocs\stack-guru\vendor\team-reflex\discord-php\src\Discord\Parts\Channel\Message.php on line 114
