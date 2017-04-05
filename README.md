@@ -1,5 +1,6 @@
 # stack-guru
 
+
 stack-guru is a Discord bot for the [/r/nootropics](https://www.reddit.com/r/nootropics) server
 
 Written and maintained by:
