@@ -20,7 +20,7 @@ Thanks to, for contribution:
  - MySQL
  - php.ini extensions:
  - - pdo_mysql
- - - mbstring
+ - Linux OS
 
 ## How to install
 When you have cloned the repo, go into ./config/ and copy the file "00_privateConstants_default.php" to "01_privateConstants_default.php" (name it whatever you want it just needs to match '01_*.php'). In this file you will set your required database credentials and your discord bot api token.
