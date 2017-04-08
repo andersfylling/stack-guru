@@ -5,4 +5,7 @@ config/00_privateConstants.php
 config/01_*.php
 vendor/
 
+output
+doc/*
+
 .sonar/
