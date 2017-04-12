@@ -386,7 +386,8 @@ class Bot
             }
 
             // show that the bot is typing
-            $message->channel->broadcastTyping();
+            //$message->channel->broadcastTyping();
+            // this is sometimes sent after the bot message -> which makes it look bad..
 
             // The incoming message is for the bot.
             $this->runScripts(BotEvent::MESSAGE_OTHERS_TO_SELF, $event, $msgId, $serviceCtx, $message);
