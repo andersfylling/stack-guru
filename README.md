@@ -12,6 +12,14 @@ Thanks to, for contribution:
 
   - [/u/theartmaker](https://www.reddit.com/u/theartmaker)
   
+## WARNING
+This seems to be a dying project as we had issues with our Discord library. Sadly. This mean the new code added here won't be tested the way it should, and there will probably be a tonn of unsolved bugs. To see the new version written in Go language, please see:
+
+ - https://github.com/s1kx/unison
+ - https://github.com/s1kx/stackguru
+ 
+ Unison is the bot framework we're developing and stackguru is a bot utilizing it.
+ If you still want to use this code REGARDLESS of issues existing within DiscordPHP, I will take a any issues written and try to solve them, write documentation and fix up code. But I won't fix issues directly related to other libraries.
   
 ## Requirements
 
