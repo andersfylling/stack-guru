@@ -292,6 +292,14 @@ class Bot
      */
     private function incoming(string $event, string $msgId, ?Message $message = null)
     {
+        // sanity check of author/member object in message
+        if ($message->author == null) {
+            return;
+        }
+        else if (isset($message->author->member) && $message->author->member == null) {
+            return;
+        }
+        
         // if development display request
         // 
         
