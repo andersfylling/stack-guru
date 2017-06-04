@@ -25,7 +25,11 @@ class MissingRole extends AbstractCommand
         $deferred = new Deferred();
 
         if (!(strpos($query, "<@&") !== false)) {
-            return Response::sendMessage("Did you mention a role?", $ctx->message);
+            // might not have been a role mention, what if its just the roleid
+            $roleid = trim($query);
+            if (!isset($ctx->guild->roles[$roleid])) {
+                return Response::sendMessage("Did you mention a role?", $ctx->message);
+            }
         }
 
         $output = null;
