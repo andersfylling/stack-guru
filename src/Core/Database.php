@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace StackGuru\Core;
 
 use \PDO;
+use \PDOException;
 
 
 /**
@@ -17,6 +18,7 @@ class Database
      * Database instance
      */
     protected $db = null;
+    private $dbConnectionData = [];
 
 
     function __construct(array $options = [])
@@ -29,19 +31,18 @@ class Database
 
         $this->file = $options["file"];
 
+        // store db connection info
+        $this->dbConnectionData = $options;
+
         /*
          * establish a new PDO connection
          */
-        //$this->db = new PDO(
-        //    "mysql:host={$options['host']};port={$options['port']}", $options["user"], $options["pass"],
-        //    array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'")
-        //);
-        $this->db = new PDO("mysql:host={$options['host']};port={$options['port']}", $options["user"], $options["pass"], 
-            array( 
-                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'", 
-                PDO::ATTR_PERSISTENT => true 
-                ) 
-        );  
+        $this->db = new PDO("mysql:host={$options['host']};port={$options['port']}", $options["user"], $options["pass"],
+            array(
+                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'",
+                PDO::ATTR_PERSISTENT => true
+                )
+        );
         $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         /*
@@ -68,7 +69,35 @@ class Database
         }
     }
 
+    final private function isAlive () {
+        try {
+            $this->pdo->query("SELECT 1");
+        } catch (PDOException $e) {
+            return false;
+        }
 
+        return true;
+    }
+
+    final protected function updateConnection () {
+        try {
+            if (!$this->isAlive()) {
+                $options = $this->dbConnectionData;
+                $this->db = new PDO("mysql:host={$options['host']};port={$options['port']}", $options["user"], $options["pass"],
+                array(
+                    PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'",
+                    PDO::ATTR_PERSISTENT => true // bs
+                    )
+            );
+            $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            }
+
+        }
+        catch (PDOException $e) {
+            var_dump($e->getMessage());
+            exit(); // kill the bot so the devs knows something is wrong
+        }
+    }
 
 
     final public function saveUser(\Discord\Parts\User\Member $member)
@@ -92,6 +121,9 @@ class Database
 
         // User object
         $u = $member->user;
+
+        // make sure the connection is good
+        $this->updateConnection();
         
 
         // First create user
@@ -134,6 +166,9 @@ class Database
         $permissions    = $role->permissions->bitwise; 
  
  
+
+        // make sure the connection is good
+        $this->updateConnection();
         // Add to DB 
         $stmt = $this->db->prepare("INSERT IGNORE INTO `mydb`.`Role`(`id`, `name`, `color`, `hoist`, `position`, `managed`, `mentionable`, `permissions`) VALUES(:id, :name, :color, :hoist, :position, :managed, :mentionable, :permissions)"); 
 
@@ -167,6 +202,9 @@ class Database
         $user_limit     = $channel->user_limit; 
  
  
+
+        // make sure the connection is good
+        $this->updateConnection();
         // Add to DB 
         $stmt = $this->db->prepare("INSERT IGNORE INTO `mydb`.`Channel` (`id`, `guild_id`, `name`, `type`, `position`, `is_private`, `permission_overwrites`, `topic`, `bitrate`, `user_limit`) VALUES (:id, :guild_id, :name, :type, :position, :is_private, NULL, :topic, :bitrate, :user_limit)"); 
 
@@ -193,6 +231,9 @@ class Database
             return; 
         }
  
+
+        // make sure the connection is good
+        $this->updateConnection();
         // Add to DB 
         $stmt = $this->db->prepare("INSERT IGNORE INTO `mydb`.`Command`(`namespace`, `description`, `activated`) VALUES(:namespace, :description, :activated)"); 
 
@@ -206,6 +247,10 @@ class Database
 
     final public function doesServiceExist(string $title): bool 
     {
+
+        // make sure the connection is good
+        $this->updateConnection();
+
         $stmt = $this->db->prepare("SELECT COUNT(`title`) FROM `Service` WHERE `title` = :title LIMIT 1");
         $stmt->bindParam(":title", $title, PDO::PARAM_STR);
         $stmt->execute();
@@ -215,6 +260,10 @@ class Database
 
     final public function enableService(string $title): bool 
     {
+
+        // make sure the connection is good
+        $this->updateConnection();
+        
         $stmt = $this->db->prepare("INSERT IGNORE INTO `mydb`.`Service` (`title`) VALUES (:title)");
         $stmt->bindParam(":title", $title, PDO::PARAM_STR);
         $stmt->execute();
@@ -224,6 +273,10 @@ class Database
 
     final public function disableService(string $title): bool 
     {
+
+        // make sure the connection is good
+        $this->updateConnection();
+        
         $stmt = $this->db->prepare("DELETE IGNORE FROM `mydb`.`Service` WHERE `title` = :title");
         $stmt->bindParam(":title", $title, PDO::PARAM_STR);
         $stmt->execute();
@@ -233,6 +286,10 @@ class Database
 
     final public function getCommandRoles(string $namespace) 
     {
+
+        // make sure the connection is good
+        $this->updateConnection();
+        
         $stmt = $this->db->prepare("SELECT Role_id FROM `Command_has_Role` WHERE `Command_namespace` = :namespace");
         $stmt->bindParam(":namespace", $namespace, PDO::PARAM_STR);
         $stmt->execute();
@@ -251,6 +308,10 @@ class Database
 
     final public function commandHasRole(string $namespace, string $roleid): bool
     {
+
+        // make sure the connection is good
+        $this->updateConnection();
+        
         $stmt = $this->db->prepare("SELECT COUNT(`Role_id`) FROM Command_has_Role WHERE `Command_namespace` = :namespace AND `Role_id` = :roleid LIMIT 1");
         $stmt->bindParam(":namespace", $namespace, PDO::PARAM_STR);
         $stmt->bindParam(":roleid", $roleid, PDO::PARAM_STR);
@@ -263,6 +324,10 @@ class Database
 
     final public function addCommandRole(string $namespace, string $roleid): bool 
     {
+
+        // make sure the connection is good
+        $this->updateConnection();
+        
         $stmt = $this->db->prepare("INSERT IGNORE INTO `mydb`.`Command_has_Role` (`Command_namespace`, `Role_id`) VALUES (:namespace, :roleid)");
         $stmt->bindParam(":roleid", $roleid, PDO::PARAM_STR);
         $stmt->bindParam(":namespace", $namespace, PDO::PARAM_STR);
@@ -274,6 +339,10 @@ class Database
 
     final public function getCommandDetails(string $namespace) 
     {
+
+        // make sure the connection is good
+        $this->updateConnection();
+        
         $stmt = $this->db->prepare("SELECT description, activated FROM `Command` WHERE `namespace` = :namespace LIMIT 1");
         $stmt->bindParam(":namespace", $namespace, PDO::PARAM_STR);
         $stmt->execute();
@@ -300,6 +369,10 @@ class Database
 
     final public function saveCommandAlias(string $namespace, string $alias): bool 
     {
+
+        // make sure the connection is good
+        $this->updateConnection();
+        
         $stmt = $this->db->prepare("INSERT IGNORE INTO `mydb`.`CommandAlias` (`title`, `Command_namespace`) VALUES (:title, :namespace)");
         $stmt->bindParam(":title", $alias, PDO::PARAM_STR);
         $stmt->bindParam(":namespace", $namespace, PDO::PARAM_STR);
@@ -310,6 +383,10 @@ class Database
 
     final public function updateCommandDescription(string $namespace, string $description): bool 
     {
+
+        // make sure the connection is good
+        $this->updateConnection();
+        
         $stmt = $this->db->prepare("UPDATE IGNORE `mydb`.`Command` SET `description` = :description WHERE `namespace` = :namespace");
         $stmt->bindParam(":description", $description, PDO::PARAM_STR);
         $stmt->bindParam(":namespace", $namespace, PDO::PARAM_STR);
@@ -320,6 +397,10 @@ class Database
 
     final public function chatlog_saveMessage(string $id, string $channel_id, string $user_id, bool $deleted = false): bool
     {
+
+        // make sure the connection is good
+        $this->updateConnection();
+        
         // INSERT INTO `mydb`.`Message`
         // (`id`,
         // `deleted`,
@@ -345,6 +426,10 @@ class Database
 
     final public function chatlog_saveMessageContent(string $content, string $message_id): bool
     {
+
+        // make sure the connection is good
+        $this->updateConnection();
+        
         // INSERT INTO `mydb`.`MessageContent`
         // (`content`,
         // `timestamp`,
@@ -364,6 +449,10 @@ class Database
 
     final public function chatlog_updateMessage(string $id, bool $deleted = false): bool
     {
+
+        // make sure the connection is good
+        $this->updateConnection();
+        
         $stmt = $this->db->prepare("UPDATE IGNORE `mydb`.`Message` SET `deleted` = :del WHERE `id` = :id");
         $stmt->bindParam(":id",     $id,      PDO::PARAM_STR);
         $stmt->bindParam(":del",    $deleted, PDO::PARAM_BOOL);
@@ -378,6 +467,10 @@ class Database
 
     final public function chatlog_loggableChannel(string $id): bool
     {
+
+        // make sure the connection is good
+        $this->updateConnection();
+        
 
         $stmt = $this->db->prepare("SELECT COUNT(`Channel_id`) FROM `mydb`.`Command_chatlog_loggable_channels` WHERE `loggable` = TRUE AND `Channel_id` = :id LIMIT 1");
         $stmt->bindParam(":id", $id, PDO::PARAM_STR);
@@ -394,6 +487,11 @@ class Database
         }
 
         $id = $channel->id;
+    
+
+        // make sure the connection is good
+        $this->updateConnection();
+        
  
         // Add to DB 
         $stmt = $this->db->prepare("INSERT IGNORE INTO `mydb`.`Command_chatlog_loggable_channels`(`Channel_id`,`loggable`) VALUES(:id,FALSE)");
@@ -404,6 +502,10 @@ class Database
 
     final public function chatlog_setChannelAsLoggable(string $id): bool 
     {
+
+        // make sure the connection is good
+        $this->updateConnection();
+        
         $stmt = $this->db->prepare("UPDATE IGNORE `mydb`.`Command_chatlog_loggable_channels` SET `loggable` = TRUE WHERE `Channel_id` = :id");
         $stmt->bindParam(":id", $id, \PDO::PARAM_STR);
         $stmt->execute();
@@ -413,6 +515,10 @@ class Database
 
     final public function chatlog_getChannels(?bool $logged = true) 
     {
+
+        // make sure the connection is good
+        $this->updateConnection();
+        
         $stmt = $this->db->prepare("SELECT `Channel`.`name` FROM `mydb`.`Channel` INNER JOIN `mydb`.`Command_chatlog_loggable_channels` ON `Command_chatlog_loggable_channels`.`Channel_id` = `Channel`.`id` WHERE `Command_chatlog_loggable_channels`.`loggable` = :loggable");
         $stmt->bindParam(":loggable", $logged, PDO::PARAM_BOOL);
         $stmt->execute();
@@ -441,6 +547,10 @@ class Database
         }
 
         $query .= "ORDER BY `MessageContent`.`timestamp` DESC LIMIT :limit";
+
+        // make sure the connection is good
+        $this->updateConnection();
+        
 
         $stmt = $this->db->prepare($query);
         $stmt->bindValue(":limit", $limit, PDO::PARAM_INT);
