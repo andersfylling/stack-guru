@@ -71,7 +71,7 @@ class Database
 
     final private function isAlive () {
         try {
-            $this->pdo->query("SELECT 1");
+            $this->db->query("SELECT 1");
         } catch (PDOException $e) {
             return false;
         }
