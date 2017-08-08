@@ -25,7 +25,7 @@ class Bitcoin extends AbstractCommand
 
     public function getBitcoinRate(): string
     {
-        $json = file_get_contents($this->url);
+        $json = file_get_contents(self::$url);
         $data = json_decode($json, true);
 
         $usd = $data[1]; // 1 == USD
