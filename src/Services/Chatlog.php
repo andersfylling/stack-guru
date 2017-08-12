@@ -23,15 +23,13 @@ class Chatlog extends AbstractService
 	final public function response(string $event, string $msgId, CommandContext $serviceCtx, $message = null)
 	{
 
-        // ignore empty messages
-        if (null === $message) {
-            return;
-        }
+        	// ignore empty messages
+        	if (null === $message) {
+        	    return;
+        	}
 
 		$channel_id = "private messaging";
-        $private = $message->channel->is_private;
-
-
+        	$private = $message->channel->is_private;
 
 		// ignore private messaging
 		if (!$private) {
@@ -43,17 +41,21 @@ class Chatlog extends AbstractService
 			return;
 		}
 
-        $messageContent = null === $message->content ? "" : $message->content;
-
-
+        	$messageContent = null === $message->content ? "" : $message->content;
+	
 		// new message
 		if (DiscordEvent::MESSAGE_CREATE == $event) {
-            $author_id = isset($message->author->user) ? $message->author->user->id : $message->author->id; // on bot message from github: Trying to get property of non-object
+			if (!isset($message->author)) {
+				// make sure author is a valid object!
+				return;
+			}
+        		
+			$author_id = isset($message->author->user) ? $message->author->user->id : $message->author->id; // on bot message from github: Trying to get property of non-object
 
-            // built in discord bots causes an error..
-            if (null === $author_id) {
-                return;
-            }
+        		// built in discord bots causes an error..
+        		if (null === $author_id) {
+                		return;
+			}
 
 			if ($serviceCtx->database->chatlog_saveMessage($msgId, $channel_id, $author_id)) {
 				$serviceCtx->database->chatlog_saveMessageContent($messageContent, $message->id);
