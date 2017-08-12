@@ -20,7 +20,7 @@ class SpanishCommands extends AbstractService
 		return "";
 	}
 
-	final public function qualified(string $msg): bool 
+	final public function qualified(?string $msg): bool 
 	{
 		return null !== $msg && '¡' == \StackGuru\Core\Utils\StringParser::getCharAt(0, $msg);
 	}
