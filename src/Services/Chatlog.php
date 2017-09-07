@@ -45,26 +45,28 @@ class Chatlog extends AbstractService
 	
 		// new message
 		if (DiscordEvent::MESSAGE_CREATE == $event) {
+			$author_id = "?";
 			if (!isset($message->author)) {
 				// make sure author is a valid object!
-				return;
+				//return;
 			}
-        		
-			$author_id = isset($message->author->user) ? $message->author->user->id : $message->author->id; // on bot message from github: Trying to get property of non-object
-
+        		else {
+				$author_id = isset($message->author->user) ? $message->author->user->id : $message->author->id; // on bot message from github: Trying to get property of non-object
+			}
+				
         		// built in discord bots causes an error..
         		if (null === $author_id) {
-                		return;
+                		return; // never fires now..
 			}
 
 			if ($serviceCtx->database->chatlog_saveMessage($msgId, $channel_id, $author_id)) {
-				$serviceCtx->database->chatlog_saveMessageContent($messageContent, $message->id);
+				$serviceCtx->database->chatlog_saveMessageContent($messageContent, $msgId);
 			}
 		}
 
 		// updated message
 		else if (DiscordEvent::MESSAGE_UPDATE == $event) {
-			$serviceCtx->database->chatlog_saveMessageContent($messageContent, $message->id);
+			$serviceCtx->database->chatlog_saveMessageContent($messageContent, $$msgId);
 		}
 
 		// deleted message
